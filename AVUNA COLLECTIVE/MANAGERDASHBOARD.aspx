@@ -80,6 +80,8 @@ color: white;
 background: rgba(255,255,255,.05);
 }
 .avuna-button-outline:hover { background: white; color: #113334; }
+.avuna-button-main { padding: 15px 30px; font-size: 14px; box-shadow: 0 10px 24px rgba(217,113,31,.35); }
+.avuna-button-main:hover { box-shadow: 0 14px 28px rgba(217,113,31,.45); }
 
 /* MANAGER BADGE */
 .avuna-manager-badge {
@@ -260,7 +262,7 @@ background: #113334; color: white; transition: .25s ease; text-decoration: none;
 <p>Monitor sales, orders, customers and operational activity from one professional management workspace.</p>
 <div class="avuna-hero-buttons">
 <a href="ManageOrders.aspx" class="avuna-button avuna-button-orange">Manage Orders &rarr;</a>
-<a href="SalesReports.aspx" class="avuna-button avuna-button-outline">View Reports</a>
+<a href="Reports.aspx?report=sales" class="avuna-button avuna-button-outline">View Reports</a>
 </div>
 </div>
 <div class="avuna-manager-badge">
@@ -344,22 +346,22 @@ background: #113334; color: white; transition: .25s ease; text-decoration: none;
 <p>Quickly access management information.</p>
 </div>
 <div class="avuna-reports">
-<a href="SalesReports.aspx" class="avuna-report">
+<a href="Reports.aspx?report=sales" class="avuna-report">
 <span class="avuna-report-icon">R</span>
 <span class="avuna-report-info"><strong>Sales Reports</strong><small>Revenue and sales trends</small></span>
 <span class="avuna-report-arrow">&rarr;</span>
 </a>
-<a href="OrderReports.aspx" class="avuna-report">
+<a href="Reports.aspx?report=orders" class="avuna-report">
 <span class="avuna-report-icon">#</span>
 <span class="avuna-report-info"><strong>Order Reports</strong><small>Status and order activity</small></span>
 <span class="avuna-report-arrow">&rarr;</span>
 </a>
-<a href="CustomerReports.aspx" class="avuna-report">
+<a href="Reports.aspx?report=customers" class="avuna-report">
 <span class="avuna-report-icon">&#9673;</span>
 <span class="avuna-report-info"><strong>Customer Reports</strong><small>Customer and loyalty insights</small></span>
 <span class="avuna-report-arrow">&rarr;</span>
 </a>
-<a href="Staff.aspx" class="avuna-report">
+<a href="Reports.aspx?report=staff" class="avuna-report">
 <span class="avuna-report-icon">&#10003;</span>
 <span class="avuna-report-info"><strong>Staff Management</strong><small>View and manage your team</small></span>
 <span class="avuna-report-arrow">&rarr;</span>

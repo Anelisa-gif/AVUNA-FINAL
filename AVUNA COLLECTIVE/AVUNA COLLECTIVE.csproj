@@ -147,6 +147,7 @@
     <Content Include="Login.aspx" />
     <Content Include="ManageOrders.aspx" />
     <Content Include="MANAGERDASHBOARD.aspx" />
+    <Content Include="ManagerLogout.aspx" />
     <Content Include="ManageStaff.aspx" />
     <Content Include="MyOrders.aspx" />
     <Content Include="OurWork.aspx" />
@@ -183,6 +184,7 @@
     <Content Include="Content\bootstrap-grid.css.map" />
     <Content Include="Customer_master.Master" />
     <Content Include="Manager_master.Master" />
+    <Content Include="Reports.aspx" />
     <None Include="Scripts\jquery-3.7.0.intellisense.js" />
     <Content Include="Scripts\jquery-3.7.0.js" />
     <Content Include="Scripts\jquery-3.7.0.min.js" />
@@ -261,6 +263,13 @@
     <Compile Include="ManageOrders.aspx.designer.cs">
       <DependentUpon>ManageOrders.aspx</DependentUpon>
     </Compile>
+    <Compile Include="ManagerLogout.aspx.cs">
+      <DependentUpon>ManagerLogout.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="ManagerLogout.aspx.designer.cs">
+      <DependentUpon>ManagerLogout.aspx</DependentUpon>
+    </Compile>
     <Compile Include="Manager_master.Master.cs">
       <DependentUpon>Manager_master.Master</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -308,7 +317,6 @@
     </Compile>
     <Compile Include="ManageStaff.aspx.cs">
       <DependentUpon>ManageStaff.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="ManageStaff.aspx.designer.cs">
       <DependentUpon>ManageStaff.aspx</DependentUpon>
@@ -375,6 +383,13 @@
     </Compile>
     <Compile Include="ViewSwitcher.ascx.designer.cs">
       <DependentUpon>ViewSwitcher.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="Reports.aspx.cs">
+      <DependentUpon>Reports.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Reports.aspx.designer.cs">
+      <DependentUpon>Reports.aspx</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>

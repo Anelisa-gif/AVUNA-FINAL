@@ -45,7 +45,7 @@
                         <li class="nav-item"><a class="nav-link" runat="server" href="~/ManagerDashboard">Dashboard</a></li>
                         <li class="nav-item"><a class="nav-link" runat="server" href="~/ManageStaff">Staff</a></li>
                         <li class="nav-item"><a class="nav-link" runat="server" href="~/ManageOrders">Orders</a></li>
-                        <li class="nav-item"><a class="nav-link" runat="server" href="~/Logout">Log Out</a></li>
+                        <li class="nav-item"><a class="nav-link" runat="server" href="~/ManagerLogOut">Log Out</a></li>
                     </ul>
                 </div>
             </div>
