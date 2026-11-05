@@ -1,0 +1,723 @@
+﻿:root {
+    --avuna-dark: #113334;
+    --avuna-orange: #d9711f;
+    --avuna-gold: #d9a52c;
+    --avuna-gray: #6e6e6e;
+    /* shared colours used by the Contact / About / Services sections */
+    --dark: #0c1e1c;
+    --orange: #d9711f;
+    --gold: #d9a52c;
+    --paper: #f6f1e6;
+    --line: #e4dcc4;
+}
+
+/* stops the sideways scrollbar */
+html, body {
+    overflow-x: hidden;
+}
+
+body {
+    color: var(--avuna-dark);
+}
+
+.body-content {
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    padding: 0;
+}
+
+/*how to order */
+.avuna-process {
+    padding: 80px 20px;
+    background: #ffffff;
+}
+
+.avuna-section-head {
+    text-align: center;
+    margin-bottom: 60px;
+}
+
+    .avuna-section-head h2 {
+        font-size: 48px;
+        margin: 15px 0;
+        font-weight: 700;
+    }
+
+    .avuna-section-head p {
+        max-width: 700px;
+        margin: auto;
+        font-size: 18px;
+        line-height: 1.7;
+        color: #555;
+    }
+
+/* 4 steps in a row */
+.avuna-steps {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 30px;
+}
+
+/* Individual step card */
+.avuna-step {
+    background: #113334;
+    padding: 35px;
+    border-radius: 20px;
+    border: 1px solid #e5e5e5;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+    transition: all 0.3s ease;
+    min-height: 220px;
+}
+
+    .avuna-step:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.12);
+    }
+
+    /* The 01, 02, 03, 04 numbers */
+    .avuna-step .num {
+        font-size: 14px;
+        font-weight: 700;
+        color: #d9711f;
+        display: block;
+        margin-bottom: 15px;
+    }
+
+    .avuna-step:nth-child(5) {
+        grid-column: 1 / -1;
+        justify-self: center;
+        width: calc((100% - 3 * 30px) / 4);
+    }
+
+    /* Step title */
+    .avuna-step h3 {
+        font-size: 22px;
+        margin-bottom: 12px;
+        color: #111;
+    }
+
+    /* Step description */
+    .avuna-step p {
+        font-size: 16px;
+        line-height: 1.7;
+        color: #666;
+    }
+
+/* Mobile */
+@media (max-width: 980px) {
+    .avuna-steps {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .avuna-step:nth-child(5) {
+        grid-column: 1 / -1;
+        width: calc((100% - 1 * 30px) / 2);
+    }
+}
+
+@media (max-width: 560px) {
+    .avuna-steps {
+        grid-template-columns: 1fr;
+    }
+
+    .avuna-step:nth-child(5) {
+        grid-column: auto;
+        width: 100%;
+    }
+
+    .avuna-section-head h2 {
+        font-size: 34px;
+    }
+
+    .avuna-step {
+        padding: 25px;
+    }
+}
+
+.avuna-about-services-wrap {
+    padding: 80px 20px;
+    background-image: url('../images/avuna_collective_background.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+/*  About / location */
+/* ABOUT SECTION  */
+.avuna-about {
+    position: relative;
+    min-height: 560px;
+    display: flex;
+    align-items: center;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    padding: 100px 20px;
+    overflow: hidden;
+}
+
+    .avuna-about::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(90deg, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.35) 50%, rgba(0,0,0,0) 100%);
+        z-index: 1;
+    }
+
+    .avuna-about .wrap {
+        position: relative;
+        z-index: 2;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+.avuna-about-copy {
+    max-width: 640px;
+}
+
+    .avuna-about-copy .eyebrow {
+        display: inline-block;
+        font-family: var(--mono, monospace);
+        font-size: 0.85rem;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--gold, #d9a52c);
+        margin-bottom: 16px;
+    }
+
+    .avuna-about-copy h2 {
+        font-family: var(--display, sans-serif);
+        font-weight: 400;
+        text-transform: uppercase;
+        font-size: clamp(2rem, 4vw, 3.2rem);
+        line-height: 1.1;
+        color: #ffffff;
+        margin: 0 0 22px;
+    }
+
+    .avuna-about-copy p {
+        font-size: 1.02rem;
+        line-height: 1.75;
+        color: black;
+        margin: 0;
+    }
+
+/* SERVICES SECTION  */
+.avuna-services {
+    background: #ffffff;
+    padding: 96px 20px;
+}
+
+    .avuna-services .wrap {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+.avuna-section-head {
+    max-width: 60ch;
+    margin: 0 auto 56px;
+    text-align: center;
+}
+
+    .avuna-section-head .eyebrow {
+        display: inline-block;
+        font-family: var(--mono, monospace);
+        font-size: 0.8rem;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--orange, #d9711f);
+        margin-bottom: 12px;
+    }
+
+    .avuna-section-head h2 {
+        font-family: var(--display, sans-serif);
+        font-weight: 400;
+        text-transform: uppercase;
+        font-size: clamp(1.9rem, 3.6vw, 2.6rem);
+        color: var(--dark, #0c1e1c);
+        margin: 0 0 14px;
+        letter-spacing: 0.01em;
+    }
+
+    .avuna-section-head p {
+        color: #565c58;
+        line-height: 1.65;
+        font-size: 1.02rem;
+        margin: 0;
+    }
+
+.avuna-service-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    background: #e4dcc4;
+    border: 1px solid #e4dcc4;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.avuna-service-card {
+    background: #f6f1e6;
+    padding: 40px 30px;
+    transition: background 0.2s ease;
+}
+
+    .avuna-service-card:hover {
+        background: #efe8d6;
+    }
+
+    .avuna-service-card .num {
+        font-family: var(--mono, monospace);
+        font-size: 0.8rem;
+        font-weight: 700;
+        color: var(--orange, #d9711f);
+        display: block;
+        margin-bottom: 22px;
+        letter-spacing: 0.05em;
+    }
+
+    .avuna-service-card h3 {
+        font-family: var(--body, sans-serif);
+        font-weight: 700;
+        font-size: 1.12rem;
+        color: var(--dark, #0c1e1c);
+        margin: 0 0 12px;
+    }
+
+    .avuna-service-card p {
+        font-size: 0.94rem;
+        line-height: 1.6;
+        color: #565c58;
+        margin: 0;
+    }
+
+@media (max-width: 980px) {
+    .avuna-service-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 560px) {
+    .avuna-service-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .avuna-about {
+        min-height: 460px;
+        padding: 70px 20px;
+    }
+
+    .avuna-services {
+        padding: 64px 20px;
+    }
+
+    .avuna-section-head {
+        margin-bottom: 40px;
+    }
+}
+
+/* Avuna Collective branding */
+
+.avuna-navbar {
+    background-color: var(--avuna-dark) !important;
+}
+
+.avuna-brand {
+    display: flex;
+    align-items: center;
+    text-decoration: none !important;
+    color: #ffffff !important;
+}
+
+    .avuna-brand:hover,
+    .avuna-brand:focus {
+        text-decoration: none !important;
+        color: #ffffff !important;
+    }
+
+    .avuna-brand .brand-name {
+        color: #ffffff !important;
+        font-size: 22px;
+        font-weight: bold;
+        white-space: nowrap;
+        display: inline-block;
+        text-decoration: none !important;
+    }
+
+.avuna-logo {
+    height: 32px;
+    width: auto;
+    margin-right: 10px;
+}
+
+.avuna-navbar .nav-link {
+    color: #f5f5f5 !important;
+}
+
+    .avuna-navbar .nav-link:hover,
+    .avuna-navbar .nav-link:focus {
+        color: var(--avuna-gold) !important;
+    }
+
+h1, h2, h3, h4, h5, h6 {
+    color: var(--avuna-dark);
+}
+
+a {
+    color: var(--avuna-orange);
+}
+
+    a:hover,
+    a:focus {
+        color: #b85f19;
+    }
+
+.btn-primary {
+    background-color: var(--avuna-orange);
+    border-color: var(--avuna-orange);
+}
+
+    .btn-primary:hover,
+    .btn-primary:focus {
+        background-color: #b85f19;
+        border-color: #b85f19;
+    }
+
+/*CONTACT*/
+
+.avuna-contact {
+    padding: 100px 20px 90px;
+    background: #ffffff;
+}
+
+    .avuna-contact .wrap {
+        max-width: 1000px;
+        margin: 0 auto;
+    }
+
+.avuna-contact-head {
+    text-align: center;
+    max-width: 60ch;
+    margin: 0 auto 56px;
+}
+
+    .avuna-contact-head .eyebrow {
+        display: inline-block;
+        font-family: var(--mono);
+        font-size: 0.8rem;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--orange);
+        margin-bottom: 12px;
+    }
+
+    .avuna-contact-head h1 {
+        font-family: var(--display);
+        font-weight: 400;
+        text-transform: uppercase;
+        font-size: clamp(2rem, 4vw, 2.8rem);
+        color: var(--dark);
+        margin: 0 0 14px;
+    }
+
+    .avuna-contact-head p {
+        color: #565c58;
+        line-height: 1.65;
+        margin: 0;
+    }
+
+.avuna-contact-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.avuna-contact-card {
+    background: var(--paper);
+    padding: 36px 30px;
+}
+
+.avuna-contact-label {
+    display: block;
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--orange);
+    margin-bottom: 14px;
+}
+
+.avuna-contact-value {
+    display: block;
+    font-family: var(--body);
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--dark);
+    line-height: 1.6;
+    text-decoration: none;
+}
+
+a.avuna-contact-value:hover {
+    color: var(--orange);
+}
+
+/*this is for the google maps on the contact page*/
+.map-container {
+    width: 100%;
+    max-width: 100%;
+    border-radius: 12px;
+    overflow: hidden;
+    margin: 30px 0;
+}
+
+    .map-container iframe {
+        display: block;
+    }
+
+@media (max-width: 860px) {
+    .avuna-contact-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .avuna-contact {
+        padding: 70px 20px 60px;
+    }
+}
+
+/* this is for register page*/
+
+.password-container {
+    position: relative;
+    width: 100%;
+}
+
+.password-input {
+    width: 100%;
+    padding-right: 50px !important;
+    box-sizing: border-box;
+}
+
+.password-eye {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 35px;
+    height: 35px;
+    border: none;
+    background: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 10;
+    color: #666;
+}
+
+    .password-eye i {
+        font-size: 18px;
+    }
+
+    .password-eye:hover {
+        color: #000;
+    }
+
+
+/*this is for the photos inside the thumbnails*/
+.step-thumb {
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    margin: 15px auto 0;
+}
+
+    .step-thumb i {
+        font-size: 24px;
+        color: #d9711f;
+    }
+
+    .step-thumb img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+footer {
+    color: var(--avuna-gray);
+    text-align: center;
+    width: 100%;
+}
+
+    footer dl {
+        display: inline-block;
+        text-align: center;
+        margin: 20px auto 0;
+    }
+
+    footer dt,
+    footer dd {
+        margin: 0;
+        padding: 2px 0;
+    }
+
+    footer p {
+        margin-top: 10px;
+    }
+
+/* Floating chatbot */
+#chatbot {
+    position: fixed;
+    bottom: 90px;
+    right: 20px;
+    z-index: 9999;
+    font-family: Arial, sans-serif;
+    text-align: right;
+}
+
+#chatToggle {
+    width: 60px;
+    height: 60px;
+    border: none;
+    border-radius: 50%;
+    background: #263e35;
+    color: white;
+    font-size: 27px;
+    line-height: 1;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.chat-window {
+    width: 340px;
+    max-width: calc(100vw - 40px);
+    height: 430px;
+    background: white;
+    border-radius: 14px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    overflow: hidden;
+    margin-bottom: 12px;
+    text-align: left;
+}
+
+.chat-header {
+    background: #263e35;
+    color: white;
+    padding: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+    .chat-header strong {
+        color: white;
+    }
+
+    .chat-header button {
+        background: transparent;
+        border: none;
+        color: white;
+        font-size: 24px;
+        cursor: pointer;
+    }
+
+.chat-messages {
+    height: 310px;
+    overflow-y: auto;
+    padding: 12px;
+    background: #f7f7f4;
+}
+
+.bot-message, .user-message {
+    padding: 10px 12px;
+    border-radius: 12px;
+    margin-bottom: 10px;
+    max-width: 85%;
+    overflow-wrap: anywhere;
+}
+
+.bot-message {
+    background: #e4ece5;
+    color: #222;
+}
+
+.user-message {
+    background: #263e35;
+    color: white;
+    margin-left: auto;
+}
+
+.chat-input-area {
+    display: flex;
+    padding: 10px;
+    gap: 6px;
+}
+
+    .chat-input-area input {
+        flex: 1;
+        min-width: 0;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+    }
+
+    .chat-input-area button {
+        background: #263e35;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        padding: 10px;
+        cursor: pointer;
+    }
+.chat-window {
+    position: relative;
+}
+
+.chat-suggestions {
+    position: absolute;
+    left: 50px;
+    right: 12px;
+    bottom: 68px;
+    background: #ffffff;
+    border-radius: 18px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    padding: 8px 0;
+    z-index: 5;
+}
+
+    /* little pointer towards the input box */
+    .chat-suggestions::after {
+        content: "";
+        position: absolute;
+        left: 22px;
+        bottom: -8px;
+        width: 16px;
+        height: 16px;
+        background: #ffffff;
+        transform: rotate(45deg);
+    }
+
+    .chat-suggestions button {
+        display: block;
+        width: 100%;
+        text-align: left;
+        background: none;
+        border: none;
+        padding: 14px 24px;
+        font-size: 15px;
+        color: #222;
+        cursor: pointer;
+    }
+
+        .chat-suggestions button:hover {
+            background: #f2f2ee;
+        }

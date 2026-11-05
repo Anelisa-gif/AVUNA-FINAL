@@ -1,0 +1,743 @@
+﻿<%@ Master Language="C#" AutoEventWireup="true" CodeBehind="Site.master.cs" Inherits="AVUNA_COLLECTIVE.SiteMaster" %>
+<!DOCTYPE html>
+<html lang="en">
+<head runat="server">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title><%: Page.Title %> - Avuna Collective</title>
+    <asp:PlaceHolder runat="server">
+        <%: Scripts.Render("~/bundles/modernizr") %>
+    </asp:PlaceHolder>
+    <webopt:bundlereference runat="server" path="~/Content/css" />
+    <%-- Chatbot styles live here so they always load, even if the Site.css bundle does not --%>
+    <style>
+        html, body { overflow-x: hidden; }
+
+        /* Account type chooser */
+.avuna-choice {
+    display: block;
+    padding: 18px 16px;
+    background: #263e35;
+    color: #fff;
+    text-align: center;
+    text-decoration: none;
+    border-radius: 6px;
+}
+.avuna-choice strong { display: block; font-size: 1.1rem; }
+.avuna-choice small { display: block; margin-top: 4px; opacity: .85; }
+.avuna-choice:hover { background: #34554a; color: #fff; }
+.avuna-choice-modal .modal-title { color: #263e35; font-weight: 700; }
+
+/* Hide the chatbot while the popup is open so it doesn't sit above the dark overlay */
+body.modal-open #chatbot { display: none; }
+
+        /* Floating chatbot */
+        #chatbot {
+            position: fixed;
+            bottom: 90px;   /* raise or lower this number to move the chatbot up or down */
+            right: 20px;
+            z-index: 9999;
+            font-family: Arial, sans-serif;
+            text-align: right;
+        }
+
+        #chatToggle {
+            width: 60px;
+            height: 60px;
+            border: none;
+            border-radius: 50%;
+            background: #263e35;
+            color: white;
+            font-size: 27px;
+            line-height: 1;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .chat-window {
+            width: 340px;
+            max-width: calc(100vw - 40px);
+            height: 430px;
+            background: white;
+            border-radius: 14px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            overflow: hidden;
+            margin-bottom: 12px;
+            text-align: left;
+            position: relative;
+        }
+
+        .chat-header {
+            background: #263e35;
+            color: white;
+            padding: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+            .chat-header strong {
+                color: white;
+            }
+
+            .chat-header button {
+                background: transparent;
+                border: none;
+                color: white;
+                font-size: 24px;
+                cursor: pointer;
+            }
+
+        .chat-messages {
+            height: 310px;
+            overflow-y: auto;
+            padding: 12px;
+            background: #f7f7f4;
+        }
+
+        .bot-message, .user-message {
+            padding: 10px 12px;
+            border-radius: 12px;
+            margin-bottom: 10px;
+            max-width: 85%;
+            overflow-wrap: anywhere;
+        }
+
+        .bot-message {
+            background: #e4ece5;
+            color: #222;
+        }
+
+        .user-message {
+            background: #263e35;
+            color: white;
+            margin-left: auto;
+        }
+
+        .chat-input-area {
+            display: flex;
+            padding: 10px;
+            gap: 6px;
+        }
+
+            .chat-input-area input {
+                flex: 1;
+                min-width: 0;
+                padding: 10px;
+                border: 1px solid #ccc;
+                border-radius: 6px;
+            }
+
+            .chat-input-area button {
+                background: #263e35;
+                color: white;
+                border: none;
+                border-radius: 6px;
+                padding: 10px;
+                cursor: pointer;
+            }
+
+        /* Suggestion bubble above the chat input */
+        .chat-suggestions {
+            position: absolute;
+            left: 56px;
+            right: 12px;
+            bottom: 68px;
+            background: #ffffff;
+            border-radius: 18px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            padding: 8px 0;
+            z-index: 5;
+        }
+
+            .chat-suggestions::after {
+                content: "";
+                position: absolute;
+                left: 22px;
+                bottom: -8px;
+                width: 16px;
+                height: 16px;
+                background: #ffffff;
+                transform: rotate(45deg);
+            }
+
+            .chat-suggestions button {
+                display: block;
+                width: 100%;
+                text-align: left;
+                background: none;
+                border: none;
+                padding: 14px 22px;
+                font-size: 15px;
+                color: #222;
+                cursor: pointer;
+            }
+
+                .chat-suggestions button:hover {
+                    background: #f2f2ee;
+                }
+    </style>
+    <link href="~/favicon.ico" rel="shortcut icon" type="image/x-icon" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Work+Sans:wght@400;600&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --avuna-dark: #0a1a14;
+    --avuna-dark-hover: #123024;
+    --avuna-cream: #f4f0dc;
+    --avuna-gold: #cfc9a0;
+    --avuna-text: #1a1a1a;
+  }
+
+  .avuna-modal-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(10, 26, 20, 0.65);
+    display: flex;
+    align-items: center;       /* centres vertically */
+    justify-content: center;   /* centres horizontally */
+    z-index: 99999;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.25s ease, visibility 0.25s ease;
+    padding: 16px;
+  }
+
+  .avuna-modal-overlay.show {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .avuna-modal {
+    background: var(--avuna-cream);
+    border: 1px solid var(--avuna-gold);
+    border-radius: 20px;
+    width: 100%;
+    max-width: 440px;
+    padding: 36px 32px 28px;
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+    transform: translateY(20px) scale(0.96);
+    transition: transform 0.25s ease;
+  }
+
+  .avuna-modal-overlay.show .avuna-modal {
+    transform: translateY(0) scale(1);
+  }
+
+  .avuna-modal-icon {
+    width: 60px;
+    height: 60px;
+    margin: 0 auto 16px;
+    border-radius: 50%;
+    background: var(--avuna-dark);
+    color: var(--avuna-cream);
+    font-size: 30px;
+    line-height: 60px;
+  }
+
+  .avuna-modal h2 {
+    font-family: 'Anton', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-size: 26px;
+    font-weight: 400;
+    color: var(--avuna-text);
+    margin: 0 0 10px;
+  }
+
+  .avuna-modal p {
+    font-family: 'Work Sans', sans-serif;
+    font-size: 15px;
+    line-height: 1.6;
+    color: #444;
+    margin: 0 0 24px;
+  }
+
+  .avuna-modal-btn {
+    font-family: 'Work Sans', sans-serif;
+    font-weight: 600;
+    font-size: 15px;
+    background: var(--avuna-dark);
+    color: var(--avuna-cream);
+    border: none;
+    border-radius: 999px;
+    padding: 12px 44px;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.1s ease;
+  }
+
+  .avuna-modal-btn:hover { background: var(--avuna-dark-hover); }
+  .avuna-modal-btn:active { transform: scale(0.97); }
+  .avuna-modal-btn:focus-visible { outline: 3px solid var(--avuna-gold); outline-offset: 2px; }
+</style>
+</head>
+<body>
+    <form runat="server">
+        <asp:ScriptManager runat="server">
+            <Scripts>
+                <%--To learn more about bundling scripts in ScriptManager see https://go.microsoft.com/fwlink/?LinkID=301884 --%>
+                <%--Framework Scripts--%>
+                <asp:ScriptReference Name="MsAjaxBundle" />
+                <asp:ScriptReference Name="jquery" />
+                <asp:ScriptReference Name="WebForms.js" Assembly="System.Web" Path="~/Scripts/WebForms/WebForms.js" />
+                <asp:ScriptReference Name="WebUIValidation.js" Assembly="System.Web" Path="~/Scripts/WebForms/WebUIValidation.js" />
+                <asp:ScriptReference Name="MenuStandards.js" Assembly="System.Web" Path="~/Scripts/WebForms/MenuStandards.js" />
+                <asp:ScriptReference Name="GridView.js" Assembly="System.Web" Path="~/Scripts/WebForms/GridView.js" />
+                <asp:ScriptReference Name="DetailsView.js" Assembly="System.Web" Path="~/Scripts/WebForms/DetailsView.js" />
+                <asp:ScriptReference Name="TreeView.js" Assembly="System.Web" Path="~/Scripts/WebForms/TreeView.js" />
+                <asp:ScriptReference Name="WebParts.js" Assembly="System.Web" Path="~/Scripts/WebForms/WebParts.js" />
+                <asp:ScriptReference Name="Focus.js" Assembly="System.Web" Path="~/Scripts/WebForms/Focus.js" />
+                <asp:ScriptReference Name="WebFormsBundle" />
+                <%--Site Scripts--%>
+            </Scripts>
+        </asp:ScriptManager>
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark bg-dark avuna-navbar">
+            <div class="container">
+                <a class="navbar-brand avuna-brand" runat="server" href="~/">
+                    <img src="~/avuna-logo.png" class="avuna-logo" alt="Avuna Collective" runat="server" />
+                    <span class="brand-name">Avuna Collective</span>
+                </a>
+
+               <button type="button" class="navbar-toggler" data-bs-toggle="collapse"  data-bs-target="#navbarContent" title="Toggle navigation" aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+           <span class="navbar-toggler-icon"></span>
+               </button>
+
+                <div class="collapse navbar-collapse justify-content-between" id="navbarContent">
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item"><a class="nav-link" runat="server" href="~/">Home</a></li>
+                        <li class="nav-item"><a class="nav-link" runat="server" href="~/About">About Us</a></li>
+                        <li class="nav-item"><a class="nav-link" runat="server" href="~/HowToOrder">How to Order</a></li>
+                        <li class="nav-item"><a class="nav-link" runat="server" href="~/OurWork">Our Work</a></li>
+                        <li class="nav-item"><a class="nav-link" runat="server" href="~/ClientReviews">Client Reviews</a></li>
+                        <li class="nav-item"><a class="nav-link" runat="server" href="~/Contact">Contact Us</a></li>
+                        
+                        </ul>
+                     
+                     <ul class="navbar-nav ms-auto">
+                         <li class="nav-item"><a class="nav-link" runat="server" href="~/Login">Login</a></li>
+
+                          <li class="nav-item dropdown">
+
+                              <a class="nav-link dropdown-toggle" href="#" id="registerDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Register</a> 
+                              <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="registerDropdown">
+                <li><a class="dropdown-item" runat="server" href="~/Register">Register: Individual</a></li>
+                <li><a class="dropdown-item" runat="server" href="~/RegisterBusiness">Register: Business</a></li>
+            </ul>
+                      </ul>
+
+                         
+
+                       
+                       
+                 
+                </div>
+            </div>
+        </nav>
+
+        <div class="body-content">
+            <asp:ContentPlaceHolder ID="MainContent" runat="server">
+            </asp:ContentPlaceHolder>
+            <hr/>
+            <footer style="text-align: center; width: 100%;">
+                <dl style="display: inline-block; text-align: center; margin: 20px auto 0;">
+                    <dt style="margin: 0; padding: 2px 0;">Address</dt>
+                    <dd style="margin: 0; padding: 2px 0;">127 Victoria Embankment</dd>
+                    <dd style="margin: 0; padding: 2px 0;">Astron Garage</dd>
+                    <dd style="margin: 0; padding: 2px 0;">Durban</dd>
+                </dl>
+                <p style="margin-top: 10px;">&copy; <%: DateTime.Now.Year %> - Avuna Collective</p>
+            </footer>
+        </div>
+
+        <!-- Account type chooser -->
+<div class="modal fade" id="accountTypeModal" tabindex="-1" aria-labelledby="accountTypeTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content avuna-choice-modal">
+            <div class="modal-header border-0">
+                <h5 class="modal-title" id="accountTypeTitle">What type of account do you want to create?</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body pt-0">
+                <div class="d-grid gap-3">
+                    <a runat="server" href="~/Register" class="avuna-choice">
+                        <strong>Individual</strong>
+                    </a>
+                    <a runat="server" href="~/RegisterBusiness" class="avuna-choice">
+                        <strong>Business</strong>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+        <!-- Avuna Collective Chatbot -->
+        <div id="chatbot">
+            <div id="chatWindow" class="chat-window" style="display:none;">
+                <div class="chat-header">
+                    <strong>Avuna Assistant</strong>
+                    <button type="button" onclick="toggleChat()">×</button>
+                </div>
+
+                <div id="chatMessages" class="chat-messages">
+                    <div class="bot-message">
+                        Hi! Welcome to Avuna Collective. How can I help you today?
+                    </div>
+                </div>
+
+                <div class="chat-suggestions" id="chatSuggestions">
+                    <button type="button" onclick="askSuggestion(this)">Do I need an account to place an order?</button>
+                    <button type="button" onclick="askSuggestion(this)">Can I upload my own design?</button>
+                </div>
+
+                <div class="chat-input-area">
+                    <input type="text" id="chatInput" placeholder="Type your question..."
+                           autocomplete="off"
+                           onkeydown="return chatKey(event)"
+                           oninput="updateSuggestions()" />
+                    <button type="button" onclick="sendMessage()">Send</button>
+                </div>
+            </div>
+
+            <button type="button" id="chatToggle" onclick="toggleChat()" aria-label="Open Avuna Assistant">
+                💬
+            </button>
+        </div>
+
+        <script>
+            function toggleChat() {
+                var chat = document.getElementById("chatWindow");
+                chat.style.display = chat.style.display === "none" ? "block" : "none";
+            }
+
+            // Shows the suggestion bubble only while the box is empty and nothing has been asked yet
+            function updateSuggestions() {
+                var box = document.getElementById("chatSuggestions");
+                var input = document.getElementById("chatInput");
+                var messages = document.getElementById("chatMessages");
+                box.style.display = (input.value.trim() === "" && messages.children.length <= 1) ? "block" : "none";
+            }
+
+            function askSuggestion(btn) {
+                document.getElementById("chatInput").value = btn.textContent;
+                sendMessage();
+            }
+
+            // Stops Enter from submitting the ASP.NET form (which reloads the page)
+            function chatKey(e) {
+                if (e.key === "Enter") {
+                    e.preventDefault();
+                    sendMessage();
+                    return false;
+                }
+                return true;
+            }
+
+            function sendMessage() {
+                var input = document.getElementById("chatInput");
+                var messages = document.getElementById("chatMessages");
+                var question = input.value.trim();
+
+                if (question === "") return;
+
+                var userMessage = document.createElement("div");
+                userMessage.className = "user-message";
+                userMessage.textContent = question;
+                messages.appendChild(userMessage);
+
+                var reply = getBotReply(question.toLowerCase());
+
+                var botMessage = document.createElement("div");
+                botMessage.className = "bot-message";
+                botMessage.textContent = reply;
+                messages.appendChild(botMessage);
+
+                input.value = "";
+                messages.scrollTop = messages.scrollHeight;
+                input.focus();
+                updateSuggestions();
+            }
+
+            function getBotReply(question) {
+                question = question.toLowerCase().trim();
+
+                // 1. Greetings (whole words only, so "this" or "which" don't trigger it)
+                if (/\b(hello|hi|hey)\b/.test(question)) {
+                    return "Hello! Welcome to Avuna Collective. You can ask me about our services, submitting designs, quotes, production, or tracking orders. How can I help you?";
+                }
+
+                // 2. About Avuna Collective
+                if (
+                    question.includes("what is avuna") ||
+                    question.includes("about avuna") ||
+                    question.includes("who are you")
+                ) {
+                    return "Avuna Collective is a custom clothing business that helps customers bring their T-shirt and clothing design ideas to life.";
+                }
+
+                if (
+                    question.includes("how does avuna work") ||
+                    question.includes("how do you operate") ||
+                    question.includes("how does the process work") ||
+                    question.includes("how does it work")
+                ) {
+                    return "Avuna Collective follows four main steps: 1. Submit your design. 2. Receive a clear quote. 3. Your items are produced. 4. Track and receive your order.";
+                }
+
+                if (
+                    question.includes("what do you sell") ||
+                    question.includes("what products") ||
+                    question.includes("what do you make") ||
+                    question.includes("your services")
+                ) {
+                    return "We focus on custom T-shirts and clothing. Please contact our team to confirm whether your specific item can be produced.";
+                }
+
+                if (
+                    question.includes("who can order") ||
+                    question.includes("who can place an order")
+                ) {
+                    return "Customers interested in custom clothing can submit their designs and requirements for our team to review.";
+                }
+
+                // 3. Design submissions
+                if (
+                    question.includes("submit") ||
+                    question.includes("upload") ||
+                    question.includes("send my design") ||
+                    question.includes("how do i design")
+                ) {
+                    return "You can submit your design through the appropriate design submission or order section of our website. Include your requirements so our team can review your request.";
+                }
+
+                if (
+                    question.includes("own design") ||
+                    question.includes("my own artwork") ||
+                    question.includes("my own logo") ||
+                    question.includes("business logo")
+                ) {
+                    return "You can submit your own artwork or logo for consideration. Our team will review your requirements and advise you on the next steps.";
+                }
+
+                if (
+                    question.includes("no design") ||
+                    question.includes("design ideas") ||
+                    question.includes("help with a design")
+                ) {
+                    return "If you do not have a design ready, contact our team to discuss your ideas and find out what options may be available.";
+                }
+
+                if (question.includes("colour") || question.includes("color")) {
+                    return "Include your preferred colours in your design requirements so our team can assess your request.";
+                }
+
+                if (
+                    question.includes("after i submit") ||
+                    question.includes("after submitting") ||
+                    question.includes("what happens next")
+                ) {
+                    return "After you submit your design and order requirements, our team reviews your request before providing a quote.";
+                }
+
+                // 4. Quotes and pricing
+                if (
+                    question.includes("quote") ||
+                    question.includes("price") ||
+                    question.includes("cost") ||
+                    question.includes("how much") ||
+                    question.includes("pricing")
+                ) {
+                    return "Pricing depends on your order requirements, including factors such as quantity, design and production needs. Submit your design and details so our team can provide a quote.";
+                }
+
+                if (
+                    question.includes("accept the quote") ||
+                    question.includes("after the quote") ||
+                    question.includes("quote approved")
+                ) {
+                    return "Once your order requirements and the necessary terms are confirmed, your order can proceed to the production stage.";
+                }
+
+                if (
+                    question.includes("change my order") ||
+                    question.includes("change my design") ||
+                    question.includes("modify my order")
+                ) {
+                    return "Please contact our team before production begins to discuss changes. Changes may affect the quoted price or production arrangements.";
+                }
+
+                // 5. Production and quantities
+                if (
+                    question.includes("production") ||
+                    question.includes("manufacturing") ||
+                    question.includes("making my order") ||
+                    question.includes("how are my t-shirts made")
+                ) {
+                    return "Your order moves through the production process according to the approved design and requirements once the necessary details and terms have been confirmed.";
+                }
+
+                if (
+                    question.includes("how long") &&
+                    (
+                        question.includes("production") ||
+                        question.includes("make") ||
+                        question.includes("ready") ||
+                        question.includes("take")
+                    )
+                ) {
+                    return "Production time depends on your order and current arrangements. Please contact our team for an estimated completion date.";
+                }
+
+                if (
+                    question.includes("quantity") ||
+                    question.includes("bulk order") ||
+                    question.includes("multiple t-shirts") ||
+                    question.includes("many t-shirts") ||
+                    question.includes("more than one")
+                ) {
+                    return "Include the quantity you require when submitting your order so our team can assess your request and provide a quote.";
+                }
+
+                if (question.includes("repeat order") || question.includes("order again")) {
+                    return "You can contact our team with the details of your previous order to enquire about placing it again.";
+                }
+
+                if (question.includes("cancel") || question.includes("cancellation")) {
+                    return "Please contact our team as soon as possible. Cancellation depends on your order status and the applicable business terms.";
+                }
+
+                // 6. Order tracking and delivery
+                if (
+                    question.includes("track") ||
+                    question.includes("order status") ||
+                    question.includes("where is my order") ||
+                    question.includes("check my order") ||
+                    question.includes("order update")
+                ) {
+                    return "Log in to your Avuna account and check your order status if tracking is available. I cannot access live order information through this chatbot.";
+                }
+
+                if (
+                    question.includes("delivery") ||
+                    question.includes("deliver") ||
+                    question.includes("collection") ||
+                    question.includes("receive my order")
+                ) {
+                    return "Delivery or collection arrangements should be confirmed with our team when your order is processed.";
+                }
+
+                if (
+                    question.includes("delayed") ||
+                    question.includes("late order") ||
+                    question.includes("order is late")
+                ) {
+                    return "Please contact our team with your order details so they can help you establish the status of your order.";
+                }
+
+                // 7. Account and login support
+                if (
+                    question.includes("forgot password") ||
+                    question.includes("reset password") ||
+                    question.includes("forgotten password")
+                ) {
+                    return "Use the password recovery option if it is available on the website. Otherwise, contact our team for assistance.";
+                }
+
+                if (
+                    question.includes("login") ||
+                    question.includes("log in") ||
+                    question.includes("sign in")
+                ) {
+                    return "Open the login page and enter your registered username and password.";
+                }
+
+                if (
+                    question.includes("account details") ||
+                    question.includes("update my profile")
+                ) {
+                    return "Log in to your account and check whether your profile details can be updated. Contact our team if you need help.";
+                }
+
+                if (
+                    question.includes("need an account") ||
+                    question.includes("create an account") ||
+                    question.includes("register")
+                ) {
+                    return "Please follow the registration and ordering instructions on our website. If registration is required, create an account before continuing.";
+                }
+
+                // 8. Contact and customer support
+                if (
+                    question.includes("contact") ||
+                    question.includes("speak to someone") ||
+                    question.includes("human") ||
+                    question.includes("customer service") ||
+                    question.includes("talk to someone") ||
+                    question.includes("help me")
+                ) {
+                    return "Please visit the Contact page on our website for the available contact details and support options.";
+                }
+
+                // 9. Thanks and goodbye
+                if (question.includes("thank") || question.includes("thanks")) {
+                    return "You're welcome! Thank you for choosing Avuna Collective.";
+                }
+
+                if (question.includes("bye") || question.includes("goodbye")) {
+                    return "Thank you for visiting Avuna Collective. We hope to help you bring your design ideas to life. Goodbye!";
+                }
+
+                // 10. Default response
+                return "I'm sorry, I don't have an answer for that yet. Please visit the Contact page on our website for assistance from the Avuna Collective team.";
+            }
+        </script>
+
+    </form>
+    <asp:PlaceHolder runat="server">
+        <%: Scripts.Render("~/Scripts/bootstrap.js") %>
+    </asp:PlaceHolder>
+    <!-- Avuna custom message box -->
+<div class="avuna-modal-overlay" id="avunaModal" aria-hidden="true">
+  <div class="avuna-modal" role="dialog" aria-modal="true" aria-labelledby="avunaModalTitle">
+    <div class="avuna-modal-icon">&#10003;</div>
+    <h2 id="avunaModalTitle">Registration Successful!</h2>
+    <p id="avunaModalMessage"></p>
+    <button type="button" class="avuna-modal-btn" id="avunaModalBtn">OK</button>
+  </div>
+</div>
+
+<script>
+    function showAvunaModal(message, title, onClose) {
+        var overlay = document.getElementById("avunaModal");
+        var btn = document.getElementById("avunaModalBtn");
+
+        document.getElementById("avunaModalTitle").textContent = title || "Success";
+        document.getElementById("avunaModalMessage").textContent = message;
+
+        overlay.classList.add("show");
+        overlay.setAttribute("aria-hidden", "false");
+        btn.focus();
+
+        function close() {
+            overlay.classList.remove("show");
+            overlay.setAttribute("aria-hidden", "true");
+            btn.removeEventListener("click", close);
+            document.removeEventListener("keydown", onKey);
+            if (typeof onClose === "function") onClose();
+        }
+
+        function onKey(e) {
+            if (e.key === "Escape" || e.key === "Enter") {
+                e.preventDefault();
+                close();
+            }
+        }
+
+        btn.addEventListener("click", close);
+        document.addEventListener("keydown", onKey);
+    }
+</script>
+</body>
+</html>

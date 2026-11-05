@@ -1,0 +1,55 @@
+﻿
+<%@ Page Title="" Language="C#"  MasterPageFile="~/Customer_master.Master" AutoEventWireup="true" CodeBehind="LogOut.aspx.cs" Inherits="AVUNA_COLLECTIVE.CUSTOMERDASHBOARD" %>
+
+<asp:Content ID="Content1" ContentPlaceHolderID="MainContent" runat="server">
+   
+      <style>
+.logout-page {
+width: 100%;
+min-height: 100vh;
+background: linear-gradient(120deg, #111111 0%, #191919 60%, #252525 100%);
+display: flex;
+align-items: center;
+justify-content: center;
+padding: 40px 20px;
+box-sizing: border-box;
+}
+.logout-card {
+background: white;
+border-radius: 20px;
+padding: 50px 40px;
+max-width: 420px;
+width: 100%;
+text-align: center;
+box-shadow: 0 25px 60px rgba(0,0,0,.35);
+}
+.logout-badge {
+width: 70px; height: 70px; border-radius: 50%;
+background: #fff0e4; color: #f47b20;
+display: flex; align-items: center; justify-content: center;
+font-size: 30px; font-weight: 900; margin: 0 auto 22px;
+}
+.logout-card h1 { font-size: 24px; margin: 0 0 12px; color: #181818; }
+.logout-card p { color: #777; font-size: 14px; line-height: 1.6; margin-bottom: 28px; }
+.customer-btn {
+display: inline-flex; align-items: center; justify-content: center;
+padding: 13px 26px; border-radius: 10px;
+text-decoration: none !important; font-weight: 700;
+background: #f47b20; color: white !important;
+box-shadow: 0 8px 20px rgba(244,123,32,.25);
+transition: all .25s ease;
+}
+.customer-btn:hover { background: #ff8b32; transform: translateY(-3px); }
+</style>
+<div class="logout-page">
+<div class="logout-card">
+<div class="logout-badge">✓</div>
+<h1>You've been logged out</h1>
+<p>Thanks for visiting AVUNA COLLECTIVE. Log back in anytime to check your orders, profile and rewards.</p>
+<a href="Login.aspx" class="customer-btn">Back to Login</a>
+</div>
+</div>
+</asp:Content>
+
+       
+   
