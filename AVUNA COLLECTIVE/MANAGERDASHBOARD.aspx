@@ -125,6 +125,7 @@ margin-bottom: 25px;
 }
 .avuna-welcome strong { color: #113334; font-size: 16px; }
 .avuna-welcome span { color: #78827f; font-size: 13px; }
+.avuna-db-notice { background: #fdeaea; border: 1px solid #f0c4c4; color: #8a2f2f; border-radius: 14px; padding: 12px 18px; font-size: 12px; margin-bottom: 20px; line-height: 1.6; }
 .avuna-business-status {
 background: #e8f4ec;
 color: #267347;
@@ -258,7 +259,7 @@ background: #113334; color: white; transition: .25s ease; text-decoration: none;
 <h1 style="color: white;">Business at a glance.</h1>
 <p>Monitor sales, orders, customers and operational activity from one professional management workspace.</p>
 <div class="avuna-hero-buttons">
-<a href="Orders.aspx" class="avuna-button avuna-button-orange">Manage Orders &rarr;</a>
+<a href="ManageOrders.aspx" class="avuna-button avuna-button-orange">Manage Orders &rarr;</a>
 <a href="SalesReports.aspx" class="avuna-button avuna-button-outline">View Reports</a>
 </div>
 </div>
@@ -274,11 +275,12 @@ background: #113334; color: white; transition: .25s ease; text-decoration: none;
 <!-- WELCOME -->
 <div class="avuna-welcome">
 <div>
-<strong>Good Afternoon, Nkosingiphile Shangase.</strong>
+<strong>Welcome back, <asp:Literal ID="litManagerName" runat="server" />.</strong>
 <span>Review the key numbers and activity that need your attention.</span>
 </div>
 <div class="avuna-business-status">&#9679; Business Data</div>
 </div>
+<asp:Literal ID="litDbNotice" runat="server" />
 <!-- STATISTICS -->
 <section class="avuna-stat-grid">
 <article class="avuna-stat-card">
@@ -286,7 +288,7 @@ background: #113334; color: white; transition: .25s ease; text-decoration: none;
 <div class="avuna-stat-icon avuna-green-icon">R</div>
 <span class="avuna-stat-label">TOTAL SALES</span>
 </div>
-<h2>R45,850</h2>
+<h2><asp:Literal ID="litTotalSales" runat="server" Text="R0" /></h2>
 <span class="avuna-stat-description">Till date</span>
 </article>
 <article class="avuna-stat-card">
@@ -295,7 +297,7 @@ background: #113334; color: white; transition: .25s ease; text-decoration: none;
 <div class="avuna-stat-icon avuna-orange-icon">#</div>
 <span class="avuna-stat-label">TOTAL ORDERS</span>
 </div>
-<h2>126</h2>
+<h2><asp:Literal ID="litTotalOrders" runat="server" Text="0" /></h2>
 <span class="avuna-stat-description">Orders recorded</span>
 </article>
 <article class="avuna-stat-card">
@@ -303,7 +305,7 @@ background: #113334; color: white; transition: .25s ease; text-decoration: none;
 <div class="avuna-stat-icon avuna-gold-icon">&#9673;</div>
 <span class="avuna-stat-label">CUSTOMERS</span>
 </div>
-<h2>82</h2>
+<h2><asp:Literal ID="litCustomers" runat="server" Text="0" /></h2>
 <span class="avuna-stat-description">Customer accounts</span>
 </article>
 <article class="avuna-stat-card">
@@ -311,7 +313,7 @@ background: #113334; color: white; transition: .25s ease; text-decoration: none;
 <div class="avuna-stat-icon avuna-red-icon">!</div>
 <span class="avuna-stat-label">PENDING ORDERS</span>
 </div>
-<h2>14</h2>
+<h2><asp:Literal ID="litPendingOrders" runat="server" Text="0" /></h2>
 <span class="avuna-stat-description">Require attention</span>
 </article>
 </section>
@@ -323,43 +325,14 @@ background: #113334; color: white; transition: .25s ease; text-decoration: none;
 <span class="avuna-sample">AVUNA COLLECTIVE DATA</span>
 <span class="avuna-eyebrow">PERFORMANCE</span>
 <h2>Sales Overview</h2>
-<p>Monthly revenue trend forecasted for the required period (Mar - Aug).</p>
+<p>Sales recorded for each of the last six months. Hover a bar to see its exact figure.</p>
 </div>
 <div class="avuna-chart">
 <div class="avuna-chart-y">
-<span>R10k</span><span>R7.5k</span><span>R5k</span><span>R2.5k</span><span>R0</span>
+<asp:Literal ID="litChartAxis" runat="server" />
 </div>
 <div class="avuna-bars">
-<div class="avuna-bar-column">
-<span class="avuna-bar-value">R7.8k</span>
-<div class="avuna-bar" style="height:45%;"></div>
-<span class="avuna-month">Mar</span>
-</div>
-<div class="avuna-bar-column">
-<span class="avuna-bar-value">R8.9k</span>
-<div class="avuna-bar" style="height:62%;"></div>
-<span class="avuna-month">Apr</span>
-</div>
-<div class="avuna-bar-column">
-<span class="avuna-bar-value">R7.4k</span>
-<div class="avuna-bar" style="height:50%;"></div>
-<span class="avuna-month">May</span>
-</div>
-<div class="avuna-bar-column">
-<span class="avuna-bar-value">R9.7k</span>
-<div class="avuna-bar" style="height:78%;"></div>
-<span class="avuna-month">Jun</span>
-</div>
-<div class="avuna-bar-column">
-<span class="avuna-bar-value">R8.5k</span>
-<div class="avuna-bar" style="height:66%;"></div>
-<span class="avuna-month">Jul</span>
-</div>
-<div class="avuna-bar-column">
-<span class="avuna-bar-value">R9.9k</span>
-<div class="avuna-bar" style="height:92%;"></div>
-<span class="avuna-month">Aug</span>
-</div>
+<asp:Literal ID="litChartBars" runat="server" />
 </div>
 </div>
 </section>
@@ -397,36 +370,13 @@ background: #113334; color: white; transition: .25s ease; text-decoration: none;
 <!-- ALERT -->
 <section class="avuna-alert">
 <div class="avuna-alert-icon">!</div>
-
-Staff.aspx
-
 <div class="avuna-alert-content">
-<strong>14 orders are currently pending.</strong>
+<strong><asp:Literal ID="litPendingAlert" runat="server" /></strong>
 <span>Review pending orders and update their status as production progresses.</span>
 </div>
-<a href="Orders.aspx" class="avuna-button avuna-button-orange">Review Orders &rarr;</a>
+<a href="ManageOrders.aspx?view=pending" class="avuna-button avuna-button-orange">Review Orders &rarr;</a>
 </section>
-<!-- SHORTCUT CARDS -->
-<div class="avuna-action-grid">
-<a href="SalesReports.aspx" class="avuna-action-card">
-<small>01 &middot; REPORT</small>
-<h3>Sales Performance</h3>
-<p>Understand revenue, completed sales and monthly sales trends.</p>
-<span class="avuna-action-arrow">&rarr;</span>
-</a>
-<a href="OrderReports.aspx" class="avuna-action-card">
-<small>02 &middot; REPORT</small>
-<h3>Order Activity</h3>
-<p>Track pending, production and completed customer orders.</p>
-<span class="avuna-action-arrow">&rarr;</span>
-</a>
-<a href="CustomerReports.aspx" class="avuna-action-card">
-<small>03 &middot; REPORT</small>
-<h3>Customer Insights</h3>
-<p>Review customers, activity and loyalty information.</p>
-<span class="avuna-action-arrow">&rarr;</span>
-</a>
-</div>
+
 </main>
 </div>
 

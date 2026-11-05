@@ -25,7 +25,7 @@ namespace AVUNA_COLLECTIVE
                 conn.Open();
 
                 //1. Check the staff table first (covers both Admin Staff and Manager)
-                string staffQuery = "SELECT staff_ID, staff_First_Name, staff_Role, staff_Password FROM AdminStaff WHERE staff_username = @staff_username";
+                string staffQuery = "SELECT staff_ID, staff_First_Name, staff_Last_Name, staff_Role, staff_Password FROM AdminStaff WHERE staff_username = @staff_username";
                 using (SqlCommand staffCmd = new SqlCommand(staffQuery, conn))
                 {
                     staffCmd.Parameters.AddWithValue("@staff_username", username);
@@ -45,10 +45,12 @@ namespace AVUNA_COLLECTIVE
                             string role = reader["staff_Role"].ToString();
                             string staffId = reader["staff_ID"].ToString();
                             string firstName = reader["staff_First_Name"].ToString();
+                            string lastName = reader["staff_Last_Name"].ToString();
                             reader.Close();
 
                             Session["staff_ID"] = staffId;
                             Session["staff_First_Name"] = firstName;
+                            Session["staff_Last_Name"] = lastName;
                             Session["staff_Role"] = role;
 
                             // Both Manager and Admin Staff land on ManagerDashboard for now.

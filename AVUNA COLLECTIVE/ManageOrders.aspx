@@ -1,5 +1,5 @@
 ﻿
-<%@ Page Title="" Language="C#"  MasterPageFile="~/Manager_master.Master" AutoEventWireup="true" CodeBehind="ManageOrders.aspx.cs" Inherits="AVUNA_COLLECTIVE.MANAGERDASHBOARD" %>
+<%@ Page Title="" Language="C#"  MasterPageFile="~/Manager_master.Master" AutoEventWireup="true" CodeBehind="ManageOrders.aspx.cs" Inherits="AVUNA_COLLECTIVE.ManageOrders" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="MainContent" runat="server">
     <style>
@@ -190,6 +190,7 @@ color: white; display: flex; align-items: center; justify-content: center; font-
 .avuna-completed { background: #e7f4eb; color: #277446; }
 .avuna-production { background: #fff0e5; color: #bb5c17; }
 .avuna-pending { background: #fff5d8; color: #927017; }
+.avuna-db-notice { background: #fdeaea; border: 1px solid #f0c4c4; color: #8a2f2f; border-radius: 14px; padding: 12px 18px; font-size: 12px; margin-bottom: 20px; line-height: 1.6; }
 /* SHORTCUT CARD */
 .avuna-action-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 20px; margin-top: 25px; }
 .avuna-action-card {
@@ -223,9 +224,9 @@ background: #113334; color: white; transition: .25s ease; text-decoration: none;
 <div class="avuna-manager-copy">
 <span class="avuna-eyebrow">AVUNA COLLECTIVE MANAGEMENT PORTAL</span>
 <h1 style="color: white;">Orders, tracked end to end.</h1>
-<p>View, update and manage every customer order moving through production.</p>
+<p>View and manage every customer order moving through production.</p>
 <div class="avuna-hero-buttons">
-<a href="OrderReports.aspx" class="avuna-button avuna-button-orange">View Order Reports &rarr;</a>
+<a href="ManageOrders.aspx?view=pending" class="avuna-button avuna-button-orange">Pending Orders &rarr;</a>
 <a href="ManagerDashboard.aspx" class="avuna-button avuna-button-outline">Back to Dashboard</a>
 </div>
 </div>
@@ -241,11 +242,12 @@ background: #113334; color: white; transition: .25s ease; text-decoration: none;
 <!-- WELCOME -->
 <div class="avuna-welcome">
 <div>
-<strong>Good Afternoon, Nkosingiphile Shangase.</strong>
+<strong>Welcome back, <asp:Literal ID="litManagerName" runat="server" />.</strong>
 <span>Here is the current state of all customer orders.</span>
 </div>
 <div class="avuna-business-status">&#9679; Order Data</div>
 </div>
+<asp:Literal ID="litDbNotice" runat="server" />
 <!-- ORDER STATISTICS -->
 <section class="avuna-stat-grid">
 <article class="avuna-stat-card">
@@ -253,24 +255,23 @@ background: #113334; color: white; transition: .25s ease; text-decoration: none;
 <div class="avuna-stat-icon avuna-orange-icon">#</div>
 <span class="avuna-stat-label">TOTAL ORDERS</span>
 </div>
-<h2>126</h2>
+<h2><asp:Literal ID="litTotalOrders" runat="server" Text="0" /></h2>
 <span class="avuna-stat-description">Orders recorded</span>
 </article>
 <article class="avuna-stat-card">
-
 <div class="avuna-stat-top">
 <div class="avuna-stat-icon avuna-red-icon">!</div>
 <span class="avuna-stat-label">PENDING</span>
 </div>
-<h2>14</h2>
-<span class="avuna-stat-description">Require attention</span>
+<h2><asp:Literal ID="litPendingCount" runat="server" Text="0" /></h2>
+<span class="avuna-stat-description">Not yet started</span>
 </article>
 <article class="avuna-stat-card">
 <div class="avuna-stat-top">
 <div class="avuna-stat-icon avuna-gold-icon">&#9881;</div>
-<span class="avuna-stat-label">IN PRODUCTION</span>
+<span class="avuna-stat-label">IN PROGRESS</span>
 </div>
-<h2>18</h2>
+<h2><asp:Literal ID="litInProgressCount" runat="server" Text="0" /></h2>
 <span class="avuna-stat-description">Currently being made</span>
 </article>
 <article class="avuna-stat-card">
@@ -278,28 +279,19 @@ background: #113334; color: white; transition: .25s ease; text-decoration: none;
 <div class="avuna-stat-icon avuna-green-icon">&#10003;</div>
 <span class="avuna-stat-label">COMPLETED</span>
 </div>
-<h2>94</h2>
+<h2><asp:Literal ID="litCompletedCount" runat="server" Text="0" /></h2>
 <span class="avuna-stat-description">Fulfilled orders</span>
 </article>
-</section>
-<!-- ALERT -->
-<section class="avuna-alert">
-<div class="avuna-alert-icon">!</div>
-<div class="avuna-alert-content">
-<strong>14 orders are currently pending.</strong>
-<span>Review pending orders and update their status as production progresses.</span>
-</div>
-<a href="#orders-table" class="avuna-button avuna-button-orange">Review Now &rarr;</a>
 </section>
 <!-- ORDERS TABLE -->
 <section class="avuna-card" id="orders-table">
 <div class="avuna-orders-header">
 <div>
-<span class="avuna-eyebrow-inline">LATEST ACTIVITY</span>
-<h2>All Orders</h2>
-<p>A full view of customer orders and their current status.</p>
+<span class="avuna-eyebrow-inline">ORDER DETAILS</span>
+<h2><asp:Literal ID="litTableTitle" runat="server" /></h2>
+<p><asp:Literal ID="litTableSubtitle" runat="server" /></p>
 </div>
-<a href="OrderReports.aspx" class="avuna-view-all">View order reports &rarr;</a>
+<asp:Literal ID="litToggleLink" runat="server" />
 </div>
 <div class="avuna-table-wrap">
 <table class="avuna-table">
@@ -307,58 +299,19 @@ background: #113334; color: white; transition: .25s ease; text-decoration: none;
 <tr>
 <th>ORDER NO.</th>
 <th>CUSTOMER</th>
-<th>PRODUCT</th>
+<th>PHONE</th>
 <th>DATE</th>
 <th>STATUS</th>
 <th>TOTAL</th>
+<th>PAYMENT</th>
 </tr>
 </thead>
 <tbody>
-<tr>
-<td class="avuna-order-number">AVU-00126</td>
-<td>Luyolata B.</td>
-<td>Embroidered Hoodie</td>
-<td>24 Aug 2026</td>
-<td><span class="avuna-status avuna-production">In Production</span></td>
-<td>R850</td>
-</tr>
-<tr>
-<td class="avuna-order-number">AVU-00125</td>
-<td>Anelisa M.</td>
-<td>Custom T-Shirt</td>
-<td>23 Aug 2026</td>
-<td><span class="avuna-status avuna-completed">Completed</span></td>
-<td>R620</td>
-</tr>
-<tr>
-<td class="avuna-order-number">AVU-00124</td>
-<td>Nyiko M.</td>
-<td>Embroidered Cap</td>
-<td>23 Aug 2026</td>
-<td><span class="avuna-status avuna-pending">Pending</span></td>
-<td>R450</td>
-</tr>
-<tr>
-<td class="avuna-order-number">AVU-00123</td>
-<td>Banele J.</td>
-<td>Custom Jacket</td>
-<td>22 Aug 2026</td>
-<td><span class="avuna-status avuna-production">In Production</span></td>
-<td>R1,250</td>
-</tr>
+<asp:Literal ID="litOrderRows" runat="server" />
 </tbody>
 </table>
 </div>
 </section>
-<!-- SHORTCUT CARD -->
-<div class="avuna-action-grid">
-<a href="OrderReports.aspx" class="avuna-action-card">
-<small>REPORT</small>
-<h3>Order Activity</h3>
-<p>Track pending, production and completed customer orders.</p>
-<span class="avuna-action-arrow">&rarr;</span>
-</a>
-</div>
 </main>
 </div>
-    </asp:Content>
+</asp:Content>
