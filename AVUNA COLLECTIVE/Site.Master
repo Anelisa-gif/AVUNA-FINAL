@@ -13,23 +13,40 @@
     <style>
         html, body { overflow-x: hidden; }
 
-        /* Account type chooser */
-.avuna-choice {
-    display: block;
-    padding: 18px 16px;
-    background: #263e35;
-    color: #fff;
-    text-align: center;
-    text-decoration: none;
-    border-radius: 6px;
-}
-.avuna-choice strong { display: block; font-size: 1.1rem; }
-.avuna-choice small { display: block; margin-top: 4px; opacity: .85; }
-.avuna-choice:hover { background: #34554a; color: #fff; }
-.avuna-choice-modal .modal-title { color: #263e35; font-weight: 700; }
+        /* Account type chooser (scoped to the modal so page CSS can't change it) */
+        #accountTypeModal .avuna-choice {
+            display: block !important;
+            padding: 18px 16px !important;
+            background: #263e35 !important;
+            color: #fff !important;
+            border: 0 !important;
+            border-radius: 6px !important;
+            box-shadow: none !important;
+            text-align: center !important;
+            text-decoration: none !important;
+            text-transform: none !important;
+            letter-spacing: normal !important;
+        }
+        #accountTypeModal .avuna-choice strong {
+            display: block;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #fff;
+            text-transform: none;
+        }
+        #accountTypeModal .avuna-choice:hover,
+        #accountTypeModal .avuna-choice:focus {
+            background: #34554a !important;
+            color: #fff !important;
+        }
+        #accountTypeModal .modal-title {
+            color: #263e35;
+            font-weight: 700;
+            text-transform: none;
+        }
 
-/* Hide the chatbot while the popup is open so it doesn't sit above the dark overlay */
-body.modal-open #chatbot { display: none; }
+        /* Hide the chatbot while the popup is open so it doesn't sit above the dark overlay */
+        body.modal-open #chatbot { display: none; }
 
         /* Floating chatbot */
         #chatbot {
@@ -293,18 +310,21 @@ body.modal-open #chatbot { display: none; }
                 <%--Site Scripts--%>
             </Scripts>
         </asp:ScriptManager>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark bg-dark avuna-navbar">
-            <div class="container">
+
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark avuna-navbar">
+            <div class="container-fluid">
                 <a class="navbar-brand avuna-brand" runat="server" href="~/">
                     <img src="~/avuna-logo.png" class="avuna-logo" alt="Avuna Collective" runat="server" />
                     <span class="brand-name">Avuna Collective</span>
                 </a>
 
-               <button type="button" class="navbar-toggler" data-bs-toggle="collapse"  data-bs-target="#navbarContent" title="Toggle navigation" aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
-           <span class="navbar-toggler-icon"></span>
-               </button>
+                <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbarContent" title="Toggle navigation" aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
 
                 <div class="collapse navbar-collapse justify-content-between" id="navbarContent">
+
+                    <!-- LEFT SIDE -->
                     <ul class="navbar-nav me-auto">
                         <li class="nav-item"><a class="nav-link" runat="server" href="~/">Home</a></li>
                         <li class="nav-item"><a class="nav-link" runat="server" href="~/About">About Us</a></li>
@@ -312,26 +332,16 @@ body.modal-open #chatbot { display: none; }
                         <li class="nav-item"><a class="nav-link" runat="server" href="~/OurWork">Our Work</a></li>
                         <li class="nav-item"><a class="nav-link" runat="server" href="~/ClientReviews">Client Reviews</a></li>
                         <li class="nav-item"><a class="nav-link" runat="server" href="~/Contact">Contact Us</a></li>
-                        
-                        </ul>
-                     
-                     <ul class="navbar-nav ms-auto">
-                         <li class="nav-item"><a class="nav-link" runat="server" href="~/Login">Login</a></li>
+                    </ul>
 
-                          <li class="nav-item dropdown">
+                    <!-- RIGHT SIDE -->
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item"><a class="nav-link" runat="server" href="~/Login">Login</a></li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#accountTypeModal">Register</a>
+                        </li>
+                    </ul>
 
-                              <a class="nav-link dropdown-toggle" href="#" id="registerDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Register</a> 
-                              <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="registerDropdown">
-                <li><a class="dropdown-item" runat="server" href="~/Register">Register: Individual</a></li>
-                <li><a class="dropdown-item" runat="server" href="~/RegisterBusiness">Register: Business</a></li>
-            </ul>
-                      </ul>
-
-                         
-
-                       
-                       
-                 
                 </div>
             </div>
         </nav>
@@ -352,26 +362,26 @@ body.modal-open #chatbot { display: none; }
         </div>
 
         <!-- Account type chooser -->
-<div class="modal fade" id="accountTypeModal" tabindex="-1" aria-labelledby="accountTypeTitle" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content avuna-choice-modal">
-            <div class="modal-header border-0">
-                <h5 class="modal-title" id="accountTypeTitle">What type of account do you want to create?</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body pt-0">
-                <div class="d-grid gap-3">
-                    <a runat="server" href="~/Register" class="avuna-choice">
-                        <strong>Individual</strong>
-                    </a>
-                    <a runat="server" href="~/RegisterBusiness" class="avuna-choice">
-                        <strong>Business</strong>
-                    </a>
+        <div class="modal fade" id="accountTypeModal" tabindex="-1" aria-labelledby="accountTypeTitle" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content avuna-choice-modal">
+                    <div class="modal-header border-0">
+                        <h5 class="modal-title" id="accountTypeTitle">What type of account do you want to create?</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body pt-0">
+                        <div class="d-grid gap-3">
+                            <a runat="server" href="~/Register" class="avuna-choice">
+                                <strong>Individual</strong>
+                            </a>
+                            <a runat="server" href="~/RegisterBusiness" class="avuna-choice">
+                                <strong>Business</strong>
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-</div>
 
         <!-- Avuna Collective Chatbot -->
         <div id="chatbot">
