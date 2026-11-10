@@ -97,7 +97,7 @@ namespace AVUNA_COLLECTIVE
         public const string ChartJsUrl = "https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js";
 
         public static readonly string[] Palette =
-            { "#113334", "#d9711f", "#d9a52c", "#2f8f83", "#7a5c99", "#c84b4b", "#3b78a8", "#687d71" };
+            { "#2a2118", "#d9711f", "#d9a52c", "#2f8f83", "#7a5c99", "#c84b4b", "#3b78a8", "#687d71" };
 
         public static readonly string[] FinishedStatuses = { "Completed", "Delivered", "Collected", "Cancelled" };
 
@@ -519,7 +519,7 @@ Chart.defaults.color = '#5d6a67';
 Chart.defaults.maintainAspectRatio = false;
 Chart.defaults.plugins.legend.labels.usePointStyle = true;
 Chart.defaults.plugins.legend.labels.boxWidth = 8;
-Chart.defaults.plugins.tooltip.backgroundColor = '#113334';
+Chart.defaults.plugins.tooltip.backgroundColor = '#2a2118';
 Chart.defaults.plugins.tooltip.padding = 10;
 Chart.defaults.plugins.tooltip.cornerRadius = 8;
 function R(v){ v = Number(v) || 0; return 'R' + v.toLocaleString('en-US', {maximumFractionDigits: 2}); }
@@ -558,10 +558,9 @@ var pieCount = { legend: { position: 'bottom' }, tooltip: { callbacks: { label: 
               .Append("<h1>").Append(Esc(v.Heading)).Append("</h1>")
               .Append("<p>").Append(Esc(v.Intro)).Append("</p>")
               .Append("<div class=\"rp-hero-actions\">")
-              .Append("<a class=\"rp-btn rp-btn-primary\" href=\"ManagerDashboard.aspx\">&larr; Back to Dashboard</a>")
+              .Append("<a class=\"rp-btn rp-btn-primary\" href=\"ManagerDashboard.aspx\">Back to Dashboard</a>")
               .Append("<button type=\"button\" class=\"rp-btn rp-btn-ghost\" onclick=\"window.print()\">Print / Save as PDF</button>")
               .Append("</div></div>")
-              .Append("<div class=\"rp-hero-badge\"><div class=\"rp-hero-badge-inner\"><strong>AVUNA</strong><span>REPORTS</span></div></div>")
               .Append("</section>");
 
             sb.Append("<main class=\"rp-body\">");
@@ -579,8 +578,8 @@ var pieCount = { legend: { position: 'bottom' }, tooltip: { callbacks: { label: 
               .Append(Pill("Reports.aspx?report=" + v.Active + "&range=6", "Last 6 months", range == 6))
               .Append(Pill("Reports.aspx?report=" + v.Active + "&range=12", "Last 12 months", range == 12))
               .Append(Pill("Reports.aspx?report=" + v.Active + "&range=all", "All time", range == 0))
-              .Append("<span class=\"rp-updated\">Live data from SQL Server &middot; generated ")
-              .Append(DateTime.Now.ToString("dd MMM yyyy HH:mm", CultureInfo.InvariantCulture)).Append("</span></div>");
+              .Append("<span class=\"rp-updated\">Updated ")
+              .Append(DateTime.Now.ToString("d MMM yyyy, HH:mm", CultureInfo.InvariantCulture)).Append("</span></div>");
 
             if (problems.Count > 0)
             {
@@ -773,7 +772,7 @@ var pieCount = { legend: { position: 'bottom' }, tooltip: { callbacks: { label: 
             // ---- page ----
             var body = new StringBuilder();
             body.Append("<section class=\"rp-kpis\">")
-                .Append(Rpt.Kpi("TOTAL SALES", Rpt.Money(totalSales), "All orders except cancelled", "#113334", "R"))
+                .Append(Rpt.Kpi("TOTAL SALES", Rpt.Money(totalSales), "All orders except cancelled", "#2a2118", "R"))
                 .Append(Rpt.Kpi("THIS MONTH", Rpt.Money(thisMonth), delta, "#d9711f", "&#9650;"))
                 .Append(Rpt.Kpi("AVERAGE ORDER", Rpt.Money(Math.Round(avg, 2)), Rpt.Int(sold.Count) + " orders counted", "#d9a52c", "&#8960;"))
                 .Append(Rpt.Kpi("LARGEST ORDER", Rpt.Money(largest), "Biggest single order", "#2f8f83", "&#9733;"))
@@ -793,7 +792,7 @@ var pieCount = { legend: { position: 'bottom' }, tooltip: { callbacks: { label: 
             const string charts = @"
 mk('cMonthly', { type: 'bar', data: { labels: __ML__, datasets: [
   { type: 'bar', label: 'Sales', data: __MS__, backgroundColor: '#d9711f', borderRadius: 8, maxBarThickness: 46, order: 2 },
-  { type: 'line', label: 'Orders', data: __MC__, borderColor: '#113334', backgroundColor: '#113334', borderWidth: 3, tension: .15, pointRadius: 4, yAxisID: 'y1', order: 1 } ] },
+  { type: 'line', label: 'Orders', data: __MC__, borderColor: '#2a2118', backgroundColor: '#2a2118', borderWidth: 3, tension: .15, pointRadius: 4, yAxisID: 'y1', order: 1 } ] },
   options: { interaction: { mode: 'index', intersect: false },
     scales: { x: noGrid, y: moneyY, y1: { position: 'right', beginAtZero: true, grid: { drawOnChartArea: false }, ticks: { precision: 0 } } },
     plugins: { legend: { position: 'top', align: 'end' }, tooltip: { callbacks: { label: function(c){ return ' ' + c.dataset.label + ': ' + (c.dataset.yAxisID === 'y1' ? c.parsed.y + ' orders' : R(c.parsed.y)); } } } } } });
@@ -835,9 +834,9 @@ mk('cDist', { type: 'bar', data: { labels: __DL__, datasets: [{ label: 'Orders',
 
             return new ReportView
             {
-                Eyebrow = "AVUNA COLLECTIVE REPORTS",
-                Heading = "Sales report.",
-                Intro = "Revenue, payments and customer spending taken live from your SQL Server database.",
+                Eyebrow = "MANAGER PORTAL",
+                Heading = "Sales Report",
+                Intro = "Revenue, payments and customer spending.",
                 Active = "sales",
                 Body = body.ToString(),
                 Script = Rpt.Script(js)
@@ -942,7 +941,7 @@ mk('cDist', { type: 'bar', data: { labels: __DL__, datasets: [{ label: 'Orders',
 
             var body = new StringBuilder();
             body.Append("<section class=\"rp-kpis\">")
-                .Append(Rpt.Kpi("TOTAL ORDERS", Rpt.Int(orders.Count), "All orders recorded", "#113334", "#"))
+                .Append(Rpt.Kpi("TOTAL ORDERS", Rpt.Int(orders.Count), "All orders recorded", "#2a2118", "#"))
                 .Append(Rpt.Kpi("PENDING", Rpt.Int(pending), "Not yet started", "#d9a52c", "!"))
                 .Append(Rpt.Kpi("IN PROGRESS", Rpt.Int(inProgress), "Currently being made", "#d9711f", "&#9881;"))
                 .Append(Rpt.Kpi("COMPLETED", Rpt.Int(completed), "Fulfilled orders", "#2f8f5b", "&#10003;"))
@@ -986,9 +985,9 @@ mk('cPay', { type: 'pie', data: { labels: __PL__, datasets: [{ data: __PV__, bac
 
             return new ReportView
             {
-                Eyebrow = "AVUNA COLLECTIVE REPORTS",
-                Heading = "Order report.",
-                Intro = "Status, ageing and payment position of every customer order, taken live from SQL Server.",
+                Eyebrow = "MANAGER PORTAL",
+                Heading = "Order Report",
+                Intro = "Every order's status, age and payment position.",
                 Active = "orders",
                 Body = body.ToString(),
                 Script = Rpt.Script(js)
@@ -1057,7 +1056,7 @@ mk('cPay', { type: 'pie', data: { labels: __PL__, datasets: [{ data: __PV__, bac
 
             var body = new StringBuilder();
             body.Append("<section class=\"rp-kpis\">")
-                .Append(Rpt.Kpi("TOTAL CUSTOMERS", Rpt.Int(customers.Count), "Registered accounts", "#113334", "&#9673;"))
+                .Append(Rpt.Kpi("TOTAL CUSTOMERS", Rpt.Int(customers.Count), "Registered accounts", "#2a2118", "&#9673;"))
                 .Append(Rpt.Kpi("ACTIVE CUSTOMERS", Rpt.Int(active), "Have placed at least one order", "#2f8f5b", "&#10003;"))
                 .Append(Rpt.Kpi("REPEAT CUSTOMERS", Rpt.Int(repeat), "Ordered two or more times", "#d9711f", "&#8635;"))
                 .Append(Rpt.Kpi("AVERAGE SPEND", Rpt.Money(Math.Round(avgSpend, 2)), "Per customer who has ordered", "#d9a52c", "R"))
@@ -1101,9 +1100,9 @@ mk('cTrend', { type: 'line', data: { labels: __ML__, datasets: [{ label: 'Averag
 
             return new ReportView
             {
-                Eyebrow = "AVUNA COLLECTIVE REPORTS",
-                Heading = "Customer report.",
-                Intro = "Who your customers are, how loyal they are and what they think - taken live from SQL Server.",
+                Eyebrow = "MANAGER PORTAL",
+                Heading = "Customer Report",
+                Intro = "Who your customers are, how often they return and what they say.",
                 Active = "customers",
                 Body = body.ToString(),
                 Script = Rpt.Script(js)
@@ -1147,7 +1146,7 @@ mk('cTrend', { type: 'line', data: { labels: __ML__, datasets: [{ label: 'Averag
 
             var body = new StringBuilder();
             body.Append("<section class=\"rp-kpis\">")
-                .Append(Rpt.Kpi("ADMIN STAFF", Rpt.Int(admin.Count), "Managers and administrators", "#113334", "&#10003;"))
+                .Append(Rpt.Kpi("ADMIN STAFF", Rpt.Int(admin.Count), "Managers and administrators", "#2a2118", "&#10003;"))
                 .Append(Rpt.Kpi("MANAGERS", Rpt.Int(managers), "With manager access", "#d9711f", "&#9733;"))
                 .Append(Rpt.Kpi("PRODUCTION STAFF", Rpt.Int(production.Count), "Making the orders", "#2f8f83", "&#9881;"))
                 .Append(Rpt.Kpi("PAYMENTS PROCESSED", Rpt.Int(handled.Count), "Payments captured by staff", "#d9a52c", "#"))
@@ -1165,7 +1164,7 @@ mk('cRoles', { type: 'doughnut', data: { labels: __RL__, datasets: [{ data: __RV
   options: { cutout: '62%', plugins: pieCount } });
 mk('cPerStaff', { type: 'bar', data: { labels: __SL__, datasets: [
   { type: 'bar', label: 'Value', data: __SV__, backgroundColor: P, borderRadius: 8, maxBarThickness: 46, order: 2 },
-  { type: 'line', label: 'Payments', data: __SC__, borderColor: '#113334', backgroundColor: '#113334', borderWidth: 3, tension: .15, pointRadius: 4, yAxisID: 'y1', order: 1 } ] },
+  { type: 'line', label: 'Payments', data: __SC__, borderColor: '#2a2118', backgroundColor: '#2a2118', borderWidth: 3, tension: .15, pointRadius: 4, yAxisID: 'y1', order: 1 } ] },
   options: { scales: { x: noGrid, y: moneyY, y1: { position: 'right', beginAtZero: true, grid: { drawOnChartArea: false }, ticks: { precision: 0 } } },
     plugins: { legend: { display: false }, tooltip: { callbacks: { label: function(c){ return ' ' + c.dataset.label + ': ' + (c.dataset.yAxisID === 'y1' ? c.parsed.y : R(c.parsed.y)); } } } } } });
 mk('cMonthly', { type: 'bar', data: { labels: __ML__, datasets: [
@@ -1187,9 +1186,9 @@ mk('cMonthly', { type: 'bar', data: { labels: __ML__, datasets: [
 
             return new ReportView
             {
-                Eyebrow = "AVUNA COLLECTIVE REPORTS",
-                Heading = "Staff report.",
-                Intro = "Your team, their roles and the payments they process - taken live from SQL Server.",
+                Eyebrow = "MANAGER PORTAL",
+                Heading = "Staff Report",
+                Intro = "Your team, their roles and the payments they process.",
                 Active = "staff",
                 Body = body.ToString(),
                 Script = Rpt.Script(js)

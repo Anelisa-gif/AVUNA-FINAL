@@ -10,6 +10,64 @@
     </asp:PlaceHolder>
     <webopt:bundlereference runat="server" path="~/Content/css" />
     <link href="~/favicon.ico" rel="shortcut icon" type="image/x-icon" />
+    <style>
+        .avuna-navbar { background-color: #2a2118 !important; padding-top: 14px; padding-bottom: 14px; }
+        .avuna-navbar .avuna-brand .brand-name { font-size: 28px; letter-spacing: .3px; }
+        .avuna-navbar .nav-link { font-size: 19px; padding: 8px 16px !important; }
+    </style>
+    <style>
+/* =====================================================================
+   REPORT PAGES — photo hero, larger type, warm palette
+   ===================================================================== */
+body .rp-page {
+    --teal: #2a2118; --teal2: #3a2c1e; --ink: #3a3028; --muted: #8a7f72; --line: #ece4d6;
+    background: #f7f3ec; font-family: "Segoe UI", Arial, Helvetica, sans-serif;
+}
+body .rp-hero {
+    box-sizing: border-box;
+    background-color: #3a2c1e;
+    background-image:
+        linear-gradient(90deg, rgba(34,24,16,0.90) 0%, rgba(34,24,16,0.72) 42%, rgba(34,24,16,0.30) 74%, rgba(34,24,16,0.08) 100%),
+        url("images/Jersey.jpg");
+    background-size: auto, cover;
+    background-position: center, center 30%;
+    background-repeat: no-repeat;
+    padding: 70px 7% 120px;
+    min-height: 500px;
+}
+body .rp-hero:before, body .rp-hero:after { display: none; }
+body .rp-hero-badge { display: none; }
+body .rp-hero-copy { max-width: 900px; }
+body .rp-eyebrow { font-size: 15px; letter-spacing: 3px; margin-bottom: 16px; }
+body .rp-hero h1 { font-size: 76px; line-height: 1.02; font-weight: 700; margin: 0 0 22px; text-shadow: 0 2px 14px rgba(0,0,0,.45); }
+body .rp-hero p { max-width: 640px; color: rgba(255,255,255,.92); text-shadow: 0 1px 8px rgba(0,0,0,.45); font-size: 22px; line-height: 1.55; margin: 0 0 34px; }
+body .rp-btn { padding: 17px 30px; font-size: 17px; }
+body .rp-btn-ghost { background: rgba(255,255,255,.12); }
+body .rp-body { margin-top: -62px; }
+body .rp-tabs { box-shadow: 0 12px 35px rgba(42,33,24,.12); }
+body .rp-tab { font-size: 16px; padding: 16px 18px; }
+body .rp-tab:hover { background: #f3ece0; }
+body .rp-toolbar { font-size: 14px; }
+body .rp-toolbar b { font-size: 12px; }
+body .rp-pill { font-size: 14px; padding: 8px 17px; }
+body .rp-kpi, body .rp-card, body .rp-kpis .rp-kpi { box-shadow: 0 12px 35px rgba(42,33,24,.10); }
+body .rp-kpi-label { font-size: 12px; }
+body .rp-kpi-value { font-size: 30px; }
+body .rp-kpi-sub { font-size: 13px; }
+body .rp-card-h h3 { font-size: 21px; }
+body .rp-card-h p { font-size: 14px; }
+body .rp-table th { background: #f7f3ec; font-size: 11px; padding: 14px 16px; }
+body .rp-table td { border-top-color: #efe7da; font-size: 14px; padding: 14px 16px; }
+body .rp-table tbody tr:hover { background: #faf6ee; }
+body .rp-badge { font-size: 11px; padding: 6px 11px; }
+body .rp-tl-date { font-size: 12px; }
+body .rp-tl-title { font-size: 15px; }
+body .rp-tl-text { font-size: 14px; }
+body .rp-empty, body .rp-nodata { font-size: 15px; }
+body .rp-notice, body .rp-nochart { font-size: 14px; }
+@media (max-width: 700px) { body .rp-hero h1 { font-size: 46px; } body .rp-hero { padding: 45px 25px 100px; } }
+@media print { body .rp-hero { background-image: none !important; background: #3a2c1e !important; min-height: 0; padding: 20px 7%; } body .rp-hero h1 { font-size: 40px; } }
+    </style>
     <asp:ContentPlaceHolder ID="head" runat="server">
     </asp:ContentPlaceHolder>
 </head>
@@ -34,7 +92,7 @@
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark bg-dark avuna-navbar">
             <div class="container">
                 <a class="navbar-brand avuna-brand" runat="server" href="~/ManagerDashboard">
-                    <span class="brand-name">Avuna Collective — Manager</span>
+                    <span class="brand-name">Avuna Collective  Manager</span>
                 </a>
                 <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" title="Toggle navigation" aria-controls="navbarSupportedContent"
                     aria-expanded="false" aria-label="Toggle navigation">
@@ -44,6 +102,7 @@
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item"><a class="nav-link" runat="server" href="~/ManagerDashboard">Dashboard</a></li>
                         <li class="nav-item"><a class="nav-link" runat="server" href="~/ManageStaff">Staff</a></li>
+                        
                         <li class="nav-item"><a class="nav-link" runat="server" href="~/ManageOrders">Orders</a></li>
                         <li class="nav-item"><a class="nav-link" runat="server" href="~/ManagerLogOut">Log Out</a></li>
                     </ul>

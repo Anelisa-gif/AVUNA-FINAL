@@ -263,13 +263,69 @@ font-weight: bold; font-size: 18px;
 .avuna-card-header { flex-direction: column; align-items: flex-start; gap: 12px; }
 }
 </style>
+<style>
+/* =========================================================
+MANAGER PAGES — photo hero, larger type, warm palette
+========================================================= */
+.avuna-manager-page { background: #f7f3ec; color: #3a3028; font-family: "Segoe UI", Arial, Helvetica, sans-serif; }
+.avuna-manager-hero {
+box-sizing: border-box;
+background-color: #3a2c1e;
+background-image:
+linear-gradient(90deg, rgba(34,24,16,0.88) 0%, rgba(34,24,16,0.7) 40%, rgba(34,24,16,0.28) 72%, rgba(34,24,16,0.06) 100%),
+url("<%= ResolveUrl("~/images/GG-0653_PinksInks_29_lg.jpg") %>");
+background-size: auto, cover;
+background-position: center, center 18%;
+background-repeat: no-repeat;
+padding: 70px 7%;
+min-height: 470px;
+}
+.avuna-manager-hero:before, .avuna-manager-hero:after { display: none; }
+.avuna-manager-copy { max-width: 900px; }
+.avuna-eyebrow { font-size: 15px; letter-spacing: 3px; margin-bottom: 16px; }
+.avuna-manager-copy h1 { font-size: 76px; line-height: 1.02; font-weight: 700; margin: 0 0 22px; text-shadow: 0 2px 14px rgba(0,0,0,.45); }
+.avuna-manager-copy p { max-width: 640px; color: rgba(255,255,255,.92); text-shadow: 0 1px 8px rgba(0,0,0,.45); font-size: 22px; line-height: 1.55; margin-bottom: 34px; }
+.avuna-button { padding: 17px 30px; font-size: 17px; }
+.avuna-button-outline { background: rgba(255,255,255,.12); }
+.avuna-button-outline:hover { color: #2a2118; }
+.avuna-manager-badge { width: 230px; height: 230px; background: rgba(34,24,16,.35); }
+.avuna-manager-badge-inner { width: 165px; height: 165px; color: #2a2118; }
+.avuna-manager-badge-inner strong { font-size: 30px; }
+.avuna-manager-badge-inner span { font-size: 12px; }
+.avuna-welcome { border-color: #ece4d6; box-shadow: 0 12px 35px rgba(42,33,24,.10); }
+.avuna-welcome strong { color: #2a2118; font-size: 22px; }
+.avuna-welcome span { color: #8a7f72; font-size: 16px; }
+.avuna-stat-card, .avuna-card { border-color: #ece4d6; box-shadow: 0 12px 35px rgba(42,33,24,.10); }
+.avuna-stat-icon svg { display: block; }
+.avuna-green-icon { background: #f3ece0; color: #2a2118; }
+.avuna-stat-label { font-size: 13px; color: #8a7f72; }
+.avuna-stat-card h2 { color: #2a2118; font-size: 42px; font-weight: 700; }
+.avuna-stat-description { color: #8a7f72; font-size: 14px; }
+.avuna-card-header { border-bottom-color: #efe7da; }
+.avuna-card-header h2, .avuna-orders-header h2 { color: #2a2118; font-size: 28px; }
+.avuna-card-header p, .avuna-orders-header p { color: #8a7f72; font-size: 15px; }
+.avuna-view-all { font-size: 15px; }
+.avuna-table th { background: #f7f3ec; color: #8a7f72; font-size: 12px; padding: 16px 20px; }
+.avuna-table td { border-top-color: #efe7da; font-size: 15px; }
+.avuna-table tbody tr:hover { background: #faf6ee; }
+.avuna-order-number { color: #2a2118; }
+.avuna-status { font-size: 12px; padding: 7px 12px; }
+@media(max-width:700px) { .avuna-manager-copy h1 { font-size: 46px; } .avuna-manager-hero { padding: 45px 25px; } }
+.avuna-edit-btn { background: #2a2118; border-color: #2a2118; font-size: 13px; }
+.avuna-edit-btn:hover { background: #4a3a2a; border-color: #4a3a2a; }
+.avuna-archive-btn { font-size: 13px; }
+.avuna-modal-head { background: linear-gradient(120deg, #2a2118, #3a2c1e 70%, #4a3a2a); }
+.avuna-modal-avatar, .avuna-modal-close:hover { color: #2a2118; }
+.avuna-type-admin .avuna-type-icon { background: #2a2118; }
+.avuna-idbox strong, .avuna-type-card strong, .avuna-modal-cancel, .avuna-gen-btn { color: #2a2118; }
+</style>
 <div class="avuna-manager-page">
 <!-- ===================================================== HERO ===================================================== -->
 <section class="avuna-manager-hero">
 <div class="avuna-manager-copy">
-<span class="avuna-eyebrow">AVUNA COLLECTIVE MANAGEMENT PORTAL</span>
-<h1 style="color: white;">Your team at a glance.</h1>
-<p>Monitor your embroidery and production staff, shifts and workloads from one place.</p>
+<span class="avuna-eyebrow">MANAGER PORTAL</span>
+<h1 style="color: white;">Staff Management</h1>
+<p>Admin and production team members at Avuna Collective.</p>
 <div class="avuna-hero-buttons">
 <a href="#" onclick="return openAddChooser();" class="avuna-button avuna-button-orange avuna-button-main">+ Add Staff Member</a>
 </div>
@@ -287,9 +343,8 @@ font-weight: bold; font-size: 18px;
 <div class="avuna-welcome">
 <div>
 <strong>Welcome back, <asp:Literal ID="litManagerName" runat="server" />.</strong>
-<span>Here is an overview of your embroidery and production team.</span>
 </div>
-<div class="avuna-business-status">&#9679; Staff Data</div>
+<span><%: DateTime.Now.ToString("dddd, d MMMM yyyy", System.Globalization.CultureInfo.InvariantCulture) %></span>
 </div>
 <!-- STAFF STATISTICS -->
     <asp:Literal ID="litDbNotice" runat="server" />
@@ -341,84 +396,84 @@ font-weight: bold; font-size: 18px;
         var name = btn.getAttribute('data-name') || btn.getAttribute('data-id');
         if (!confirm('Archive ' + name + '?\n\nThey will be moved out of the active staff list into the archive.')) return;
         document.getElementById('<%= hfKind.ClientID %>').value = btn.getAttribute('data-kind');
-    document.getElementById('<%= hfId.ClientID %>').value = btn.getAttribute('data-id');
-    document.getElementById('<%= btnArchive.ClientID %>').click();
-}
-
-function $ed(id) { return document.getElementById(id); }
-
-function openEdit(d) {
-    $ed('edKind').value = d.kind;
-    $ed('edId').value = d.id;
-    $ed('edFirst').value = d.first || '';
-    $ed('edLast').value = d.last || '';
-    $ed('edPhone').value = d.phone || '';
-    $ed('edEmail').value = d.email || '';
-    $ed('edUsername').value = d.username || '';
-    $ed('edPassword').value = '';
-
-    var isAdmin = d.kind === 'admin';
-    var fields = document.querySelectorAll('.ed-admin');
-    for (var i = 0; i < fields.length; i++) fields[i].style.display = isAdmin ? '' : 'none';
-
-    var role = $ed('edRole');
-    if (isAdmin) {
-        var found = false;
-        for (var j = 0; j < role.options.length; j++) { if (role.options[j].value.toLowerCase() === (d.role || '').toLowerCase()) { role.selectedIndex = j; found = true; } }
-        if (!found && d.role) { role.add(new Option(d.role, d.role)); role.value = d.role; }
+        document.getElementById('<%= hfId.ClientID %>').value = btn.getAttribute('data-id');
+        document.getElementById('<%= btnArchive.ClientID %>').click();
     }
-    role.disabled = !!d.self;                                   // you cannot change your own role
-    $ed('edRoleNote').style.display = d.self ? 'block' : 'none';
 
-    var name = ((d.first || '') + ' ' + (d.last || '')).trim();
-    $ed('edTitle').textContent = name || 'Staff member';
-    $ed('edMeta').textContent = (isAdmin ? 'ADMIN STAFF' : 'PRODUCTION STAFF') + '  \u00B7  ' + d.id;
-    $ed('edAvatar').textContent = (((d.first || '').charAt(0)) + ((d.last || '').charAt(0))).toUpperCase() || 'AV';
-    $ed('edClientError').style.display = 'none';
+    function $ed(id) { return document.getElementById(id); }
 
-    var m = $ed('edModal');
-    m.classList.add('avuna-open');
-    document.body.style.overflow = 'hidden';
-    setTimeout(function () { m.classList.add('avuna-show'); $ed('edFirst').focus(); }, 20);
-}
+    function openEdit(d) {
+        $ed('edKind').value = d.kind;
+        $ed('edId').value = d.id;
+        $ed('edFirst').value = d.first || '';
+        $ed('edLast').value = d.last || '';
+        $ed('edPhone').value = d.phone || '';
+        $ed('edEmail').value = d.email || '';
+        $ed('edUsername').value = d.username || '';
+        $ed('edPassword').value = '';
 
-function editStaff(btn) {
-    var selfId = '<%= Session["staff_ID"] == null ? "" : System.Web.HttpUtility.JavaScriptStringEncode(Session["staff_ID"].ToString()) %>';
-    var id = btn.getAttribute('data-id');
-    openEdit({
-        kind: btn.getAttribute('data-kind'), id: id,
-        first: btn.getAttribute('data-first'), last: btn.getAttribute('data-last'),
-        phone: btn.getAttribute('data-phone'), email: btn.getAttribute('data-email'),
-        role: btn.getAttribute('data-role'), username: btn.getAttribute('data-username'),
-        self: btn.getAttribute('data-kind') === 'admin' && id === selfId
-    });
-}
+        var isAdmin = d.kind === 'admin';
+        var fields = document.querySelectorAll('.ed-admin');
+        for (var i = 0; i < fields.length; i++) fields[i].style.display = isAdmin ? '' : 'none';
 
-function closeEdit() {
-    var m = $ed('edModal');
-    m.classList.remove('avuna-show');
-    document.body.style.overflow = '';
-    setTimeout(function () { m.classList.remove('avuna-open'); }, 250);
-}
+        var role = $ed('edRole');
+        if (isAdmin) {
+            var found = false;
+            for (var j = 0; j < role.options.length; j++) { if (role.options[j].value.toLowerCase() === (d.role || '').toLowerCase()) { role.selectedIndex = j; found = true; } }
+            if (!found && d.role) { role.add(new Option(d.role, d.role)); role.value = d.role; }
+        }
+        role.disabled = !!d.self;                                   // you cannot change your own role
+        $ed('edRoleNote').style.display = d.self ? 'block' : 'none';
 
-function validateEdit() {
-    var msg = '';
-    var isAdmin = $ed('edKind').value === 'admin';
-    if (!$ed('edFirst').value.trim()) msg = 'Please enter the first name.';
-    else if (!$ed('edLast').value.trim()) msg = 'Please enter the last name.';
-    else if (!/^[0-9+()\- ]{7,20}$/.test($ed('edPhone').value.trim())) msg = 'Please enter a valid phone number (digits only).';
-    else if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test($ed('edEmail').value.trim())) msg = 'Please enter a valid email address.';
-    else if (isAdmin && !$ed('edUsername').value.trim()) msg = 'Please enter a username - the staff member needs it to log in.';
-    if (msg) { var b = $ed('edClientError'); b.textContent = msg; b.style.display = 'block'; return false; }
-    return true;
-}
+        var name = ((d.first || '') + ' ' + (d.last || '')).trim();
+        $ed('edTitle').textContent = name || 'Staff member';
+        $ed('edMeta').textContent = (isAdmin ? 'ADMIN STAFF' : 'PRODUCTION STAFF') + '  \u00B7  ' + d.id;
+        $ed('edAvatar').textContent = (((d.first || '').charAt(0)) + ((d.last || '').charAt(0))).toUpperCase() || 'AV';
+        $ed('edClientError').style.display = 'none';
 
-document.addEventListener('keydown', function (e) {
-    if (e.key === 'Escape') closeEdit();
-    // Enter inside the pop-up saves (instead of submitting the hidden Archive button)
-    if (e.key === 'Enter' && e.target && e.target.closest && e.target.closest('#edModal') && e.target.tagName === 'INPUT') {
-        e.preventDefault();
-        document.getElementById('<%= btnSave.ClientID %>').click();
+        var m = $ed('edModal');
+        m.classList.add('avuna-open');
+        document.body.style.overflow = 'hidden';
+        setTimeout(function () { m.classList.add('avuna-show'); $ed('edFirst').focus(); }, 20);
+    }
+
+    function editStaff(btn) {
+        var selfId = '<%= Session["staff_ID"] == null ? "" : System.Web.HttpUtility.JavaScriptStringEncode(Session["staff_ID"].ToString()) %>';
+        var id = btn.getAttribute('data-id');
+        openEdit({
+            kind: btn.getAttribute('data-kind'), id: id,
+            first: btn.getAttribute('data-first'), last: btn.getAttribute('data-last'),
+            phone: btn.getAttribute('data-phone'), email: btn.getAttribute('data-email'),
+            role: btn.getAttribute('data-role'), username: btn.getAttribute('data-username'),
+            self: btn.getAttribute('data-kind') === 'admin' && id === selfId
+        });
+    }
+
+    function closeEdit() {
+        var m = $ed('edModal');
+        m.classList.remove('avuna-show');
+        document.body.style.overflow = '';
+        setTimeout(function () { m.classList.remove('avuna-open'); }, 250);
+    }
+
+    function validateEdit() {
+        var msg = '';
+        var isAdmin = $ed('edKind').value === 'admin';
+        if (!$ed('edFirst').value.trim()) msg = 'Please enter the first name.';
+        else if (!$ed('edLast').value.trim()) msg = 'Please enter the last name.';
+        else if (!/^[0-9+()\- ]{7,20}$/.test($ed('edPhone').value.trim())) msg = 'Please enter a valid phone number (digits only).';
+        else if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test($ed('edEmail').value.trim())) msg = 'Please enter a valid email address.';
+        else if (isAdmin && !$ed('edUsername').value.trim()) msg = 'Please enter a username - the staff member needs it to log in.';
+        if (msg) { var b = $ed('edClientError'); b.textContent = msg; b.style.display = 'block'; return false; }
+        return true;
+    }
+
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') closeEdit();
+        // Enter inside the pop-up saves (instead of submitting the hidden Archive button)
+        if (e.key === 'Enter' && e.target && e.target.closest && e.target.closest('#edModal') && e.target.tagName === 'INPUT') {
+            e.preventDefault();
+            document.getElementById('<%= btnSave.ClientID %>').click();
     }
 });
 </script>
@@ -578,35 +633,35 @@ document.addEventListener('keydown', function (e) {
         if (e.key === 'Enter' && e.target && e.target.closest && e.target.closest('#adStep2') && e.target.tagName === 'INPUT') {
             e.preventDefault();
             document.getElementById('<%= btnAdd.ClientID %>').click();
-    }
-});
+        }
+    });
 </script>
 <asp:Literal ID="litActionMessage" runat="server" />
 <asp:HiddenField ID="hfKind" runat="server" />
 <asp:HiddenField ID="hfId" runat="server" />
 <asp:Button ID="btnArchive" runat="server" Text="Archive" OnClick="btnArchive_Click" style="display:none" />
 <script>
-function archiveStaff(btn) {
-    var name = btn.getAttribute('data-name') || btn.getAttribute('data-id');
-    if (!confirm('Archive ' + name + '?\n\nThey will be moved out of the active staff list into the archive.')) return;
-    document.getElementById('<%= hfKind.ClientID %>').value = btn.getAttribute('data-kind');
+    function archiveStaff(btn) {
+        var name = btn.getAttribute('data-name') || btn.getAttribute('data-id');
+        if (!confirm('Archive ' + name + '?\n\nThey will be moved out of the active staff list into the archive.')) return;
+        document.getElementById('<%= hfKind.ClientID %>').value = btn.getAttribute('data-kind');
     document.getElementById('<%= hfId.ClientID %>').value = btn.getAttribute('data-id');
     document.getElementById('<%= btnArchive.ClientID %>').click();
-}
+    }
 </script>
 <!-- STAFF STATISTICS -->
 <section class="avuna-stat-grid">
 <article class="avuna-stat-card">
 <div class="avuna-stat-top">
-<div class="avuna-stat-icon avuna-green-icon">&#9673;</div>
+<div class="avuna-stat-icon avuna-green-icon"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.6-3.6 3.2-5.5 6.5-5.5s5.9 1.9 6.5 5.5"/><path d="M16 4.7a3.5 3.5 0 0 1 0 6.6M18.5 14.8c1.7.7 2.8 2.3 3 5.2"/></svg></div>
 <span class="avuna-stat-label">TOTAL STAFF</span>
 </div>
 <h2><asp:Literal ID="litTotalStaff" runat="server" /></h2>
-<span class="avuna-stat-description">Admin and production staff combined</span>
+<span class="avuna-stat-description">Admin and production</span>
 </article>
 <article class="avuna-stat-card">
 <div class="avuna-stat-top">
-<div class="avuna-stat-icon avuna-orange-icon">&#10003;</div>
+<div class="avuna-stat-icon avuna-orange-icon"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M9 12l2 2 4-4"/></svg></div>
 <span class="avuna-stat-label">ADMIN &amp; MANAGERS</span>
 </div>
 <h2><asp:Literal ID="litAdminCount" runat="server" /></h2>
@@ -614,30 +669,29 @@ function archiveStaff(btn) {
 </article>
 <article class="avuna-stat-card">
 <div class="avuna-stat-top">
-<div class="avuna-stat-icon avuna-gold-icon">&#9881;</div>
+<div class="avuna-stat-icon avuna-gold-icon"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.5 6.5a4 4 0 0 0-5 5L3 18l3 3 6.5-6.5a4 4 0 0 0 5-5l-2.5 2.5-2.5-.5-.5-2.5z"/></svg></div>
 <span class="avuna-stat-label">PRODUCTION STAFF</span>
 </div>
 <h2><asp:Literal ID="litProductionCount" runat="server" /></h2>
-<span class="avuna-stat-description">Making the orders</span>
+<span class="avuna-stat-description">Production team</span>
 </article>
 <article class="avuna-stat-card">
 <div class="avuna-stat-top">
-<div class="avuna-stat-icon avuna-red-icon">#</div>
+<div class="avuna-stat-icon avuna-red-icon"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4h6l1 2h3v15H5V6h3z"/><path d="M9 12h6M9 16h6"/></svg></div>
 <span class="avuna-stat-label">ORDERS IN PRODUCTION</span>
 </div>
 <h2><asp:Literal ID="litInProduction" runat="server" /></h2>
-<span class="avuna-stat-description">Orders with status In Progress</span>
+<span class="avuna-stat-description">Currently in progress</span>
 </article>
 </section>
 <!-- STAFF LIST -->
 <section class="avuna-card">
 <div class="avuna-card-header">
 <div>
-<span class="avuna-eyebrow">TEAM DIRECTORY</span>
 <h2>Staff Members</h2>
 <p><asp:Literal ID="litDirectorySubtitle" runat="server" /></p>
 </div>
-<a href="Reports.aspx?report=staff" class="avuna-view-all">View staff report &rarr;</a>
+<a href="Reports.aspx?report=staff" class="avuna-view-all">Staff report</a>
 </div>
 <div class="avuna-table-wrap">
 <table class="avuna-table">

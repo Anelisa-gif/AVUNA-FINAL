@@ -218,15 +218,66 @@ background: #113334; color: white; transition: .25s ease; text-decoration: none;
 .avuna-orders-header { flex-direction: column; align-items: flex-start; gap: 12px; }
 }
 </style>
+<style>
+/* =========================================================
+MANAGER PAGES — photo hero, larger type, warm palette
+========================================================= */
+.avuna-manager-page { background: #f7f3ec; color: #3a3028; font-family: "Segoe UI", Arial, Helvetica, sans-serif; }
+.avuna-manager-hero {
+box-sizing: border-box;
+background-color: #3a2c1e;
+background-image:
+linear-gradient(90deg, rgba(34,24,16,0.93) 0%, rgba(34,24,16,0.82) 40%, rgba(34,24,16,0.4) 72%, rgba(34,24,16,0.1) 100%),
+url("<%= ResolveUrl("~/images/golf tshirt.jpg") %>");
+background-size: auto, cover;
+background-position: center, center 42%;
+background-repeat: no-repeat;
+padding: 70px 7%;
+min-height: 470px;
+}
+.avuna-manager-hero:before, .avuna-manager-hero:after { display: none; }
+.avuna-manager-copy { max-width: 900px; }
+.avuna-eyebrow { font-size: 15px; letter-spacing: 3px; margin-bottom: 16px; }
+.avuna-manager-copy h1 { font-size: 76px; line-height: 1.02; font-weight: 700; margin: 0 0 22px; text-shadow: 0 2px 14px rgba(0,0,0,.45); }
+.avuna-manager-copy p { max-width: 640px; color: rgba(255,255,255,.92); text-shadow: 0 1px 8px rgba(0,0,0,.45); font-size: 22px; line-height: 1.55; margin-bottom: 34px; }
+.avuna-button { padding: 17px 30px; font-size: 17px; }
+.avuna-button-outline { background: rgba(255,255,255,.12); }
+.avuna-button-outline:hover { color: #2a2118; }
+.avuna-manager-badge { width: 230px; height: 230px; background: rgba(34,24,16,.35); }
+.avuna-manager-badge-inner { width: 165px; height: 165px; color: #2a2118; }
+.avuna-manager-badge-inner strong { font-size: 30px; }
+.avuna-manager-badge-inner span { font-size: 12px; }
+.avuna-welcome { border-color: #ece4d6; box-shadow: 0 12px 35px rgba(42,33,24,.10); }
+.avuna-welcome strong { color: #2a2118; font-size: 22px; }
+.avuna-welcome span { color: #8a7f72; font-size: 16px; }
+.avuna-stat-card, .avuna-card { border-color: #ece4d6; box-shadow: 0 12px 35px rgba(42,33,24,.10); }
+.avuna-stat-icon svg { display: block; }
+.avuna-green-icon { background: #f3ece0; color: #2a2118; }
+.avuna-stat-label { font-size: 13px; color: #8a7f72; }
+.avuna-stat-card h2 { color: #2a2118; font-size: 42px; font-weight: 700; }
+.avuna-stat-description { color: #8a7f72; font-size: 14px; }
+.avuna-card-header { border-bottom-color: #efe7da; }
+.avuna-card-header h2, .avuna-orders-header h2 { color: #2a2118; font-size: 28px; }
+.avuna-card-header p, .avuna-orders-header p { color: #8a7f72; font-size: 15px; }
+.avuna-view-all { font-size: 15px; }
+.avuna-table th { background: #f7f3ec; color: #8a7f72; font-size: 12px; padding: 16px 20px; }
+.avuna-table td { border-top-color: #efe7da; font-size: 15px; }
+.avuna-table tbody tr:hover { background: #faf6ee; }
+.avuna-order-number { color: #2a2118; }
+.avuna-status { font-size: 12px; padding: 7px 12px; }
+@media(max-width:700px) { .avuna-manager-copy h1 { font-size: 46px; } .avuna-manager-hero { padding: 45px 25px; } }
+.avuna-orders-header { }
+.avuna-eyebrow-inline { font-size: 14px; }
+</style>
 <div class="avuna-manager-page">
 <!-- ===================================================== HERO ===================================================== -->
 <section class="avuna-manager-hero">
 <div class="avuna-manager-copy">
-<span class="avuna-eyebrow">AVUNA COLLECTIVE MANAGEMENT PORTAL</span>
-<h1 style="color: white;">Orders, tracked end to end.</h1>
-<p>View and manage every customer order moving through production.</p>
+<span class="avuna-eyebrow">MANAGER PORTAL</span>
+<h1 style="color: white;">Orders</h1>
+<p>Every customer order and its current status.</p>
 <div class="avuna-hero-buttons">
-<a href="ManageOrders.aspx?view=pending" class="avuna-button avuna-button-orange">Pending Orders &rarr;</a>
+<a href="ManageOrders.aspx?view=pending" class="avuna-button avuna-button-orange">Pending Orders</a>
 <a href="ManagerDashboard.aspx" class="avuna-button avuna-button-outline">Back to Dashboard</a>
 </div>
 </div>
@@ -243,16 +294,15 @@ background: #113334; color: white; transition: .25s ease; text-decoration: none;
 <div class="avuna-welcome">
 <div>
 <strong>Welcome back, <asp:Literal ID="litManagerName" runat="server" />.</strong>
-<span>Here is the current state of all customer orders.</span>
 </div>
-<div class="avuna-business-status">&#9679; Order Data</div>
+<span><%: DateTime.Now.ToString("dddd, d MMMM yyyy", System.Globalization.CultureInfo.InvariantCulture) %></span>
 </div>
 <asp:Literal ID="litDbNotice" runat="server" />
 <!-- ORDER STATISTICS -->
 <section class="avuna-stat-grid">
 <article class="avuna-stat-card">
 <div class="avuna-stat-top">
-<div class="avuna-stat-icon avuna-orange-icon">#</div>
+<div class="avuna-stat-icon avuna-orange-icon"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4h6l1 2h3v15H5V6h3z"/><path d="M9 12h6M9 16h6"/></svg></div>
 <span class="avuna-stat-label">TOTAL ORDERS</span>
 </div>
 <h2><asp:Literal ID="litTotalOrders" runat="server" Text="0" /></h2>
@@ -260,7 +310,7 @@ background: #113334; color: white; transition: .25s ease; text-decoration: none;
 </article>
 <article class="avuna-stat-card">
 <div class="avuna-stat-top">
-<div class="avuna-stat-icon avuna-red-icon">!</div>
+<div class="avuna-stat-icon avuna-red-icon"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div>
 <span class="avuna-stat-label">PENDING</span>
 </div>
 <h2><asp:Literal ID="litPendingCount" runat="server" Text="0" /></h2>
@@ -268,15 +318,15 @@ background: #113334; color: white; transition: .25s ease; text-decoration: none;
 </article>
 <article class="avuna-stat-card">
 <div class="avuna-stat-top">
-<div class="avuna-stat-icon avuna-gold-icon">&#9881;</div>
+<div class="avuna-stat-icon avuna-gold-icon"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.5 6.5a4 4 0 0 0-5 5L3 18l3 3 6.5-6.5a4 4 0 0 0 5-5l-2.5 2.5-2.5-.5-.5-2.5z"/></svg></div>
 <span class="avuna-stat-label">IN PROGRESS</span>
 </div>
 <h2><asp:Literal ID="litInProgressCount" runat="server" Text="0" /></h2>
-<span class="avuna-stat-description">Currently being made</span>
+<span class="avuna-stat-description">In production</span>
 </article>
 <article class="avuna-stat-card">
 <div class="avuna-stat-top">
-<div class="avuna-stat-icon avuna-green-icon">&#10003;</div>
+<div class="avuna-stat-icon avuna-green-icon"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l3 3 5-6"/></svg></div>
 <span class="avuna-stat-label">COMPLETED</span>
 </div>
 <h2><asp:Literal ID="litCompletedCount" runat="server" Text="0" /></h2>
@@ -287,7 +337,6 @@ background: #113334; color: white; transition: .25s ease; text-decoration: none;
 <section class="avuna-card" id="orders-table">
 <div class="avuna-orders-header">
 <div>
-<span class="avuna-eyebrow-inline">ORDER DETAILS</span>
 <h2><asp:Literal ID="litTableTitle" runat="server" /></h2>
 <p><asp:Literal ID="litTableSubtitle" runat="server" /></p>
 </div>
