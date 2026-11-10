@@ -109,16 +109,7 @@
 .status-processing { background: #fff0df; color: #c46715; }
 .status-completed { background: #e4f5ec; color: #287a52; }
 .status-pending { background: #fff4d7; color: #9a7416; }
-/* SHORTCUT CARDS */
-.action-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 20px; margin-bottom: 24px; }
-.action-card { position: relative; overflow: hidden; transition: all .25s ease; }
-.action-card:hover { transform: translateY(-6px); box-shadow: 0 18px 35px rgba(0,0,0,.10); }
-.action-card:after { content: ""; position: absolute; width: 130px; height: 130px; border-radius: 50%; right: -60px; top: -60px; background: rgba(244,123,32,.06); }
-.action-icon { width: 52px; height: 52px; border-radius: 14px; background: #fff0e4; color: var(--avuna-orange); display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: 900; margin-bottom: 20px; }
-.action-card h3 { margin: 7px 0; font-size: 20px; }
-.action-card p { color: #777; font-size: 13px; line-height: 1.6; min-height: 60px; }
-.customer-outline { border: 1px solid #d8d4cd; color: #222 !important; background: white; }
-.customer-outline:hover { border-color: var(--avuna-orange); color: var(--avuna-orange) !important; transform: translateY(-2px); }
+
 /* RESPONSIVE */
 @media(max-width: 1000px) {
   .customer-stat-grid { grid-template-columns: repeat(2,1fr); }
@@ -142,7 +133,7 @@
       <h1 style="color: white;">Your orders, tracked end to end.</h1>
       <p>Check the status, progress and value of everything you've ordered from AVUNA.</p>
       <div class="customer-hero-actions">
-        <a href="SubmitDesign.aspx" class="customer-btn customer-btn-orange">＋ Submit New Design</a>
+        <a href="~/CreateOrder.aspx" runat="server" class="customer-btn customer-btn-orange">Create a New Order</a>
         <a href="CustomerDashboard.aspx" class="customer-btn customer-btn-light">Back to Dashboard</a>
       </div>
     </div>
@@ -214,30 +205,7 @@
         </asp:GridView>
       </div>
     </section>
-    <!-- SHORTCUT CARDS -->
-    <div class="action-grid">
-      <section class="customer-card action-card">
-        <div class="action-icon">✦</div>
-        <span class="customer-dark-eyebrow">NEW IDEA?</span>
-        <h3>Submit a Design</h3>
-        <p>Have a new concept? Send us your design, product and requirements.</p>
-        <a href="SubmitDesign.aspx" class="customer-btn customer-btn-orange">Submit Design</a>
-      </section>
-      <section class="customer-card action-card">
-        <div class="action-icon">R</div>
-        <span class="customer-dark-eyebrow">PAYMENTS</span>
-        <h3>Payment History</h3>
-        <p>View your previous payments, balances, methods and payment status.</p>
-        <a href="Payments.aspx" class="customer-btn customer-outline">View Payments</a>
-      </section>
-      <section class="customer-card action-card">
-        <div class="action-icon">?</div>
-        <span class="customer-dark-eyebrow">NEED HELP?</span>
-        <h3>AVUNA Support</h3>
-        <p>Keep your order number ready when contacting the AVUNA COLLECTIVE team.</p>
-        <a href="Contact.aspx" class="customer-btn customer-outline">Contact Us</a>
-      </section>
-    </div>
+   
   </main>
 </div>
 </asp:Content>

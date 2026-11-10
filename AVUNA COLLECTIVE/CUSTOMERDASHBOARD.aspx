@@ -179,6 +179,23 @@ right: -35px; bottom: -35px; background: rgba(244,123,32,.05);
 .customer-card { padding: 20px; }
 .tier-track { grid-template-columns: repeat(2,1fr); }
 }
+
+.action-cards {
+  display: flex;
+  gap: 24px;          /* space between the two cards */
+  margin-top: 24px;   /* space between these and the loyalty card above */
+}
+
+.action-cards .action-card {
+  flex: 1;            /* both cards share the width equally */
+}
+
+@media (max-width: 768px) {
+  .action-cards {
+    flex-direction: column;
+  }
+}
+
 </style>
 <div class="customer-dashboard">
 <!-- ===================================================== HERO ===================================================== -->
@@ -188,8 +205,8 @@ right: -35px; bottom: -35px; background: rgba(244,123,32,.05);
 <h1 style="color: white;">Welcome back</h1>
 <p>Your AVUNA space for orders, payments, designs and account information all in one place.</p>
 <div class="customer-hero-actions">
-<a href="SubmitDesign.aspx" class="customer-btn customer-btn-orange">+ Submit New Design</a>
-<a href="MyOrders.aspx" class="customer-btn customer-btn-light">View My Orders ↓</a>
+<a href="~/CreateOrder.aspx" runat="server" class="customer-btn customer-btn-orange">Create a New Order</a>
+<a href="MyOrders.aspx" class="customer-btn customer-btn-light">View My Orders</a>
 </div>
 </div>
 <div class="customer-hero-badge">
@@ -299,34 +316,27 @@ right: -35px; bottom: -35px; background: rgba(244,123,32,.05);
 </section>
 </div>
 <!-- ACTION CARDS -->
-<div class="action-grid">
 
-2. My Orders Page
-Order-focused stats plus the full orders GridView pulled out of the old dashboard.
+    <div class="action-cards">
+
 <!-- DESIGN -->
 <section class="customer-card action-card">
 <div class="action-icon">✦</div>
-<span class="customer-dark-eyebrow">NEW IDEA?</span>
-<h3>Submit a Design</h3>
+<span class="customer-dark-eyebrow">WANT TO CREATE A NEW ORDER?</span>
+<h3>Create a New Order</h3>
 <p>Have a new concept? Send us your design, product and requirements.</p>
-<a href="SubmitDesign.aspx" class="customer-btn customer-btn-orange">Submit Design</a>
+<a href="~/CreateOrder.aspx" runat="server" class="customer-btn customer-btn-orange">Create a New Order</a>
 </section>
+
 <!-- PAYMENTS -->
 <section class="customer-card action-card">
 <div class="action-icon">R</div>
 <span class="customer-dark-eyebrow">PAYMENTS</span>
 <h3>Payment History</h3>
 <p>View your previous payments, balances, methods and payment status.</p>
-<a href="Payments.aspx" class="customer-btn customer-outline">View Payments</a>
+<a href="~/MyOrders.aspx" runat="server" class="customer-btn customer-outline">View Payments</a>
 </section>
-<!-- SUPPORT -->
-<section class="customer-card action-card">
-<div class="action-icon">?</div>
-<span class="customer-dark-eyebrow">NEED HELP?</span>
-<h3>AVUNA Support</h3>
-<p>Keep your order number ready when contacting the AVUNA COLLECTIVE team.</p>
-<a href="Contact.aspx" class="customer-btn customer-outline">Contact Us</a>
-</section>
+
 </div>
 </main>
 </div>
