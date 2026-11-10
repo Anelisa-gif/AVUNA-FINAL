@@ -73,9 +73,28 @@ namespace AVUNA_COLLECTIVE
 
         private void ShowServerMessage(string message, bool success)
         {
-            ServerFeedbackHtml = "<div class=\"feedback " + (success ? "success" : "error") +
-                "\" style=\"display:block\" role=\"status\">" +
-                HttpUtility.HtmlEncode(message) + "</div>";
+            string safeMessage = HttpUtility.HtmlEncode(message);
+            if (success)
+            {
+                // Render a centered success dialog only after the save has committed.
+                // The order ID is taken from the server-side session-confirmed redirect.
+                ServerFeedbackHtml =
+                    "<div id=\"orderSuccessOverlay\" class=\"avuna-confirm-overlay\" role=\"presentation\">" +
+                    "<div class=\"avuna-confirm-dialog\" role=\"alertdialog\" aria-modal=\"true\" " +
+                    "aria-labelledby=\"orderSuccessTitle\" aria-describedby=\"orderSuccessText\">" +
+                    "<div class=\"avuna-confirm-icon\" aria-hidden=\"true\">&#10003;</div>" +
+                    "<h2 id=\"orderSuccessTitle\">Order Added Successfully!</h2>" +
+                    "<p id=\"orderSuccessText\">" + safeMessage + "</p>" +
+                    "<p class=\"avuna-confirm-muted\">Your order is now Pending.</p>" +
+                    "<button id=\"closeOrderSuccess\" type=\"button\" class=\"avuna-confirm-close\" " +
+                    "onclick=\"document.getElementById('orderSuccessOverlay').style.display='none';\">Close</button>" +
+                    "</div></div>";
+            }
+            else
+            {
+                ServerFeedbackHtml = "<div class=\"feedback error\" style=\"display:block\" " +
+                    "role=\"alert\">" + safeMessage + "</div>";
+            }
         }
 
         private void SubmitOrderFromPostback(JavaScriptSerializer serializer)
@@ -446,6 +465,48 @@ namespace AVUNA_COLLECTIVE
             }
         }
 
+        // Deduct stock for each exact inventory variant AND its parent inventory item.
+        // Must run using the same open connection and transaction as all order inserts.
+        // Do not call this separately after tx.Commit().
+        private static void DeductStockForOrder(SqlConnection con, SqlTransaction tx,
+                                                List<OrderLine> lines)
+        {
+            foreach (var line in lines)
+            {
+                // Guarded update makes over-selling impossible even if stock has changed.
+                using (var cmd = new SqlCommand(@"
+                    UPDATE dbo.InventoryVariant
+                    SET QuantityAvailable = QuantityAvailable - @quantity
+                    WHERE Variant_ID = @variant
+                      AND QuantityAvailable >= @quantity;", con, tx))
+                {
+                    cmd.Parameters.Add("@quantity", SqlDbType.Int).Value = line.Quantity;
+                    cmd.Parameters.Add("@variant", SqlDbType.Int).Value = line.VariantId;
+                    if (cmd.ExecuteNonQuery() != 1)
+                        throw new OrderValidationException(
+                            "The selected size or colour no longer has enough stock. " +
+                            "Your order was not saved. Please review your selection.");
+                }
+
+                // Deduct the same quantity from the parent Inventory total.
+                using (var cmd = new SqlCommand(@"
+                    UPDATE i
+                    SET i.quantityAvailable = i.quantityAvailable - @quantity
+                    FROM dbo.Inventory AS i
+                    INNER JOIN dbo.InventoryVariant AS v ON v.item_ID = i.item_ID
+                    WHERE v.Variant_ID = @variant
+                      AND i.quantityAvailable >= @quantity;", con, tx))
+                {
+                    cmd.Parameters.Add("@quantity", SqlDbType.Int).Value = line.Quantity;
+                    cmd.Parameters.Add("@variant", SqlDbType.Int).Value = line.VariantId;
+                    if (cmd.ExecuteNonQuery() != 1)
+                        throw new OrderValidationException(
+                            "The main inventory does not have enough stock for this order. " +
+                            "Nothing was saved. Please contact AVUNA staff.");
+                }
+            }
+        }
+
         private string SaveOrder(CheckoutRequest request, HttpPostedFile file)
         {
             int customerId;
@@ -623,6 +684,10 @@ namespace AVUNA_COLLECTIVE
                                 AddText(cmd, "@order", orderId, 50);
                                 cmd.Parameters.Add("@customer", SqlDbType.Int).Value = customerId;
                             });
+
+                        // All inserts + Customer latest-order update + BOTH stock deductions
+                        // are atomic: any failure triggers the catch/rollback below.
+                        DeductStockForOrder(con, tx, lines);
 
                         tx.Commit();
                         return orderId;

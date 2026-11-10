@@ -101,8 +101,9 @@ body .rp-notice, body .rp-nochart { font-size: 14px; }
                 <div class="collapse navbar-collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item"><a class="nav-link" runat="server" href="~/ManagerDashboard">Dashboard</a></li>
-                        <li class="nav-item"><a class="nav-link" runat="server" href="~/ManageStaff">Staff</a></li>
-                        
+                        <li class="nav-item"><a class="nav-link" runat="server" href="~/ManageStaff">Manage Staff</a></li>
+                        <li class="nav-item"><a class="nav-link" runat="server" href="~/ManageCustomers">Manage Customers</a></li>
+                        <li class="nav-item"><a class="nav-link" runat="server" href="~/Inventory">Inventory Management</a></li>
                         <li class="nav-item"><a class="nav-link" runat="server" href="~/ManageOrders">Orders</a></li>
                         <li class="nav-item"><a class="nav-link" runat="server" href="~/ManagerLogOut">Log Out</a></li>
                     </ul>

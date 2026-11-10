@@ -144,8 +144,10 @@
     <Content Include="images\Picture9.jpg" />
     <Content Include="images\sweater.jpg" />
     <Content Include="images\tshirt.jpg" />
+    <Content Include="Inventory.aspx" />
     <Content Include="LogOut.aspx" />
     <Content Include="Login.aspx" />
+    <Content Include="ManageCustomers.aspx" />
     <Content Include="ManageOrders.aspx" />
     <Content Include="MANAGERDASHBOARD.aspx" />
     <Content Include="ManagerLogout.aspx" />
@@ -257,12 +259,26 @@
     <Compile Include="CUSTOMERDASHBOARD.aspx.designer.cs">
       <DependentUpon>CUSTOMERDASHBOARD.aspx</DependentUpon>
     </Compile>
+    <Compile Include="Inventory.aspx.cs">
+      <DependentUpon>Inventory.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Inventory.aspx.designer.cs">
+      <DependentUpon>Inventory.aspx</DependentUpon>
+    </Compile>
     <Compile Include="LogOut.aspx.cs">
       <DependentUpon>LogOut.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="LogOut.aspx.designer.cs">
       <DependentUpon>LogOut.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="ManageCustomers.aspx.cs">
+      <DependentUpon>ManageCustomers.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="ManageCustomers.aspx.designer.cs">
+      <DependentUpon>ManageCustomers.aspx</DependentUpon>
     </Compile>
     <Compile Include="ManageOrders.aspx.cs">
       <DependentUpon>ManageOrders.aspx</DependentUpon>

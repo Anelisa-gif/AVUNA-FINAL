@@ -20,6 +20,15 @@
 .avuna-order .rowline{display:flex;align-items:start;justify-content:space-between;gap:14px;border-bottom:1px solid #eee;padding:14px 0;font-size:14px}.avuna-order .rowline span{color:#777}.avuna-order .rowline strong{text-align:right;overflow-wrap:anywhere}.avuna-order .total{border-radius:12px;background:#191919;color:#fff;padding:22px;margin-top:20px}.avuna-order .total span{color:#bbb;font-size:11px;letter-spacing:1px}.avuna-order .total strong{display:block;color:#f47b20;font-size:30px;margin-top:8px}.avuna-order .note{background:#fff4e9;color:#81542f;padding:15px;border-radius:10px;font-size:12px;line-height:1.6;margin-top:20px}
 .avuna-order .colour-picker{background:#faf9f7;border:1px solid #e5dfd8;border-radius:10px;padding:12px;min-height:52px}.avuna-order .colour-option{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:10px 6px;border-bottom:1px solid #ece8e2}.avuna-order .colour-option:last-child{border-bottom:0}.avuna-order .colour-option label{display:inline-flex;align-items:center;gap:8px;margin:0;font-size:13px;letter-spacing:0;color:#222;text-transform:none;flex:1;min-width:110px}.avuna-order .colour-option input[type=checkbox]{width:17px;height:17px;accent-color:#f47b20}.avuna-order .colour-option input[type=number]{width:112px;height:42px}.avuna-order input[readonly]{background:#f0eeeb;color:#666}.avuna-order .feedback{margin-top:17px;border-radius:10px;padding:14px;display:none;font-size:13px;line-height:1.7}.avuna-order .feedback.error{display:block;background:#fff0ed;color:#a52c21;border:1px solid #efc7bf}.avuna-order .feedback.success{display:block;background:#edfaef;color:#256339;border:1px solid #b5ddbd}.avuna-order .feedback ul{margin:5px 0 0;padding-left:20px}
 @media(max-width:850px){.avuna-order .layout{grid-template-columns:1fr}.avuna-order .hero-mark{display:none}}@media(max-width:550px){.avuna-order .fields{grid-template-columns:1fr}.avuna-order .intro{gap:10px}.avuna-order .pill{font-size:9px}}
+/* Confirmation popup displayed after successful database commit /
+.avuna-confirm-overlay{position:fixed;inset:0;z-index:2147483000;background:rgba(0,0,0,.66);display:flex;align-items:center;justify-content:center;padding:20px}
+.avuna-confirm-dialog{box-sizing:border-box;background:#fff;color:#202020;border-radius:18px;box-shadow:0 22px 70px #0006;text-align:center;width:min(100%,440px);padding:36px 28px;font-family:Arial,sans-serif}
+.avuna-confirm-icon{width:66px;height:66px;border-radius:50%;background:#e7f8eb;color:#24733d;margin:0 auto 18px;display:flex;align-items:center;justify-content:center;font-size:34px;font-weight:900}
+.avuna-confirm-dialog h2{font-size:25px;color:#132c22;margin:0 0 12px}
+.avuna-confirm-dialog p{line-height:1.6;font-size:15px;margin:8px 0;overflow-wrap:anywhere}
+.avuna-confirm-muted{color:#666}
+.avuna-confirm-close{margin-top:20px;border:0;background:#f47b20;color:#fff;border-radius:10px;padding:13px 36px;font-size:15px;font-weight:700;cursor:pointer}
+.avuna-confirm-close:hover,.avuna-confirm-close:focus{background:#d9650e}
 </style>
 <div class="avuna-order" id="createOrderPage">
 <section class="hero"><div class="hero-copy"><div class="eyebrow">AVUNA COLLECTIVE · CUSTOMER PORTAL</div><h1>Your vision,<br />our creation.</h1><p>Choose an item, size and multiple available colours, upload your design and review your quotation.</p><a runat="server" href="~/CustomerDashboard" class="back">Back to Dashboard</a></div><div class="hero-mark"><strong>AV</strong><small>CREATE<br />ORDER</small></div></section>
@@ -56,12 +65,12 @@
 <div class="rowline"><span>Subtotal including VAT</span><strong id="quoteSubtotal">R 0.00</strong></div>
 <div class="rowline"><span>Markup (10% after VAT)</span><strong id="quoteMarkup">R 0.00</strong></div>
 <div class="total"><span>ESTIMATED ORDER TOTAL</span><strong id="quoteTotal">R 0.00</strong></div>
-<div class="note">Inventory and prices are retrieved from Avuna Collective. The design package is based on the number of selected garment colours. Submitting saves your pending order and uploaded design.</div>
+<div class="note">Inventory and prices are retrieved from GroupWst2 using the normal page load. The design package is based on the number of selected garment colours. Submitting saves your pending order and uploaded design. Stock is checked again before saving, and available inventory quantities are deducted when the order is successfully submitted.</div>
 </div></div></div></div>
 <script>
-(function () {
-"use strict";
-var records = <%= InventoryJson %>;
+    (function () {
+        "use strict";
+        var records = <%= InventoryJson %>;
         var fees = { Bronze: 15000, Silver: 25000, Gold: 35000, Platinum: 40000 };
         var currentPackage = "";
         var colourQuantities = {};
