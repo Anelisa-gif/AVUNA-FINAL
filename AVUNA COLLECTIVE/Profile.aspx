@@ -1,5 +1,4 @@
-﻿
-<%@ Page Title="" Language="C#"  MasterPageFile="~/Customer_master.Master" AutoEventWireup="true" CodeBehind="MyOrders.aspx.cs" Inherits="AVUNA_COLLECTIVE.CUSTOMERDASHBOARD" %>
+﻿<%@ Page Title="" Language="C#" MasterPageFile="~/Customer_master.Master" AutoEventWireup="true" CodeBehind="Profile.aspx.cs" Inherits="AVUNA_COLLECTIVE.ProfilePage" %>
 <asp:Content ID="BodyContent" ContentPlaceHolderID="MainContent" runat="server">
 <style>
 /* =========================================================
@@ -41,9 +40,9 @@
   position: absolute;
   width: 380px; height: 380px;
   border: 70px solid rgba(244,123,32,.08);
-}
   border-radius: 50%;
   right: -120px; top: -170px;
+}
 .customer-hero:after {
   content: "";
   position: absolute;
@@ -94,6 +93,38 @@
 .profile-box { background: #f8f7f4; border: 1px solid #ebe7df; border-radius: 12px; padding: 18px; }
 .profile-box label { display: block; color: #888; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; font-weight: 800; margin-bottom: 7px; }
 .profile-box strong { font-size: 14px; color: #222; }
+
+/* ---------- EDIT PROFILE BUTTON + MESSAGE ---------- */
+.profile-edit-btn { padding: 12px 22px; border: none; border-radius: 10px; background: var(--avuna-orange); color: #fff; font-weight: 700; font-size: 14px; cursor: pointer; box-shadow: 0 8px 20px rgba(244,123,32,.25); transition: all .25s ease; white-space: nowrap; }
+.profile-edit-btn:hover { background: #ff8b32; transform: translateY(-2px); }
+.customer-inline-message { display: block; margin-bottom: 18px; font-size: 14px; font-weight: 700; }
+.msg-success { color: var(--avuna-green); background: #eaf6f0; border: 1px solid #cfe9dc; padding: 12px 16px; border-radius: 10px; }
+.msg-error { color: var(--avuna-red); background: #fbeceb; border: 1px solid #f1cfcd; padding: 12px 16px; border-radius: 10px; }
+
+/* ---------- EDIT PROFILE MODAL ---------- */
+.edit-overlay { position: fixed; inset: 0; z-index: 9999; background: rgba(17,17,17,.62); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; padding: 20px; }
+.edit-overlay.open { display: flex; }
+.edit-modal { background: #fff; width: 680px; max-width: 100%; max-height: 95vh; overflow-y: auto; border-radius: 24px; box-shadow: 0 30px 80px rgba(0,0,0,.4); }
+.edit-modal-head { position: relative; overflow: hidden; display: flex; align-items: center; gap: 18px; padding: 30px 32px; color: #fff; background: linear-gradient(120deg, #111111 0%, #191919 60%, #252525 100%); }
+.edit-modal-head:before { content: ""; position: absolute; width: 200px; height: 200px; border: 40px solid rgba(244,123,32,.10); border-radius: 50%; right: -60px; top: -90px; }
+.edit-avatar { position: relative; z-index: 2; flex: 0 0 62px; width: 62px; height: 62px; border-radius: 50%; background: var(--avuna-orange); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 22px; }
+.edit-modal-title { position: relative; z-index: 2; }
+.edit-eyebrow { display: block; color: var(--avuna-orange); font-size: 11px; font-weight: 800; letter-spacing: 2px; margin-bottom: 4px; }
+.edit-modal-title h3 { margin: 0; font-size: 24px; font-weight: 800; color: #fff; }
+.edit-close { position: absolute; z-index: 3; top: 16px; right: 16px; width: 32px; height: 32px; border: none; border-radius: 50%; background: rgba(255,255,255,.18); color: #fff; font-size: 18px; line-height: 1; cursor: pointer; }
+.edit-close:hover { background: rgba(255,255,255,.3); }
+.edit-modal-body { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; padding: 30px 32px 10px; }
+.edit-field label { display: block; font-size: 10px; letter-spacing: 1.2px; color: #888; font-weight: 800; text-transform: uppercase; margin-bottom: 8px; }
+.edit-field .edit-input { width: 100%; box-sizing: border-box; padding: 14px 16px; border: 1px solid var(--avuna-border); border-radius: 12px; background: #f8f7f4; font-size: 15px; color: #222; }
+.edit-field .edit-input:focus { outline: none; border-color: var(--avuna-orange); background: #fff; box-shadow: 0 0 0 3px rgba(244,123,32,.15); }
+.edit-field .edit-input[readonly] { opacity: .65; cursor: not-allowed; }
+.edit-note { grid-column: 1 / -1; margin: -6px 0 0; font-size: 12px; color: #888; }
+.edit-modal-foot { display: flex; justify-content: flex-end; gap: 12px; padding: 20px 32px 30px; }
+.edit-btn-cancel { padding: 14px 26px; border: 1px solid var(--avuna-border); background: #fff; border-radius: 12px; font-weight: 700; cursor: pointer; color: #222; }
+.edit-btn-cancel:hover { background: #f6f4ef; }
+.edit-btn-save { padding: 14px 26px; border: none; background: var(--avuna-orange); color: #fff; border-radius: 12px; font-weight: 800; cursor: pointer; box-shadow: 0 8px 20px rgba(244,123,32,.25); }
+.edit-btn-save:hover { background: var(--avuna-orange-dark); }
+
 /* RESPONSIVE */
 @media(max-width: 1000px) {
   .profile-grid { grid-template-columns: repeat(2,1fr); }
@@ -107,8 +138,12 @@
   .customer-welcome { flex-direction: column; align-items: flex-start; gap: 12px; }
   .customer-card { padding: 20px; }
   .profile-grid { grid-template-columns: 1fr; }
+  .edit-modal-body { grid-template-columns: 1fr; padding: 24px 22px 6px; }
+  .edit-modal-head { padding: 26px 22px; }
+  .edit-modal-foot { padding: 16px 22px 24px; }
 }
 </style>
+
 <div class="customer-dashboard">
   <!-- ===================================================== HERO ===================================================== -->
   <section class="customer-hero">
@@ -125,6 +160,7 @@
       <span>Customer<br />Portal</span>
     </div>
   </section>
+
   <!-- ===================================================== PROFILE BODY ===================================================== -->
   <main class="customer-body">
     <!-- WELCOME -->
@@ -135,6 +171,7 @@
       </div>
       <span class="customer-demo">DATA</span>
     </div>
+
     <!-- PROFILE -->
     <section class="customer-card profile-section">
       <div class="customer-card-heading">
@@ -143,37 +180,99 @@
           <h2>My Profile</h2>
           <p>Your information used for AVUNA COLLECTIVE orders.</p>
         </div>
-        
+        <button type="button" class="profile-edit-btn" onclick="openEditProfile()">Edit profile</button>
       </div>
+
       <asp:Label ID="lblProfileMessage" runat="server" CssClass="customer-inline-message" />
+
       <div class="profile-grid">
         <div class="profile-box">
           <label>Full Name</label>
-          <strong>Luyolata Boyce</strong>
+          <strong><asp:Label ID="lblFullName" runat="server" /></strong>
         </div>
         <div class="profile-box">
           <label>Email</label>
-          <strong>luyolataBoyce2@gmail.com</strong>
+          <strong><asp:Label ID="lblEmail" runat="server" /></strong>
         </div>
         <div class="profile-box">
           <label>Cell Number</label>
-          <strong>071 234 5678</strong>
+          <strong><asp:Label ID="lblPhone" runat="server" /></strong>
         </div>
         <div class="profile-box">
           <label>Customer Type</label>
-          <strong>Individual</strong>
+          <strong><asp:Label ID="lblType" runat="server" /></strong>
         </div>
         <div class="profile-box">
           <label>Address</label>
-          <strong>12 Marine Parade, Durban</strong>
-        </div>
-        <div class="profile-box">
-          <label>Loyalty Tier</label>
-          <strong class="orange-text">Gold</strong>
+          <strong><asp:Label ID="lblAddress" runat="server" /></strong>
         </div>
       </div>
     </section>
   </main>
 </div>
-</asp:Content>
 
+<!-- ===================================================== EDIT PROFILE MODAL ===================================================== -->
+<div class="edit-overlay" id="editProfileOverlay">
+  <div class="edit-modal">
+    <div class="edit-modal-head">
+      <div class="edit-avatar"><asp:Label ID="lblAvatar" runat="server" /></div>
+      <div class="edit-modal-title">
+        <span class="edit-eyebrow">EDIT YOUR DETAILS</span>
+        <h3><asp:Label ID="lblModalName" runat="server" /></h3>
+      </div>
+      <button type="button" class="edit-close" onclick="closeEditProfile()" aria-label="Close">&times;</button>
+    </div>
+
+    <div class="edit-modal-body">
+      <div class="edit-field">
+        <label for="<%= txtFirstName.ClientID %>">First name</label>
+        <asp:TextBox ID="txtFirstName" runat="server" CssClass="edit-input" ReadOnly="true" />
+      </div>
+      <div class="edit-field">
+        <label for="<%= txtLastName.ClientID %>">Last name</label>
+        <asp:TextBox ID="txtLastName" runat="server" CssClass="edit-input" MaxLength="100" />
+      </div>
+
+      <div class="edit-field">
+        <label for="<%= txtPhone.ClientID %>">Phone number</label>
+        <asp:TextBox ID="txtPhone" runat="server" CssClass="edit-input" MaxLength="30" TextMode="Phone" />
+      </div>
+      <div class="edit-field">
+        <label for="<%= txtEmail.ClientID %>">Email address</label>
+        <asp:TextBox ID="txtEmail" runat="server" CssClass="edit-input" MaxLength="150" TextMode="Email" />
+      </div>
+
+      <div class="edit-field">
+        <label for="<%= txtHouse.ClientID %>">House number</label>
+        <asp:TextBox ID="txtHouse" runat="server" CssClass="edit-input" MaxLength="20" />
+      </div>
+      <div class="edit-field">
+        <label for="<%= txtStreet.ClientID %>">Street name</label>
+        <asp:TextBox ID="txtStreet" runat="server" CssClass="edit-input" MaxLength="100" />
+      </div>
+
+      <div class="edit-field">
+        <label for="<%= txtSuburb.ClientID %>">Suburb</label>
+        <asp:TextBox ID="txtSuburb" runat="server" CssClass="edit-input" MaxLength="100" />
+      </div>
+      <div class="edit-field">
+        <label for="<%= txtTown.ClientID %>">Town</label>
+        <asp:TextBox ID="txtTown" runat="server" CssClass="edit-input" MaxLength="100" />
+      </div>
+
+      <p class="edit-note">Your first name can't be changed here. Contact AVUNA support if it needs correcting.</p>
+    </div>
+
+    <div class="edit-modal-foot">
+      <button type="button" class="edit-btn-cancel" onclick="closeEditProfile()">Cancel</button>
+      <asp:Button ID="btnSaveProfile" runat="server" Text="Save changes" CssClass="edit-btn-save" OnClick="btnSaveProfile_Click" />
+    </div>
+  </div>
+</div>
+
+<script>
+  function openEditProfile() { document.getElementById('editProfileOverlay').classList.add('open'); }
+  function closeEditProfile() { document.getElementById('editProfileOverlay').classList.remove('open'); }
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeEditProfile(); });
+</script>
+</asp:Content>

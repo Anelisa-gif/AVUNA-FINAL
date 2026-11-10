@@ -247,10 +247,7 @@
             </div>
 
             <div class="avuna-row-between">
-                <label class="avuna-remember">
-                    <asp:CheckBox ID="chkRemember" runat="server" />
-                    Remember me
-                </label>
+               
                 <a href="#">Forgot password?</a>
             </div>
 

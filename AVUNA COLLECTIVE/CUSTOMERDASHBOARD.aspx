@@ -294,7 +294,8 @@ right: -35px; bottom: -35px; background: rgba(244,123,32,.05);
 <strong class="orange-text">Gold Member</strong>
 </div>
 </div>
-<a href="MyProfile.aspx" class="customer-btn customer-outline full-btn">Manage Profile</a>
+
+    <a href="~/Profile.aspx" runat="server" class="customer-btn customer-outline full-btn">Manage Profile</a>
 </section>
 </div>
 <!-- ACTION CARDS -->

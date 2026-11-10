@@ -121,6 +121,7 @@
     <Content Include="Content\bootstrap.rtl.css" />
     <Content Include="Content\bootstrap.rtl.min.css" />
     <Content Include="Content\Site.css" />
+    <Content Include="CreateOrder.aspx" />
     <Content Include="CUSTOMERDASHBOARD.aspx" />
     <Content Include="Default.aspx" />
     <Content Include="favicon.ico" />
@@ -241,6 +242,13 @@
     </Compile>
     <Compile Include="Contact.aspx.designer.cs">
       <DependentUpon>Contact.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="CreateOrder.aspx.cs">
+      <DependentUpon>CreateOrder.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="CreateOrder.aspx.designer.cs">
+      <DependentUpon>CreateOrder.aspx</DependentUpon>
     </Compile>
     <Compile Include="CUSTOMERDASHBOARD.aspx.cs">
       <DependentUpon>CUSTOMERDASHBOARD.aspx</DependentUpon>
