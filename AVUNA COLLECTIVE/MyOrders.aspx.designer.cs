@@ -11,8 +11,44 @@ namespace AVUNA_COLLECTIVE
 {
 
 
-    public partial class CUSTOMERDASHBOARD
+    public partial class MyOrders
     {
+
+        /// <summary>
+        /// litActive control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal litActive;
+
+        /// <summary>
+        /// litCompleted control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal litCompleted;
+
+        /// <summary>
+        /// litOutstanding control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal litOutstanding;
+
+        /// <summary>
+        /// litTotal control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal litTotal;
 
         /// <summary>
         /// gvOrders control.

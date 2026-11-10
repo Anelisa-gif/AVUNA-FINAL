@@ -1,5 +1,4 @@
-﻿
-<%@ Page Title="" Language="C#"  MasterPageFile="~/Customer_master.Master" AutoEventWireup="true" CodeBehind="MyOrders.aspx.cs" Inherits="AVUNA_COLLECTIVE.CUSTOMERDASHBOARD" %>
+﻿<%@ Page Title="" Language="C#" MasterPageFile="~/Customer_master.Master" AutoEventWireup="true" CodeBehind="MyOrders.aspx.cs" Inherits="AVUNA_COLLECTIVE.MyOrders" %>
 <asp:Content ID="BodyContent" ContentPlaceHolderID="MainContent" runat="server">
 <style>
 /* =========================================================
@@ -109,6 +108,20 @@
 .status-processing { background: #fff0df; color: #c46715; }
 .status-completed { background: #e4f5ec; color: #287a52; }
 .status-pending { background: #fff4d7; color: #9a7416; }
+.status-delivered { background: #e4f5ec; color: #287a52; }
+.status-cancelled { background: #fbe5e3; color: #c94b45; }
+
+.view-design-btn { display: inline-block; padding: 8px 14px; border-radius: 8px; border: 1px solid var(--avuna-orange); background: #fff4e9; color: var(--avuna-orange); font-size: 11px; font-weight: 800; letter-spacing: .5px; cursor: pointer; white-space: nowrap; transition: all .2s ease; }
+.view-design-btn:hover { background: var(--avuna-orange); color: white; transform: translateY(-2px); box-shadow: 0 6px 14px rgba(244,123,32,.3); }
+.no-design { color: #aaa; font-size: 12px; }
+/* IMAGE VIEWER (lightbox) */
+.design-viewer { display: none; position: fixed; inset: 0; z-index: 99999; background: rgba(0,0,0,.82); align-items: center; justify-content: center; padding: 30px; }
+.design-viewer.open { display: flex; }
+.design-viewer-box { position: relative; max-width: 92vw; max-height: 90vh; }
+.design-viewer-box img { display: block; max-width: 92vw; max-height: 85vh; border-radius: 12px; background: white; box-shadow: 0 20px 60px rgba(0,0,0,.5); }
+.design-viewer-caption { margin-top: 12px; text-align: center; color: #f1f1f1; font-size: 13px; font-weight: 700; letter-spacing: .5px; }
+.design-viewer-close { position: absolute; top: -14px; right: -14px; width: 38px; height: 38px; border-radius: 50%; border: none; background: var(--avuna-orange); color: white; font-size: 22px; font-weight: 800; line-height: 1; cursor: pointer; box-shadow: 0 6px 16px rgba(0,0,0,.35); }
+.design-viewer-close:hover { background: #ff8b32; }
 
 /* RESPONSIVE */
 @media(max-width: 1000px) {
@@ -157,25 +170,25 @@
       <article class="customer-stat stat-green">
         <div class="customer-stat-icon">↗</div>
         <small>ACTIVE ORDERS</small>
-        <strong>3</strong>
+        <strong><asp:Literal ID="litActive" runat="server" /></strong>
         <span>Currently in progress</span>
       </article>
       <article class="customer-stat stat-orange">
         <div class="customer-stat-icon">✓</div>
         <small>COMPLETED</small>
-        <strong>12</strong>
+        <strong><asp:Literal ID="litCompleted" runat="server" /></strong>
         <span>Successfully delivered</span>
       </article>
       <article class="customer-stat stat-gold">
         <div class="customer-stat-icon">R</div>
         <small>OUTSTANDING</small>
-        <strong>R2,450</strong>
+        <strong><asp:Literal ID="litOutstanding" runat="server" /></strong>
         <span>Outstanding balance</span>
       </article>
       <article class="customer-stat stat-dark">
         <div class="customer-stat-icon">#</div>
         <small>TOTAL ORDERS</small>
-        <strong>15</strong>
+        <strong><asp:Literal ID="litTotal" runat="server" /></strong>
         <span>Placed all-time</span>
       </article>
     </section>
@@ -189,23 +202,74 @@
         </div>
       </div>
       <div style="overflow-x:auto;">
-        <asp:GridView ID="gvOrders" runat="server" AutoGenerateColumns="False" CssClass="orders-table" GridLines="None">
+        <asp:GridView ID="gvOrders" runat="server" AutoGenerateColumns="False" CssClass="orders-table" GridLines="None"
+            EmptyDataText="You haven't placed any orders yet.">
           <Columns>
-            <asp:BoundField DataField="OrderNumber" HeaderText="Order No." />
-            <asp:BoundField DataField="Product" HeaderText="Product" />
-            <asp:BoundField DataField="Quantity" HeaderText="Qty" />
-            <asp:TemplateField HeaderText="Status">
+            <asp:BoundField DataField="order_ID" HeaderText="Order No." />
+            <asp:BoundField DataField="order_Date" HeaderText="Order Date" DataFormatString="{0:dd MMM yyyy}" />
+            <asp:BoundField DataField="item" HeaderText="Item" />
+            <asp:BoundField DataField="DesignPackage" HeaderText="Package" />
+            <asp:BoundField DataField="orderItem_Quantity" HeaderText="Qty" />
+            <asp:BoundField DataField="orderItem_Size" HeaderText="Size" />
+            <asp:BoundField DataField="orderItem_Colour" HeaderText="Colour" />
+            <asp:TemplateField HeaderText="Design">
               <ItemTemplate>
-                <span class="status status-processing"><%# Eval("Status") %></span>
+                <%# RenderDesign(Eval("designFile_ID"), Eval("order_ID"), Eval("item")) %>
               </ItemTemplate>
             </asp:TemplateField>
-            <asp:BoundField DataField="Total" HeaderText="Total" />
-            <asp:BoundField DataField="Date" HeaderText="Purchase Date" />
+            <asp:TemplateField HeaderText="Status">
+              <ItemTemplate>
+                <span class='status <%# GetStatusClass(Eval("order_Status")) %>'><%# FormatStatus(Eval("order_Status")) %></span>
+              </ItemTemplate>
+            </asp:TemplateField>
+            <asp:BoundField DataField="orderItem_Subtotal" HeaderText="Subtotal" DataFormatString="R {0:N2}" />
           </Columns>
         </asp:GridView>
       </div>
     </section>
-   
+
   </main>
 </div>
+
+<!-- DESIGN PHOTOS (loaded from the database with the page, so they are ready instantly) -->
+<div style="display:none" aria-hidden="true"><%= DesignStoreHtml %></div>
+
+<!-- DESIGN IMAGE VIEWER -->
+<div id="designViewer" class="design-viewer" aria-hidden="true">
+  <div class="design-viewer-box">
+    <button type="button" id="designViewerClose" class="design-viewer-close" aria-label="Close">&times;</button>
+    <img id="designViewerImg" src="" alt="Design preview" />
+    <div id="designViewerCaption" class="design-viewer-caption"></div>
+  </div>
+</div>
+<script>
+    (function () {
+        var viewer = document.getElementById('designViewer');
+        var img = document.getElementById('designViewerImg');
+        var caption = document.getElementById('designViewerCaption');
+
+        function openViewer(src, title) {
+            img.src = src;
+            caption.textContent = title || '';
+            viewer.classList.add('open');
+            viewer.setAttribute('aria-hidden', 'false');
+        }
+        function closeViewer() {
+            viewer.classList.remove('open');
+            viewer.setAttribute('aria-hidden', 'true');
+            img.removeAttribute('src');
+        }
+
+        document.addEventListener('click', function (e) {
+            var btn = e.target.closest ? e.target.closest('.view-design-btn') : null;
+            if (btn) {
+                var source = document.getElementById(btn.getAttribute('data-img'));
+                if (source && source.src) openViewer(source.src, btn.getAttribute('data-title'));
+                return;
+            }
+            if (e.target === viewer || e.target.id === 'designViewerClose') closeViewer();
+        });
+        document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeViewer(); });
+    })();
+</script>
 </asp:Content>
