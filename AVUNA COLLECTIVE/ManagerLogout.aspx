@@ -6,7 +6,7 @@
 .logout-page {
     width: 100%;
     min-height: 100vh;
-    background: linear-gradient(120deg, #111111 0%, #191919 60%, #252525 100%);
+    background: linear-gradient(135deg, #f7f3ec 0%, #f3ece0 60%, #ece4d6 100%);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -20,7 +20,7 @@
     max-width: 420px;
     width: 100%;
     text-align: center;
-    box-shadow: 0 25px 60px rgba(0,0,0,.35);
+    box-shadow: 0 20px 50px rgba(42,33,24,.14); border: 1px solid #ece4d6;
 }
 .logout-badge {
     width: 70px; height: 70px; border-radius: 50%;
