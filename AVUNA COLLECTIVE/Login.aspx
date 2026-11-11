@@ -256,7 +256,8 @@
             <div class="avuna-auth-divider">New here?</div>
 
             <div class="avuna-auth-register">
-                Don't have an account? <a href="~/Register" runat="server">Create one</a>
+               Don't have an account? <a href="~/Register.aspx" runat="server" class="avuna-btn avuna-btn-primary" data-bs-toggle="modal" data-bs-target="#accountTypeModal">Create one</a>
+                   
             </div>
         </div>
     </div>

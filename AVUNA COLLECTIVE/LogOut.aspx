@@ -43,10 +43,10 @@ transition: all .25s ease;
 </style>
 <div class="logout-page">
 <div class="logout-card">
-<div class="logout-badge">✓</div>
-<h1>You've been logged out</h1>
-<p>Thanks for visiting AVUNA COLLECTIVE. Log back in anytime to check your orders, profile and rewards.</p>
-<a href="Login.aspx" class="customer-btn">Back to Login</a>
+
+<h1>You have been logged out</h1>
+<p>Thank you for visiting Avuna Collective. Log back in anytime to visit your profile.</p>
+<a href="Default.aspx" class="customer-btn">Back to Home Page</a>
 </div>
 </div>
 </asp:Content>

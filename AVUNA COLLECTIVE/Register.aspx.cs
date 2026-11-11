@@ -77,14 +77,12 @@ namespace AVUNA_COLLECTIVE
                 return;
             }
 
-
-            // VALIDATE PASSWORD LENGTH
-            if (password.Length < 8)
+            // VALIDATE PASSWORD STRENGTH (matches the rules shown on the page)
+            if (!Regex.IsMatch(password, @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$"))
             {
-                ShowMessage("Password must be at least 8 characters.");
+                ShowMessage("Password must be at least 8 characters and contain an uppercase letter, a lowercase letter, a number and a special character.");
                 return;
             }
-
 
             // CONFIRM PASSWORD
             if (password != confirmPassword)
@@ -92,7 +90,6 @@ namespace AVUNA_COLLECTIVE
                 ShowMessage("Passwords do not match.");
                 return;
             }
-
 
             // CREATE FULL CELL NUMBER
             string cellNumber = "(" + cellCode + ") "
