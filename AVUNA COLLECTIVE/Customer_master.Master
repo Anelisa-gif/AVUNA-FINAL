@@ -27,17 +27,17 @@
         }
 
         #chatToggle {
-            width: 60px;
-            height: 60px;
-            border: none;
+            width: 64px;
+            height: 64px;
+            padding: 0;
+            border: 2px solid #d9a52c;
             border-radius: 50%;
-            background: #263e35;
-            color: white;
-            font-size: 27px;
-            line-height: 1;
+            background: #fff;
             cursor: pointer;
             box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            overflow: hidden;
         }
+        #chatToggle img { width: 100%; height: 100%; object-fit: contain; display: block; }
 
         .chat-window {
             width: 340px;
@@ -161,6 +161,15 @@
                 .chat-suggestions button:hover {
                     background: #f2f2ee;
                 }
+        .avuna-navbar { background-color: #0a1a14 !important; padding-top: 8px; padding-bottom: 8px; }
+        .avuna-navbar .container, .avuna-navbar .container-fluid { max-width: none; padding-left: 24px; padding-right: 24px; flex-wrap: nowrap; }
+        .avuna-navbar .avuna-brand { flex: none; margin-right: 28px; }
+        .avuna-navbar .avuna-brand .brand-name { font-size: 22px; letter-spacing: .3px; white-space: nowrap; }
+        .avuna-navbar .navbar-collapse { flex-grow: 1; }
+        .avuna-navbar .navbar-nav { flex-direction: row; flex-wrap: nowrap; align-items: center; gap: 6px; }
+        .avuna-navbar .nav-link { font-size: 16px; padding: 8px 14px !important; white-space: nowrap; }
+        .avuna-navbar .navbar-nav > .nav-item:last-child { margin-left: auto; }
+        @media (max-width: 991px) { .avuna-navbar .navbar-nav { flex-direction: column; align-items: flex-start; } .avuna-navbar .navbar-nav > .nav-item:last-child { margin-left: 0; } }
     </style>
     <link href="~/favicon.ico" rel="shortcut icon" type="image/x-icon" />
     <asp:ContentPlaceHolder ID="head" runat="server">
@@ -187,6 +196,7 @@
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark bg-dark avuna-navbar">
             <div class="container">
                 <a class="navbar-brand avuna-brand" runat="server" href="~/CustomerDashboard">
+                    <img src="~/avuna-logo.png" class="avuna-logo" alt="Avuna Collective" runat="server" style="height:44px;width:44px;object-fit:cover;border-radius:50%;background:#fff;border:2px solid #d9a52c" />
                     <span class="brand-name">Avuna Collective - Customer</span>
                 </a>
                 <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" title="Toggle navigation" aria-controls="navbarSupportedContent"
@@ -242,9 +252,7 @@
                 </div>
             </div>
 
-            <button type="button" id="chatToggle" onclick="toggleChat()" aria-label="Open Avuna Assistant">
-                💬
-            </button>
+            <button type="button" id="chatToggle" onclick="toggleChat()" aria-label="Open Avuna Assistant"><img runat="server" src="~/avuna-logo.png" alt="" /></button>
         </div>
 
         <script>

@@ -19,19 +19,32 @@
 .avuna-order .submit{background:#f47b20;color:#fff;border:0;border-radius:10px;width:100%;padding:16px;font-weight:800;box-shadow:0 8px 22px #f47b2035;cursor:pointer}.avuna-order .submit:hover{background:#d9650e}
 .avuna-order .rowline{display:flex;align-items:start;justify-content:space-between;gap:14px;border-bottom:1px solid #eee;padding:14px 0;font-size:14px}.avuna-order .rowline span{color:#777}.avuna-order .rowline strong{text-align:right;overflow-wrap:anywhere}.avuna-order .total{border-radius:12px;background:#191919;color:#fff;padding:22px;margin-top:20px}.avuna-order .total span{color:#bbb;font-size:11px;letter-spacing:1px}.avuna-order .total strong{display:block;color:#f47b20;font-size:30px;margin-top:8px}.avuna-order .note{background:#fff4e9;color:#81542f;padding:15px;border-radius:10px;font-size:12px;line-height:1.6;margin-top:20px}
 .avuna-order .colour-picker{background:#faf9f7;border:1px solid #e5dfd8;border-radius:10px;padding:12px;min-height:52px}.avuna-order .colour-option{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:10px 6px;border-bottom:1px solid #ece8e2}.avuna-order .colour-option:last-child{border-bottom:0}.avuna-order .colour-option label{display:inline-flex;align-items:center;gap:8px;margin:0;font-size:13px;letter-spacing:0;color:#222;text-transform:none;flex:1;min-width:110px}.avuna-order .colour-option input[type=checkbox]{width:17px;height:17px;accent-color:#f47b20}.avuna-order .colour-option input[type=number]{width:112px;height:42px}.avuna-order input[readonly]{background:#f0eeeb;color:#666}.avuna-order .feedback{margin-top:17px;border-radius:10px;padding:14px;display:none;font-size:13px;line-height:1.7}.avuna-order .feedback.error{display:block;background:#fff0ed;color:#a52c21;border:1px solid #efc7bf}.avuna-order .feedback.success{display:block;background:#edfaef;color:#256339;border:1px solid #b5ddbd}.avuna-order .feedback ul{margin:5px 0 0;padding-left:20px}
-@media(max-width:850px){.avuna-order .layout{grid-template-columns:1fr}.avuna-order .hero-mark{display:none}}@media(max-width:550px){.avuna-order .fields{grid-template-columns:1fr}.avuna-order .intro{gap:10px}.avuna-order .pill{font-size:9px}}
-/* Confirmation popup displayed after successful database commit /
+@media(max-width:850px){.avuna-order .layout{grid-template-columns:1fr}.avuna-order .hero-mark-logo{display:none}}@media(max-width:550px){.avuna-order .fields{grid-template-columns:1fr}.avuna-order .intro{gap:10px}.avuna-order .pill{font-size:9px}}
+/* Confirmation popup displayed after successful database commit */
 .avuna-confirm-overlay{position:fixed;inset:0;z-index:2147483000;background:rgba(0,0,0,.66);display:flex;align-items:center;justify-content:center;padding:20px}
 .avuna-confirm-dialog{box-sizing:border-box;background:#fff;color:#202020;border-radius:18px;box-shadow:0 22px 70px #0006;text-align:center;width:min(100%,440px);padding:36px 28px;font-family:Arial,sans-serif}
-.avuna-confirm-icon{width:66px;height:66px;border-radius:50%;background:#e7f8eb;color:#24733d;margin:0 auto 18px;display:flex;align-items:center;justify-content:center;font-size:34px;font-weight:900}
+.avuna-confirm-icon{width:120px;height:120px;border-radius:50%;margin:0 auto 14px;background:#fff url("avuna-logo.png") center/contain no-repeat;color:transparent;font-size:0}
 .avuna-confirm-dialog h2{font-size:25px;color:#132c22;margin:0 0 12px}
 .avuna-confirm-dialog p{line-height:1.6;font-size:15px;margin:8px 0;overflow-wrap:anywhere}
 .avuna-confirm-muted{color:#666}
 .avuna-confirm-close{margin-top:20px;border:0;background:#f47b20;color:#fff;border-radius:10px;padding:13px 36px;font-size:15px;font-weight:700;cursor:pointer}
 .avuna-confirm-close:hover,.avuna-confirm-close:focus{background:#d9650e}
+
+.avuna-order .quote-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:22px 0 4px}.avuna-order .quote-head h3{margin:0}
+.avuna-order .quote-actions{display:flex;gap:8px;flex-wrap:wrap}
+.avuna-order .qbtn{border:1.5px solid #f47b20;background:#fff;color:#f47b20;border-radius:10px;padding:9px 14px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;font-family:inherit}.avuna-order .qbtn:hover{background:#fff0e4}
+.avuna-order .qbtn-alt{background:#f47b20;color:#fff}.avuna-order .qbtn-alt:hover{background:#d9650e}.avuna-order .qbtn:disabled{opacity:.6;cursor:wait}
+.avuna-order .quote-msg{display:none;margin:8px 0 2px;padding:10px 12px;border-radius:10px;font-size:13px;line-height:1.5}
+.avuna-order .quote-msg.ok{display:block;background:#e7f4eb;color:#277446}.avuna-order .quote-msg.bad{display:block;background:#fdeaea;color:#b03a3a}
+.av-logo-tile{position:relative;z-index:2;width:190px;height:190px;min-width:190px;flex:none;background:#fff;border:2px solid #d9a52c;border-radius:50%;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.av-logo-tile img{width:100%;height:100%;object-fit:contain;display:block}
+.avuna-manager-hero:before,.avuna-manager-hero:after,.customer-hero:before,.customer-hero:after,.rp-hero:before,.rp-hero:after,.rp-kpi:after,.customer-stat:after,.action-card:after,.avuna-modal-head:after,.edit-modal-head:before,.avuna-order .hero:before{display:none !important}
+.avuna-modal-avatar,.edit-avatar,.customer-avatar{border-radius:50% !important;background:#fff url("avuna-logo.png") center/contain no-repeat !important;color:transparent !important;font-size:0 !important;border:1px solid #d9a52c}
+.avuna-modal-close,.edit-close,.design-viewer-close,.av-nav-btn{border-radius:50% !important}
+@media (max-width:700px){.av-logo-tile{width:130px;height:130px;min-width:130px}}
 </style>
 <div class="avuna-order" id="createOrderPage">
-<section class="hero"><div class="hero-copy"><div class="eyebrow">AVUNA COLLECTIVE · CUSTOMER PORTAL</div><h1>Your vision,<br />our creation.</h1><p>Choose an item, size and multiple available colours, upload your design and review your quotation.</p><a runat="server" href="~/CustomerDashboard" class="back">Back to Dashboard</a></div><div class="hero-mark"><strong>AV</strong><small>CREATE<br />ORDER</small></div></section>
+<section class="hero"><div class="hero-copy"><div class="eyebrow">AVUNA COLLECTIVE · CUSTOMER PORTAL</div><h1>Your vision,<br />our creation.</h1><p>Choose an item, size and multiple available colours, upload your design and review your quotation.</p><a runat="server" href="~/CustomerDashboard" class="back">Back to Dashboard</a></div><div class="av-logo-tile hero-mark-logo"><img runat="server" src="~/avuna-logo.png" alt="Avuna Collective" /></div></section>
 <div class="wrap"><div class="intro"><div><strong>Create a new order</strong><p class="muted">Your custom order details for AVUNA COLLECTIVE.</p></div><span class="pill">NEW ORDER</span></div>
 <div class="layout"><div class="panel"><span class="tag">ORDER DETAILS</span><h2>Customize Your Order</h2><p class="muted">Only available inventory combinations can be selected.</p>
 <div class="fields">
@@ -56,7 +69,8 @@
 <div class="rowline"><span>Quantity</span><strong id="summaryQuantity">-</strong></div>
 <div class="rowline"><span>Design package</span><strong id="summaryPackage">Not selected</strong></div>
 <div class="rowline"><span>Design file</span><strong id="summaryDesign">Not uploaded</strong></div>
-<h3>Your Quotation</h3>
+<div class="quote-head"><h3>Your Quotation</h3><div class="quote-actions"><button type="button" class="qbtn" id="printQuote" title="Print the quotation or save it as a PDF">Print / PDF</button><button type="button" class="qbtn qbtn-alt" id="emailQuote" title="Send the quotation to the email address on your profile">Email me</button></div></div>
+<div id="quoteMessage" class="quote-msg" role="status" aria-live="polite"></div>
 <div class="rowline"><span>Unit cost(s)</span><strong id="quoteUnit">R 0.00</strong></div>
 <div class="rowline"><span>Item cost (quantity × unit cost)</span><strong id="quoteItemCost">R 0.00</strong></div>
 <div class="rowline"><span>Design fee (once)</span><strong id="quoteFee">R 0.00</strong></div>
@@ -208,6 +222,83 @@
             // multipart POST containing the uploaded design and hidden order payload.
             HTMLFormElement.prototype.submit.call(form);
         });
+        // ---- Print / save as PDF and email the quotation ----
+        var quoteMsg = el("quoteMessage");
+        function showQuoteMessage(text, ok) { quoteMsg.textContent = text; quoteMsg.className = "quote-msg " + (ok ? "ok" : "bad"); }
+        function quoteSelection() {
+            var chosen = selections();
+            if (!item.value || !size.value || !chosen.length || !chosen.every(function (v) { return v.valid && !v.conflict; })) {
+                showQuoteMessage("Choose an item, size, colours and quantities first, so there is a quotation to print or email.", false);
+                return null;
+            }
+            quoteMsg.className = "quote-msg";
+            return chosen;
+        }
+        function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
+        function printDocument(chosen) {
+            var logo = new URL("<%= ResolveUrl("~/avuna-logo.png") %>", window.location.href).href;
+            var today = new Date().toLocaleDateString("en-ZA", { day: "numeric", month: "long", year: "numeric" });
+            var colourRows = chosen.map(function (v) {
+                return "<tr><td>" + esc(v.colour) + "</td><td class='r'>" + v.quantity + "</td><td class='r'>" + esc(money(v.unitCents)) + "</td><td class='r'>" + esc(money(v.unitCents * v.quantity)) + "</td></tr>";
+            }).join("");
+            function line(label, id, strong) { return "<tr" + (strong ? " class='s'" : "") + "><td>" + label + "</td><td class='r'>" + esc(el(id).textContent) + "</td></tr>"; }
+            return "<!DOCTYPE html><html><head><meta charset='utf-8'><title>Avuna Collective quotation</title><style>" +
+                "@page{margin:16mm}*{box-sizing:border-box}body{font-family:Arial,Helvetica,sans-serif;color:#2a2118;margin:0;font-size:13px}" +
+                ".head{display:flex;align-items:center;gap:16px;border-bottom:3px solid #d9a52c;padding-bottom:14px;margin-bottom:20px}" +
+                ".head img{width:70px;height:70px;border-radius:50%;border:2px solid #d9a52c;object-fit:contain}" +
+                ".head h1{margin:0;font-size:24px;color:#0a1a14}.head p{margin:3px 0 0;color:#8a7f72;font-size:12px;letter-spacing:2px;font-weight:bold}.head .d{margin-left:auto;text-align:right;color:#6b6055;font-size:12px}" +
+                "h2{font-size:12px;letter-spacing:1.5px;color:#8a7f72;margin:22px 0 8px}table{width:100%;border-collapse:collapse}" +
+                "td,th{padding:9px 10px;border-bottom:1px solid #e7dfd0;text-align:left}th{background:#f7f3ec;color:#8a7f72;font-size:11px;letter-spacing:1px}.r{text-align:right}" +
+                ".k td:first-child{color:#8a7f72;width:38%}.k td:last-child{font-weight:bold}.s td{font-weight:bold}" +
+                ".total{margin-top:18px;background:#0a1a14;color:#fff;border-radius:10px;padding:16px 20px;display:flex;justify-content:space-between;align-items:center;-webkit-print-color-adjust:exact;print-color-adjust:exact}" +
+                ".total small{color:#cfc9a0;letter-spacing:1.5px;font-size:11px}.total strong{color:#f47b20;font-size:26px}" +
+                ".note{margin-top:20px;color:#8a7f72;font-size:11px;line-height:1.6}.foot{margin-top:26px;padding-top:12px;border-top:1px solid #e7dfd0;text-align:center;color:#8a7f72;font-size:11px}" +
+                "</style></head><body>" +
+                "<div class='head'><img src='" + esc(logo) + "' alt='Avuna Collective'><div><h1>Avuna Collective</h1><p>QUOTATION</p></div><div class='d'>Date<br><strong>" + esc(today) + "</strong></div></div>" +
+                "<h2>ORDER DETAILS</h2><table class='k'><tr><td>Item</td><td>" + esc(el("summaryItem").textContent) + "</td></tr><tr><td>Size</td><td>" + esc(el("summarySize").textContent) + "</td></tr>" +
+                "<tr><td>Design package</td><td>" + esc(el("summaryPackage").textContent) + "</td></tr><tr><td>Total quantity</td><td>" + esc(el("summaryQuantity").textContent) + "</td></tr></table>" +
+                "<h2>COLOURS</h2><table><thead><tr><th>COLOUR</th><th class='r'>QTY</th><th class='r'>UNIT COST</th><th class='r'>TOTAL</th></tr></thead><tbody>" + colourRows + "</tbody></table>" +
+                "<h2>QUOTATION</h2><table class='k'>" + line("Item cost (quantity &times; unit cost)", "quoteItemCost") + line("Design fee (once)", "quoteFee") + line("Amount before VAT", "quoteBeforeVat") +
+                line("VAT (15%)", "quoteVat") + line("Subtotal including VAT", "quoteSubtotal") + line("Markup (10% after VAT)", "quoteMarkup") + "</table>" +
+                "<div class='total'><small>ESTIMATED ORDER TOTAL</small><strong>" + esc(el("quoteTotal").textContent) + "</strong></div>" +
+                "<p class='note'>This is an estimate based on current inventory and prices. Stock is checked again when the order is submitted, so the final amount may change if stock or prices change.</p>" +
+                "<div class='foot'>Avuna Collective &middot; 127 Victoria Embankment, Astron Garage, Durban</div></body></html>";
+        }
+        el("printQuote").addEventListener("click", function () {
+            var chosen = quoteSelection();
+            if (!chosen) return;
+            var frame = document.createElement("iframe");
+            frame.setAttribute("aria-hidden", "true");
+            frame.style.cssText = "position:fixed;right:0;bottom:0;width:0;height:0;border:0";
+            document.body.appendChild(frame);
+            var doc = frame.contentWindow.document;
+            doc.open(); doc.write(printDocument(chosen)); doc.close();
+            var started = false;
+            function go() {
+                if (started) return; started = true;
+                try { frame.contentWindow.focus(); frame.contentWindow.print(); } catch (e) { showQuoteMessage("Printing is not available in this browser.", false); }
+                setTimeout(function () { if (frame.parentNode) frame.parentNode.removeChild(frame); }, 60000);
+            }
+            var img = doc.querySelector("img");
+            if (img && !img.complete) { img.onload = go; img.onerror = go; setTimeout(go, 2000); } else { go(); }
+        });
+        el("emailQuote").addEventListener("click", function () {
+            var chosen = quoteSelection();
+            if (!chosen) return;
+            var btn = this, label = btn.textContent;
+            btn.disabled = true; btn.textContent = "Sending...";
+            var body = new URLSearchParams();
+            body.set("avunaAction", "emailQuote");
+            body.set("payload", JSON.stringify({ item: item.value, size: size.value, colours: chosen.map(function (v) { return { colour: v.colour, quantity: v.quantity }; }) }));
+            fetch(window.location.pathname + window.location.search, {
+                method: "POST", credentials: "same-origin",
+                headers: { "X-Requested-With": "XMLHttpRequest", "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8" },
+                body: body.toString()
+            }).then(function (r) { return r.json(); })
+                .then(function (j) { showQuoteMessage(j.message, !!j.ok); })
+                .catch(function () { showQuoteMessage("The quotation could not be emailed right now. Please try Print / PDF instead.", false); })
+                .then(function () { btn.disabled = false; btn.textContent = label; });
+        });
         window.addEventListener("pageshow", function (e) {
             if (e.persisted) {
                 submissionInProgress = false;
@@ -225,3 +316,4 @@
     })();
 </script>
 </asp:Content>
+

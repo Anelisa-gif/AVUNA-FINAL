@@ -11,9 +11,15 @@
     <webopt:bundlereference runat="server" path="~/Content/css" />
     <link href="~/favicon.ico" rel="shortcut icon" type="image/x-icon" />
     <style>
-        .avuna-navbar { background-color: #2a2118 !important; padding-top: 14px; padding-bottom: 14px; }
-        .avuna-navbar .avuna-brand .brand-name { font-size: 28px; letter-spacing: .3px; }
-        .avuna-navbar .nav-link { font-size: 19px; padding: 8px 16px !important; }
+        .avuna-navbar { background-color: #0a1a14 !important; padding-top: 8px; padding-bottom: 8px; }
+        .avuna-navbar .container, .avuna-navbar .container-fluid { max-width: none; padding-left: 24px; padding-right: 24px; flex-wrap: nowrap; }
+        .avuna-navbar .avuna-brand { flex: none; margin-right: 28px; }
+        .avuna-navbar .avuna-brand .brand-name { font-size: 22px; letter-spacing: .3px; white-space: nowrap; }
+        .avuna-navbar .navbar-collapse { flex-grow: 1; }
+        .avuna-navbar .navbar-nav { flex-direction: row; flex-wrap: nowrap; align-items: center; gap: 6px; }
+        .avuna-navbar .nav-link { font-size: 16px; padding: 8px 14px !important; white-space: nowrap; }
+        .avuna-navbar .navbar-nav > .nav-item:last-child { margin-left: auto; }
+        @media (max-width: 991px) { .avuna-navbar .navbar-nav { flex-direction: column; align-items: flex-start; } .avuna-navbar .navbar-nav > .nav-item:last-child { margin-left: 0; } }
     </style>
     <style>
 /* =====================================================================
@@ -92,6 +98,7 @@ body .rp-notice, body .rp-nochart { font-size: 14px; }
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark bg-dark avuna-navbar">
             <div class="container">
                 <a class="navbar-brand avuna-brand" runat="server" href="~/ManagerDashboard">
+                    <img src="~/avuna-logo.png" class="avuna-logo" alt="Avuna Collective" runat="server" style="height:44px;width:44px;object-fit:cover;border-radius:50%;background:#fff;border:2px solid #d9a52c" />
                     <span class="brand-name">Avuna Collective  Manager</span>
                 </a>
                 <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" title="Toggle navigation" aria-controls="navbarSupportedContent"
@@ -125,3 +132,5 @@ body .rp-notice, body .rp-nochart { font-size: 14px; }
     </asp:PlaceHolder>
 </body>
 </html>
+
+ 

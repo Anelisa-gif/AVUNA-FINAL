@@ -34,6 +34,13 @@ namespace AVUNA_COLLECTIVE
                 return;
             }
 
+            // "Email me this quotation" button (sent with fetch from the page, see CreateOrder.aspx).
+            if (Request.Form["avunaAction"] == "emailQuote")
+            {
+                SendQuoteEmailResponse();
+                return;
+            }
+
             Page.Form.Enctype = "multipart/form-data";
             // A redirect after saving prevents an accidental duplicate order on Refresh.
             if (!IsPostBack && !String.IsNullOrWhiteSpace(Request.QueryString["saved"]) &&
@@ -209,6 +216,227 @@ namespace AVUNA_COLLECTIVE
             public string[] errors { get; set; }
             public CheckoutQuote quote { get; set; }
         }
+
+        // =====================================================================
+        //  Email the quotation to the signed-in customer
+        // =====================================================================
+        private static readonly CultureInfo QuoteCulture = new CultureInfo("en-ZA");
+
+        private static string QuoteMoney(int cents)
+        {
+            return "R " + (cents / 100m).ToString("N2", QuoteCulture);
+        }
+
+        private void SendQuoteEmailResponse()
+        {
+            bool ok = false;
+            string message;
+            try
+            {
+                if (Request.Headers["X-Requested-With"] != "XMLHttpRequest")
+                    throw new OrderValidationException("Invalid request.");
+
+                DateTime? last = Session["QuoteEmailLast"] as DateTime?;
+                if (last.HasValue && (DateTime.UtcNow - last.Value).TotalSeconds < 20)
+                    throw new OrderValidationException("Please wait a few seconds before sending another quotation.");
+
+                var serializer = new JavaScriptSerializer { MaxJsonLength = 100000 };
+                var request = serializer.Deserialize<CheckoutRequest>(Request.Form["payload"] ?? "");
+                if (request != null) request.designFileName = "design-to-be-uploaded";
+
+                // The figures are always recalculated on the server from the database prices.
+                var result = ValidateCheckout(request, ReadInventory());
+                if (!result.ok)
+                    throw new OrderValidationException(String.Join(" ", result.errors));
+
+                int customerId;
+                if (!Int32.TryParse(Convert.ToString(Session["customer_ID"]), out customerId) || customerId < 1)
+                    throw new OrderValidationException("Please sign in again.");
+
+                string name = "", email = "";
+                string cs = ConfigurationManager.ConnectionStrings["GroupWst2"].ConnectionString;
+                using (var con = new SqlConnection(cs))
+                using (var cmd = new SqlCommand("SELECT cust_First_Name, cust_Last_Name, cust_Email FROM dbo.Customer WHERE customer_ID = @id", con))
+                {
+                    cmd.Parameters.AddWithValue("@id", customerId);
+                    con.Open();
+                    using (var r = cmd.ExecuteReader())
+                    {
+                        if (r.Read())
+                        {
+                            name = (Convert.ToString(r["cust_First_Name"]) + " " + Convert.ToString(r["cust_Last_Name"])).Trim();
+                            email = Convert.ToString(r["cust_Email"]).Trim();
+                        }
+                    }
+                }
+
+                System.Net.Mail.MailAddress to;
+                try { to = new System.Net.Mail.MailAddress(email, name); }
+                catch (Exception)
+                {
+                    throw new OrderValidationException("There is no valid email address on your profile. Please add one on the Profile page and try again.");
+                }
+
+                string quoteNo = "Q-" + DateTime.Now.ToString("yyyyMMdd-HHmmss", CultureInfo.InvariantCulture);
+                SendQuoteEmail(to, name, quoteNo, result.quote);
+                Session["QuoteEmailLast"] = DateTime.UtcNow;
+                ok = true;
+                message = "Your quotation " + quoteNo + " was sent to " + MaskEmail(to.Address) + ". Please check your inbox (and spam folder).";
+            }
+            catch (OrderValidationException ex)
+            {
+                message = ex.Message;
+            }
+            catch (InvalidOperationException ex)
+            {
+                // Raised by SmtpClient when no SMTP host is configured in Web.config.
+                System.Diagnostics.Trace.TraceError("Quote email not configured: " + ex);
+                message = "Emailing is not set up on this server yet. Please use Print / PDF instead.";
+            }
+            catch (System.Net.Mail.SmtpException ex)
+            {
+                System.Diagnostics.Trace.TraceError("Quote email SMTP error: " + ex);
+                message = "We could not send the email right now. Please try again later or use Print / PDF.";
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Trace.TraceError("Quote email error: " + ex);
+                message = "We could not send the email right now. Please try again later or use Print / PDF.";
+            }
+
+            Response.Clear();
+            Response.ContentType = "application/json";
+            Response.Cache.SetCacheability(HttpCacheability.NoCache);
+            Response.Write(new JavaScriptSerializer().Serialize(new { ok = ok, message = message }));
+            Response.End();
+        }
+
+        private static string MaskEmail(string address)
+        {
+            int at = address.IndexOf('@');
+            if (at < 1) return address;
+            string local = address.Substring(0, at);
+            string shown = local.Length <= 2 ? local.Substring(0, 1) : local.Substring(0, 2);
+            return shown + "****" + address.Substring(at);
+        }
+
+        private void SendQuoteEmail(System.Net.Mail.MailAddress to, string name, string quoteNo, CheckoutQuote q)
+        {
+            using (var msg = new System.Net.Mail.MailMessage())
+            {
+                msg.To.Add(to);
+                msg.Subject = "Your Avuna Collective quotation " + quoteNo;
+
+                var plain = System.Net.Mail.AlternateView.CreateAlternateViewFromString(BuildQuoteText(name, quoteNo, q), null, "text/plain");
+                var html = System.Net.Mail.AlternateView.CreateAlternateViewFromString(BuildQuoteHtml(name, quoteNo, q), null, "text/html");
+                try
+                {
+                    string logoPath = Server.MapPath("~/avuna-logo.png");
+                    if (File.Exists(logoPath))
+                    {
+                        var logo = new System.Net.Mail.LinkedResource(logoPath, "image/png");
+                        logo.ContentId = "avunalogo";
+                        html.LinkedResources.Add(logo);
+                    }
+                }
+                catch (Exception ex) { System.Diagnostics.Trace.TraceWarning("Quote email logo skipped: " + ex.Message); }
+                msg.AlternateViews.Add(plain);
+                msg.AlternateViews.Add(html);
+
+                // Sender and server come from <system.net><mailSettings> in Web.config.
+                using (var smtp = new System.Net.Mail.SmtpClient())
+                {
+                    smtp.Timeout = 20000;
+                    smtp.Send(msg);
+                }
+            }
+        }
+
+        private static string BuildQuoteText(string name, string quoteNo, CheckoutQuote q)
+        {
+            var sb = new System.Text.StringBuilder();
+            sb.AppendLine("AVUNA COLLECTIVE - QUOTATION " + quoteNo);
+            sb.AppendLine("Date: " + DateTime.Now.ToString("d MMMM yyyy", CultureInfo.InvariantCulture));
+            sb.AppendLine();
+            sb.AppendLine("Hi " + (name.Length == 0 ? "there" : name) + ", here is the quotation you requested.");
+            sb.AppendLine();
+            sb.AppendLine("Item: " + q.item);
+            sb.AppendLine("Size: " + q.size);
+            foreach (var c in q.colours)
+                sb.AppendLine("  " + c.colour + ": " + c.quantity + " x " + QuoteMoney(c.unitCents) + " = " + QuoteMoney(c.unitCents * c.quantity));
+            sb.AppendLine("Design package: " + q.package);
+            sb.AppendLine();
+            sb.AppendLine("Item cost: " + QuoteMoney(q.itemCostCents));
+            sb.AppendLine("Design fee (once): " + QuoteMoney(q.designFeeCents));
+            sb.AppendLine("Amount before VAT: " + QuoteMoney(q.beforeVatCents));
+            sb.AppendLine("VAT (15%): " + QuoteMoney(q.vatCents));
+            sb.AppendLine("Subtotal including VAT: " + QuoteMoney(q.subtotalCents));
+            sb.AppendLine("Markup (10% after VAT): " + QuoteMoney(q.markupCents));
+            sb.AppendLine("ESTIMATED ORDER TOTAL: " + QuoteMoney(q.totalCents));
+            sb.AppendLine();
+            sb.AppendLine("This is an estimate based on current inventory. Stock is checked again when you submit your order.");
+            sb.AppendLine("Avuna Collective, 127 Victoria Embankment, Astron Garage, Durban");
+            return sb.ToString();
+        }
+
+        private static string BuildQuoteHtml(string name, string quoteNo, CheckoutQuote q)
+        {
+            Func<string, string> e = s => System.Net.WebUtility.HtmlEncode(s ?? "");
+            var sb = new System.Text.StringBuilder();
+            sb.Append("<div style=\"background:#f7f3ec;padding:24px 12px;font-family:Arial,Helvetica,sans-serif;color:#2a2118\">");
+            sb.Append("<table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" style=\"max-width:620px;margin:0 auto;background:#ffffff;border:1px solid #ece4d6;border-radius:14px;overflow:hidden\">");
+            sb.Append("<tr><td style=\"background:#0a1a14;padding:20px 26px\"><table role=\"presentation\" cellpadding=\"0\" cellspacing=\"0\"><tr>");
+            sb.Append("<td style=\"padding-right:14px\"><img src=\"cid:avunalogo\" width=\"54\" height=\"54\" alt=\"Avuna Collective\" style=\"display:block;border-radius:50%;background:#ffffff;border:2px solid #d9a52c\" /></td>");
+            sb.Append("<td style=\"color:#ffffff;font-size:22px;font-weight:bold\">Avuna Collective<div style=\"color:#d9a52c;font-size:12px;letter-spacing:2px;font-weight:bold;margin-top:3px\">QUOTATION</div></td>");
+            sb.Append("</tr></table></td></tr>");
+            sb.Append("<tr><td style=\"padding:26px\">");
+            sb.Append("<p style=\"margin:0 0 6px;font-size:16px\">Hi " + e(name.Length == 0 ? "there" : name) + ",</p>");
+            sb.Append("<p style=\"margin:0 0 20px;color:#6b6055;font-size:14px;line-height:1.6\">Here is the quotation you requested. Quotation no. <strong>" + e(quoteNo) + "</strong> &middot; " + DateTime.Now.ToString("d MMMM yyyy", CultureInfo.InvariantCulture) + "</p>");
+
+            sb.Append("<table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" style=\"font-size:14px;margin-bottom:18px\">");
+            sb.Append(QuoteRow("Item", e(q.item), false));
+            sb.Append(QuoteRow("Size", e(q.size), false));
+            sb.Append(QuoteRow("Design package", e(q.package), false));
+            sb.Append("</table>");
+
+            sb.Append("<table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" style=\"font-size:14px;margin-bottom:18px;border:1px solid #efe7da\">");
+            sb.Append("<tr style=\"background:#f7f3ec;color:#8a7f72;font-size:11px;letter-spacing:1px\"><td style=\"padding:10px 12px\">COLOUR</td><td style=\"padding:10px 12px;text-align:right\">QTY</td><td style=\"padding:10px 12px;text-align:right\">UNIT COST</td><td style=\"padding:10px 12px;text-align:right\">TOTAL</td></tr>");
+            foreach (var c in q.colours)
+            {
+                sb.Append("<tr><td style=\"padding:10px 12px;border-top:1px solid #efe7da\">" + e(c.colour) + "</td>"
+                    + "<td style=\"padding:10px 12px;border-top:1px solid #efe7da;text-align:right\">" + c.quantity + "</td>"
+                    + "<td style=\"padding:10px 12px;border-top:1px solid #efe7da;text-align:right\">" + e(QuoteMoney(c.unitCents)) + "</td>"
+                    + "<td style=\"padding:10px 12px;border-top:1px solid #efe7da;text-align:right\">" + e(QuoteMoney(c.unitCents * c.quantity)) + "</td></tr>");
+            }
+            sb.Append("</table>");
+
+            sb.Append("<table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" style=\"font-size:14px\">");
+            sb.Append(QuoteRow("Item cost", e(QuoteMoney(q.itemCostCents)), false));
+            sb.Append(QuoteRow("Design fee (once)", e(QuoteMoney(q.designFeeCents)), false));
+            sb.Append(QuoteRow("Amount before VAT", e(QuoteMoney(q.beforeVatCents)), false));
+            sb.Append(QuoteRow("VAT (15%)", e(QuoteMoney(q.vatCents)), false));
+            sb.Append(QuoteRow("Subtotal including VAT", e(QuoteMoney(q.subtotalCents)), false));
+            sb.Append(QuoteRow("Markup (10% after VAT)", e(QuoteMoney(q.markupCents)), false));
+            sb.Append("</table>");
+
+            sb.Append("<table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" style=\"margin-top:18px\"><tr><td style=\"background:#0a1a14;border-radius:10px;padding:18px 20px\">");
+            sb.Append("<div style=\"color:#cfc9a0;font-size:11px;letter-spacing:1.5px\">ESTIMATED ORDER TOTAL</div>");
+            sb.Append("<div style=\"color:#f47b20;font-size:28px;font-weight:bold;margin-top:6px\">" + e(QuoteMoney(q.totalCents)) + "</div>");
+            sb.Append("</td></tr></table>");
+
+            sb.Append("<p style=\"margin:20px 0 0;color:#8a7f72;font-size:12px;line-height:1.6\">This is an estimate based on current inventory and prices. Stock is checked again when you submit your order, so the final amount may change if stock or prices change.</p>");
+            sb.Append("</td></tr>");
+            sb.Append("<tr><td style=\"background:#f7f3ec;padding:14px 26px;color:#8a7f72;font-size:12px;text-align:center\">Avuna Collective &middot; 127 Victoria Embankment, Astron Garage, Durban</td></tr>");
+            sb.Append("</table></div>");
+            return sb.ToString();
+        }
+
+        private static string QuoteRow(string label, string valueHtml, bool bold)
+        {
+            return "<tr><td style=\"padding:9px 0;border-bottom:1px solid #efe7da;color:#8a7f72\">" + label + "</td>"
+                 + "<td style=\"padding:9px 0;border-bottom:1px solid #efe7da;text-align:right;" + (bold ? "font-weight:bold;" : "font-weight:bold;color:#2a2118;") + "\">" + valueHtml + "</td></tr>";
+        }
+
 
         private static string DisplayName(string itemId, string rawName)
         {

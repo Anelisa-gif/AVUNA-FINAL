@@ -43,7 +43,7 @@
 
 <div class="logout-page">
     <div class="logout-card">
-        <div class="logout-badge">&#10003;</div>
+        <img runat="server" src="~/avuna-logo.png" alt="Avuna Collective" style="width:150px;height:150px;object-fit:contain;display:block;margin:0 auto 14px;border-radius:50%" />
         <h1>You've been logged out</h1>
         <p>Thanks for managing AVUNA COLLECTIVE. Log back in anytime to review orders, staff and reports.</p>
         <a href="Login.aspx" class="customer-btn">Back to Login</a>

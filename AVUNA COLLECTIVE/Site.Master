@@ -59,17 +59,17 @@
         }
 
         #chatToggle {
-            width: 60px;
-            height: 60px;
-            border: none;
+            width: 64px;
+            height: 64px;
+            padding: 0;
+            border: 2px solid #d9a52c;
             border-radius: 50%;
-            background: #263e35;
-            color: white;
-            font-size: 27px;
-            line-height: 1;
+            background: #fff;
             cursor: pointer;
             box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            overflow: hidden;
         }
+        #chatToggle img { width: 100%; height: 100%; object-fit: contain; display: block; }
 
         .chat-window {
             width: 340px;
@@ -243,16 +243,7 @@
     transform: translateY(0) scale(1);
   }
 
-  .avuna-modal-icon {
-    width: 60px;
-    height: 60px;
-    margin: 0 auto 16px;
-    border-radius: 50%;
-    background: var(--avuna-dark);
-    color: var(--avuna-cream);
-    font-size: 30px;
-    line-height: 60px;
-  }
+  .avuna-modal-logo { display:block; width:120px; height:120px; object-fit:contain; margin:0 auto 10px; border-radius:50%; }
 
   .avuna-modal h2 {
     font-family: 'Anton', sans-serif;
@@ -279,7 +270,7 @@
     background: var(--avuna-dark);
     color: var(--avuna-cream);
     border: none;
-    border-radius: 999px;
+    border-radius: 0;
     padding: 12px 44px;
     cursor: pointer;
     transition: background 0.2s ease, transform 0.1s ease;
@@ -314,7 +305,7 @@
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark avuna-navbar">
             <div class="container-fluid">
                 <a class="navbar-brand avuna-brand" runat="server" href="~/">
-                    <img src="~/avuna-logo.png" class="avuna-logo" alt="Avuna Collective" runat="server" />
+                    <img src="~/avuna-logo.png" class="avuna-logo" alt="Avuna Collective" runat="server" style="height:44px;width:44px;object-fit:cover;border-radius:50%;background:#fff;border:2px solid #d9a52c" />
                     <span class="brand-name">Avuna Collective</span>
                 </a>
 
@@ -411,9 +402,7 @@
                 </div>
             </div>
 
-            <button type="button" id="chatToggle" onclick="toggleChat()" aria-label="Open Avuna Assistant">
-                💬
-            </button>
+            <button type="button" id="chatToggle" onclick="toggleChat()" aria-label="Open Avuna Assistant"><img runat="server" src="~/avuna-logo.png" alt="" /></button>
         </div>
 
         <script>
@@ -711,7 +700,7 @@
     <!-- Avuna custom message box -->
 <div class="avuna-modal-overlay" id="avunaModal" aria-hidden="true">
   <div class="avuna-modal" role="dialog" aria-modal="true" aria-labelledby="avunaModalTitle">
-    <div class="avuna-modal-icon">&#10003;</div>
+    <img runat="server" src="~/avuna-logo.png" alt="Avuna Collective" class="avuna-modal-logo" />
     <h2 id="avunaModalTitle">Registration Successful!</h2>
     <p id="avunaModalMessage"></p>
     <button type="button" class="avuna-modal-btn" id="avunaModalBtn">OK</button>
