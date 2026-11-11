@@ -1,5 +1,4 @@
-﻿
-<%@ Page Title="CUSTOMERDASHBOARD" Language="C#"  MasterPageFile="~/Customer_master.Master" AutoEventWireup="true" CodeBehind="CUSTOMERDASHBOARD.aspx.cs" Inherits="AVUNA_COLLECTIVE.CUSTOMERDASHBOARD" %>
+﻿<%@ Page Title="CUSTOMERDASHBOARD" Language="C#"  MasterPageFile="~/Customer_master.Master" AutoEventWireup="true" CodeBehind="CUSTOMERDASHBOARD.aspx.cs" Inherits="AVUNA_COLLECTIVE.CUSTOMERDASHBOARD" %>
 <asp:Content ID="BodyContent" ContentPlaceHolderID="MainContent" runat="server">
 <style>
 /* =========================================================
@@ -196,6 +195,13 @@ right: -35px; bottom: -35px; background: rgba(244,123,32,.05);
   }
 }
 
+
+.av-logo-tile{position:relative;z-index:2;width:190px;height:190px;min-width:190px;flex:none;background:#fff;border:2px solid #d9a52c;border-radius:50%;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.av-logo-tile img{width:100%;height:100%;object-fit:contain;display:block}
+.avuna-manager-hero:before,.avuna-manager-hero:after,.customer-hero:before,.customer-hero:after,.rp-hero:before,.rp-hero:after,.rp-kpi:after,.customer-stat:after,.action-card:after,.avuna-modal-head:after,.edit-modal-head:before,.avuna-order .hero:before{display:none !important}
+.avuna-modal-avatar,.edit-avatar,.customer-avatar{border-radius:50% !important;background:#fff url("avuna-logo.png") center/contain no-repeat !important;color:transparent !important;font-size:0 !important;border:1px solid #d9a52c}
+.avuna-modal-close,.edit-close,.design-viewer-close,.av-nav-btn{border-radius:50% !important}
+@media (max-width:700px){.av-logo-tile{width:130px;height:130px;min-width:130px}}
 </style>
 <div class="customer-dashboard">
 <!-- ===================================================== HERO ===================================================== -->
@@ -209,10 +215,7 @@ right: -35px; bottom: -35px; background: rgba(244,123,32,.05);
 <a href="MyOrders.aspx" class="customer-btn customer-btn-light">View My Orders</a>
 </div>
 </div>
-<div class="customer-hero-badge">
-<strong>AV</strong>
-<span>Customer<br />Portal</span>
-</div>
+<div class="av-logo-tile"><img runat="server" src="~/avuna-logo.png" alt="Avuna Collective" /></div>
 </section>
 <!-- ===================================================== DASHBOARD BODY ===================================================== -->
 <main class="customer-body">

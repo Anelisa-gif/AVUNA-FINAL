@@ -1,5 +1,4 @@
-﻿
-<%@ Page Title="" Language="C#"  MasterPageFile="~/Customer_master.Master" AutoEventWireup="true" CodeBehind="LogOut.aspx.cs" Inherits="AVUNA_COLLECTIVE.CUSTOMERDASHBOARD" %>
+﻿<%@ Page Title="" Language="C#"  MasterPageFile="~/Customer_master.Master" AutoEventWireup="true" CodeBehind="LogOut.aspx.cs" Inherits="AVUNA_COLLECTIVE.CUSTOMERDASHBOARD" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="MainContent" runat="server">
    
@@ -7,7 +6,7 @@
 .logout-page {
 width: 100%;
 min-height: 100vh;
-background: linear-gradient(120deg, #111111 0%, #191919 60%, #252525 100%);
+background: linear-gradient(135deg, #f7f3ec 0%, #f3ece0 60%, #ece4d6 100%);
 display: flex;
 align-items: center;
 justify-content: center;
@@ -21,7 +20,7 @@ padding: 50px 40px;
 max-width: 420px;
 width: 100%;
 text-align: center;
-box-shadow: 0 25px 60px rgba(0,0,0,.35);
+box-shadow: 0 20px 50px rgba(42,33,24,.14); border: 1px solid #ece4d6;
 }
 .logout-badge {
 width: 70px; height: 70px; border-radius: 50%;
@@ -43,13 +42,10 @@ transition: all .25s ease;
 </style>
 <div class="logout-page">
 <div class="logout-card">
-
-<h1>You have been logged out</h1>
-<p>Thank you for visiting Avuna Collective. Log back in anytime to visit your profile.</p>
-<a href="Default.aspx" class="customer-btn">Back to Home Page</a>
+<div class="logout-badge">✓</div>
+<h1>You've been logged out</h1>
+<p>Thanks for visiting AVUNA COLLECTIVE. Log back in anytime to check your orders, profile and rewards.</p>
+<a href="Login.aspx" class="customer-btn">Back to Login</a>
 </div>
 </div>
 </asp:Content>
-
-       
-   

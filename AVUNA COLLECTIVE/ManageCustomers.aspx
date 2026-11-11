@@ -120,6 +120,13 @@
     .avuna-welcome { flex-direction: column; align-items: flex-start; gap: 12px; }
     .avuna-orders-header { flex-direction: column; align-items: flex-start; gap: 12px; }
 }
+
+.av-logo-tile{position:relative;z-index:2;width:190px;height:190px;min-width:190px;flex:none;background:#fff;border:2px solid #d9a52c;border-radius:50%;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.av-logo-tile img{width:100%;height:100%;object-fit:contain;display:block}
+.avuna-manager-hero:before,.avuna-manager-hero:after,.customer-hero:before,.customer-hero:after,.rp-hero:before,.rp-hero:after,.rp-kpi:after,.customer-stat:after,.action-card:after,.avuna-modal-head:after,.edit-modal-head:before,.avuna-order .hero:before{display:none !important}
+.avuna-modal-avatar,.edit-avatar,.customer-avatar{border-radius:50% !important;background:#fff url("avuna-logo.png") center/contain no-repeat !important;color:transparent !important;font-size:0 !important;border:1px solid #d9a52c}
+.avuna-modal-close,.edit-close,.design-viewer-close,.av-nav-btn{border-radius:50% !important}
+@media (max-width:700px){.av-logo-tile{width:130px;height:130px;min-width:130px}}
 </style>
 <div class="avuna-manager-page">
 <!-- ===================================================== HERO ===================================================== -->
@@ -133,12 +140,7 @@
 <a href="ManagerDashboard.aspx" class="avuna-button avuna-button-outline">Back to Dashboard</a>
 </div>
 </div>
-<div class="avuna-manager-badge">
-<div class="avuna-manager-badge-inner">
-<strong>AVUNA</strong>
-<span>MANAGER</span>
-</div>
-</div>
+<div class="av-logo-tile"><img runat="server" src="~/avuna-logo.png" alt="Avuna Collective" /></div>
 </section>
 <main class="avuna-manager-body">
 <!-- WELCOME -->
@@ -217,22 +219,21 @@
 </main>
 </div>
 <script>
-function toggleCust(id) {
-    var row = document.getElementById('cd-' + id);
-    var btn = document.getElementById('cb-' + id);
-    if (!row) return;
-    var open = row.style.display !== 'none';
-    row.style.display = open ? 'none' : 'table-row';
-    if (btn) btn.textContent = open ? 'Details' : 'Hide';
-}
-function doSearch() {
-    var q = document.getElementById('custSearch').value.replace(/^\s+|\s+$/g, '');
-    window.location.href = 'ManageCustomers.aspx' + (q ? '?q=' + encodeURIComponent(q) : '');
-}
-document.addEventListener('DOMContentLoaded', function () {
-    var box = document.getElementById('custSearch');
-    if (box) box.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); doSearch(); } });
-});
+    function toggleCust(id) {
+        var row = document.getElementById('cd-' + id);
+        var btn = document.getElementById('cb-' + id);
+        if (!row) return;
+        var open = row.style.display !== 'none';
+        row.style.display = open ? 'none' : 'table-row';
+        if (btn) btn.textContent = open ? 'Details' : 'Hide';
+    }
+    function doSearch() {
+        var q = document.getElementById('custSearch').value.replace(/^\s+|\s+$/g, '');
+        window.location.href = 'ManageCustomers.aspx' + (q ? '?q=' + encodeURIComponent(q) : '');
+    }
+    document.addEventListener('DOMContentLoaded', function () {
+        var box = document.getElementById('custSearch');
+        if (box) box.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); doSearch(); } });
+    });
 </script>
 </asp:Content>
-

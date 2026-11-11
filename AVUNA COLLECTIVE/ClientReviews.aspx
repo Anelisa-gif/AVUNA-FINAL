@@ -213,7 +213,8 @@
             width: 100%;
             text-align: center;
         }
-    </style>
+    .av-nav-btn{border-radius:0 !important}
+</style>
 
     <div id="avunaReviewsPage">
 

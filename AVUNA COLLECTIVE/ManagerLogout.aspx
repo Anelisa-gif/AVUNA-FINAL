@@ -43,10 +43,10 @@
 
 <div class="logout-page">
     <div class="logout-card">
-        
-        <h1>You have been logged out</h1>
-        <p>Thanks for managing Avuna Collective. Log back in anytime to review orders, staff and reports.</p>
-        <a href="Default.aspx" class="customer-btn">Back to Home Page</a>
+        <div class="logout-badge">&#10003;</div>
+        <h1>You've been logged out</h1>
+        <p>Thanks for managing AVUNA COLLECTIVE. Log back in anytime to review orders, staff and reports.</p>
+        <a href="Login.aspx" class="customer-btn">Back to Login</a>
     </div>
 </div>
 

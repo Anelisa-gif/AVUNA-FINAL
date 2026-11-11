@@ -561,6 +561,7 @@ var pieCount = { legend: { position: 'bottom' }, tooltip: { callbacks: { label: 
               .Append("<a class=\"rp-btn rp-btn-primary\" href=\"ManagerDashboard.aspx\">Back to Dashboard</a>")
               .Append("<button type=\"button\" class=\"rp-btn rp-btn-ghost\" onclick=\"window.print()\">Print / Save as PDF</button>")
               .Append("</div></div>")
+              .Append("<div class=\"av-logo-tile\"><img src=\"" + VirtualPathUtility.ToAbsolute("~/avuna-logo.png") + "\" alt=\"Avuna Collective\" /></div>")
               .Append("</section>");
 
             sb.Append("<main class=\"rp-body\">");

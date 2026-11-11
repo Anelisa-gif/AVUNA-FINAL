@@ -160,6 +160,13 @@
   .edit-modal-head { padding: 26px 22px; }
   .edit-modal-foot { padding: 16px 22px 24px; }
 }
+
+.av-logo-tile{position:relative;z-index:2;width:190px;height:190px;min-width:190px;flex:none;background:#fff;border:2px solid #d9a52c;border-radius:50%;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.av-logo-tile img{width:100%;height:100%;object-fit:contain;display:block}
+.avuna-manager-hero:before,.avuna-manager-hero:after,.customer-hero:before,.customer-hero:after,.rp-hero:before,.rp-hero:after,.rp-kpi:after,.customer-stat:after,.action-card:after,.avuna-modal-head:after,.edit-modal-head:before,.avuna-order .hero:before{display:none !important}
+.avuna-modal-avatar,.edit-avatar,.customer-avatar{border-radius:50% !important;background:#fff url("avuna-logo.png") center/contain no-repeat !important;color:transparent !important;font-size:0 !important;border:1px solid #d9a52c}
+.avuna-modal-close,.edit-close,.design-viewer-close,.av-nav-btn{border-radius:50% !important}
+@media (max-width:700px){.av-logo-tile{width:130px;height:130px;min-width:130px}}
 </style>
 
 <div class="customer-dashboard">
@@ -173,10 +180,7 @@
         <a href="CustomerDashboard.aspx" class="customer-btn customer-btn-light">Back to Dashboard</a>
       </div>
     </div>
-    <div class="customer-hero-badge">
-      <strong>AV</strong>
-      <span>Customer<br />Portal</span>
-    </div>
+    <div class="av-logo-tile"><img runat="server" src="~/avuna-logo.png" alt="Avuna Collective" /></div>
   </section>
 
   <!-- ===================================================== PROFILE BODY ===================================================== -->
@@ -317,75 +321,9 @@
 <div class="av-toast-host" id="avToastHost"></div>
 
 <script>
-    function openEditProfile() { document.getElementById('editProfileOverlay').classList.add('open'); }
-    function closeEditProfile() { document.getElementById('editProfileOverlay').classList.remove('open'); }
-    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeEditProfile(); });
-
-    // Same password rule as the registration page
-    var PASSWORD_RULE = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
-    var PASSWORD_RULE_MESSAGE = 'Password must be at least 8 characters and contain an uppercase letter, a lowercase letter, a number and a special character.';
-
-    // Turns the hint red or green while the customer types
-    function updatePasswordHint() {
-        var el = document.getElementById('pwHint');
-        var v = document.getElementById('<%= txtNewPassword.ClientID %>').value;
-        el.className = 'pw-hint' + (v.length === 0 ? '' : (PASSWORD_RULE.test(v) ? ' ok' : ' bad'));
-    }
-
-    // Runs before Save: stops the postback (so the typed passwords aren't cleared) and shows a popup
-    function checkPasswordBeforeSave() {
-        var np = document.getElementById('<%= txtNewPassword.ClientID %>').value;
-        var cp = document.getElementById('<%= txtConfirmPassword.ClientID %>').value;
-        if (np.length === 0 && cp.length === 0) return true; // password not being changed
-        if (!PASSWORD_RULE.test(np)) { showToast(PASSWORD_RULE_MESSAGE, 'error'); return false; }
-        if (np !== cp) { showToast('The new password and confirmation do not match.', 'error'); return false; }
-        return true;
-    }
-
-    // Shows a popup message. type = 'success' or 'error'
-    function showToast(message, type) {
-        var host = document.getElementById('avToastHost');
-        if (!host) { alert(message); return; }
-
-        var isSuccess = (type === 'success');
-
-        var toast = document.createElement('div');
-        toast.className = 'av-toast ' + (isSuccess ? 'av-toast-success' : 'av-toast-error');
-        toast.setAttribute('role', isSuccess ? 'status' : 'alert');
-
-        var icon = document.createElement('div');
-        icon.className = 'av-toast-icon';
-        icon.textContent = isSuccess ? '\u2713' : '!';
-
-        var text = document.createElement('div');
-        text.className = 'av-toast-text';
-        var title = document.createElement('strong');
-        title.textContent = isSuccess ? 'Success' : 'Please check';
-        var msg = document.createElement('span');
-        msg.textContent = message;
-        text.appendChild(title);
-        text.appendChild(msg);
-
-        var close = document.createElement('button');
-        close.type = 'button';
-        close.className = 'av-toast-close';
-        close.setAttribute('aria-label', 'Dismiss');
-        close.innerHTML = '&times;';
-
-        toast.appendChild(icon);
-        toast.appendChild(text);
-        toast.appendChild(close);
-        host.appendChild(toast);
-
-        var removed = false;
-        function remove() {
-            if (removed) return;
-            removed = true;
-            toast.classList.add('av-toast-out');
-            setTimeout(function () { if (toast.parentNode) toast.parentNode.removeChild(toast); }, 250);
-        }
-        close.onclick = remove;
-        setTimeout(remove, isSuccess ? 5000 : 9000);
-    }
+  function openEditProfile() { document.getElementById('editProfileOverlay').classList.add('open'); }
+  function closeEditProfile() { document.getElementById('editProfileOverlay').classList.remove('open'); }
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeEditProfile(); });
 </script>
 </asp:Content>
+
