@@ -196,9 +196,51 @@ right: -35px; bottom: -35px; background: rgba(244,123,32,.05);
 }
 
 
+.dash-notice { background: #fdeaea; border: 1px solid #f0c4c4; color: #8a2f2f; border-radius: 12px; padding: 12px 16px; font-size: 13px; line-height: 1.6; margin-bottom: 18px; }
+.dash-h2 { margin: 5px 0 14px; font-size: 22px; color: #181818; }
+.dash-side { display: flex; flex-direction: column; gap: 22px; }
+.dash-table-wrap { overflow-x: auto; }
+.dash-table { width: 100%; border-collapse: collapse; }
+.dash-table th { text-align: left; color: #858585; font-size: 11px; letter-spacing: 1.4px; padding: 12px 10px; border-bottom: 1px solid #eee; white-space: nowrap; }
+.dash-table td { padding: 15px 10px; border-bottom: 1px solid #f1f1f1; font-size: 14px; vertical-align: middle; }
+.dash-table tbody tr:hover { background: #fafafa; }
+.dash-money { white-space: nowrap; font-variant-numeric: tabular-nums; }
+.dash-owing { color: #b03a3a; font-weight: 800; }
+.dash-settled { color: #277446; font-weight: 800; }
+.dash-muted { color: #858585; font-size: 12px; }
+.dash-empty { text-align: center; color: #777; padding: 34px 10px !important; }
+.dash-hint { color: #777; font-size: 13px; line-height: 1.6; margin: 14px 0 0; }
+.st-pill { display: inline-block; padding: 6px 12px; border-radius: 30px; font-size: 11px; font-weight: 800; white-space: nowrap; }
+.st-done { background: #e6f5ed; color: #277446; }
+.st-prod { background: #fff0e4; color: #bb5c17; }
+.st-pending { background: #fff7dc; color: #927017; }
+.st-failed { background: #fdeaea; color: #b03a3a; }
+.dash-search { display: flex; gap: 10px; }
+.dash-search input { flex: 1; min-width: 0; padding: 12px 14px; border: 1px solid #d8d4cd; border-radius: 10px; font-size: 14px; background: #faf9f7; outline: none; }
+.dash-search input:focus { border-color: var(--avuna-orange); background: #fff; box-shadow: 0 0 0 3px rgba(244,123,32,.15); }
+.dash-search button { background: var(--avuna-orange); color: #fff; border: 0; border-radius: 10px; padding: 12px 20px; font-weight: 800; cursor: pointer; }
+.dash-search button:hover { background: #d95f0b; }
+.track-card { margin-top: 18px; padding: 16px; border: 1px solid #eee; border-radius: 14px; background: #faf9f7; }
+.track-top { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 4px; }
+.track-top strong { font-size: 17px; }
+.track-steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin: 16px 0; }
+.track-steps span { padding: 9px 4px; border-radius: 8px; background: #eeeeee; color: #888; text-align: center; font-size: 11px; font-weight: 700; }
+.track-steps .done { background: #e6f5ed; color: #277446; }
+.track-steps .current { background: #111; color: #fff; }
+.track-cancelled { color: #b03a3a; font-weight: 700; margin: 14px 0; }
+.track-money { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 6px 0 12px; }
+.track-money span { display: block; color: #858585; font-size: 11px; letter-spacing: 1px; }
+.track-money strong { font-size: 15px; }
+.track-bar { height: 9px; background: #e8e8e8; border-radius: 20px; overflow: hidden; margin-bottom: 6px; }
+.track-bar span { display: block; height: 100%; background: #2f8f5b; border-radius: 20px; }
+.track-bar.amber span { background: #e0a42c; }
+.track-bar.red span { background: #c84b4b; }
+.dash-actions { display: flex; flex-direction: column; gap: 10px; }
+.dash-actions .customer-btn { width: 100%; justify-content: center; box-sizing: border-box; }
+.customer-hero{background-color:#2a2118;background-image:linear-gradient(90deg,rgba(24,17,10,.90) 0%,rgba(24,17,10,.74) 42%,rgba(24,17,10,.28) 100%),url("<%= ResolveUrl("~/images/customer-hero.jpg") %>");background-size:auto,cover;background-position:center,center;background-repeat:no-repeat}
 .av-logo-tile{position:relative;z-index:2;width:190px;height:190px;min-width:190px;flex:none;background:#fff;border:2px solid #d9a52c;border-radius:50%;display:flex;align-items:center;justify-content:center;overflow:hidden}
 .av-logo-tile img{width:100%;height:100%;object-fit:contain;display:block}
-.avuna-manager-hero:before,.avuna-manager-hero:after,.customer-hero:before,.customer-hero:after,.rp-hero:before,.rp-hero:after,.rp-kpi:after,.customer-stat:after,.action-card:after,.avuna-modal-head:after,.edit-modal-head:before,.avuna-order .hero:before{display:none !important}
+.avuna-manager-hero:before,.avuna-manager-hero:after,.customer-hero:before,.customer-hero:after,.rp-hero:before,.rp-hero:after,.rp-kpi:after,.customer-stat:after,.action-card:after,.avuna-modal-head:after,.edit-modal-head:before,.avuna-order .hero:before{~/images/avuna_collective_background.jpg}
 .avuna-modal-avatar,.edit-avatar,.customer-avatar{border-radius:50% !important;background:#fff url("avuna-logo.png") center/contain no-repeat !important;color:transparent !important;font-size:0 !important;border:1px solid #d9a52c}
 .avuna-modal-close,.edit-close,.design-viewer-close,.av-nav-btn{border-radius:50% !important}
 @media (max-width:700px){.av-logo-tile{width:130px;height:130px;min-width:130px}}
@@ -208,7 +250,7 @@ right: -35px; bottom: -35px; background: rgba(244,123,32,.05);
 <section class="customer-hero">
 <div class="customer-hero-copy">
 <span class="customer-eyebrow">AVUNA COLLECTIVE · CUSTOMER PORTAL</span>
-<h1 style="color: white;">Welcome back</h1>
+<h1 style="color: white;">Welcome back<asp:Literal ID="litGreetName" runat="server" /></h1>
 <p>Your AVUNA space for orders, payments, designs and account information all in one place.</p>
 <div class="customer-hero-actions">
 <a href="~/CreateOrder.aspx" runat="server" class="customer-btn customer-btn-orange">Create a New Order</a>
@@ -219,128 +261,62 @@ right: -35px; bottom: -35px; background: rgba(244,123,32,.05);
 </section>
 <!-- ===================================================== DASHBOARD BODY ===================================================== -->
 <main class="customer-body">
-<!-- WELCOME -->
-<div class="customer-welcome">
-<div>
-<strong>Your account at a glance</strong>
-
-<span>Here is what is happening with your AVUNA orders.</span>
-</div>
-<span class="customer-demo">DATA</span>
-</div>
-<!-- STATISTICS -->
-<section class="customer-stat-grid">
-<article class="customer-stat stat-green">
-<div class="customer-stat-icon">↗</div>
-<small>ACTIVE ORDERS</small>
-<strong>3</strong>
-<span>Currently in progress</span>
-</article>
-<article class="customer-stat stat-orange">
-<div class="customer-stat-icon">✓</div>
-<small>COMPLETED</small>
-<strong>12</strong>
-<span>Successfully delivered</span>
-</article>
-<article class="customer-stat stat-gold">
-<div class="customer-stat-icon">R</div>
-<small>OUTSTANDING</small>
-<strong>R2,450</strong>
-<span>Outstanding Balance</span>
-</article>
-<article class="customer-stat stat-dark">
-<div class="customer-stat-icon">★</div>
-<small>LOYALTY TIER</small>
-<strong>GOLD</strong>
-<span>8 purchases · 2 to Platinum</span>
-</article>
-</section>
-<!-- LOYALTY + PROFILE -->
+<asp:Literal ID="litDbNotice" runat="server" />
 <div class="customer-main-grid">
-<!-- LOYALTY -->
+<!-- RECENT ORDERS -->
 <section class="customer-card">
 <div class="customer-card-heading">
 <div>
-<span class="customer-dark-eyebrow">REWARDS</span>
-<h2>Your Loyalty Journey</h2>
-<p>Keep shopping with AVUNA to unlock your next tier.</p>
+<span class="customer-dark-eyebrow">ORDERS</span>
+<h2>Your Recent Orders</h2>
+<p><asp:Literal ID="litRecentSub" runat="server" /></p>
 </div>
-<span class="loyalty-tier">GOLD</span>
+<a href="MyOrders.aspx" class="view-link">View all orders &rarr;</a>
 </div>
-<div class="loyalty-number">
-<strong>8</strong>
-<span>purchases</span>
-</div>
-
-<div class="loyalty-progress"><span></span></div>
-<div class="loyalty-meta">
-<span>Gold</span>
-<strong>2 more purchases → Platinum</strong>
-</div>
-<div class="tier-track">
-<span class="done">Bronze<br /><b>0-2</b></span>
-<span class="done">Silver<br /><b>3-5</b></span>
-<span class="current">Gold<br /><b>6-9</b></span>
-<span>Platinum<br /><b>10+</b></span>
+<div class="dash-table-wrap">
+<table class="dash-table">
+<thead>
+<tr><th>ORDER</th><th>DATE</th><th>STATUS</th><th>TOTAL</th><th>BALANCE</th><th></th></tr>
+</thead>
+<tbody>
+<asp:Literal ID="litRecentRows" runat="server" />
+</tbody>
+</table>
 </div>
 </section>
-<!-- PROFILE SUMMARY -->
+<div class="dash-side">
+<!-- TRACK AN ORDER -->
+<section class="customer-card" id="track">
+<span class="customer-dark-eyebrow">TRACK</span>
+<h2 class="dash-h2">Track an Order</h2>
+<div class="dash-search">
+<input type="text" id="trackInput" maxlength="20" autocomplete="off" placeholder="Order number, e.g. ORD001" value="<%: TrackValue %>" />
+<button type="button" onclick="doTrack()">Track</button>
+</div>
+<asp:Literal ID="litTrackResult" runat="server" />
+</section>
+<!-- QUICK ACTIONS -->
 <section class="customer-card">
-<div class="customer-card-heading">
-<div>
-<span class="customer-dark-eyebrow">ACCOUNT</span>
-<h2>My Profile</h2>
-</div>
-<a href="MyProfile.aspx" class="view-link">View details →</a>
-</div>
-<div class="profile-row">
-<span class="customer-avatar">TM</span>
-<div>
-<strong>Thando Mthembu</strong>
-<span>Individual Customer</span>
-</div>
-</div>
-<div class="profile-details">
-<div class="profile-detail">
-<span>Email</span>
-<strong>thando@example.com</strong>
-</div>
-<div class="profile-detail">
-<span>Cell</span>
-<strong>071 234 5678</strong>
-</div>
-<div class="profile-detail">
-<span>Loyalty</span>
-<strong class="orange-text">Gold Member</strong>
-</div>
-</div>
-
-    <a href="~/Profile.aspx" runat="server" class="customer-btn customer-outline full-btn">Manage Profile</a>
-</section>
-</div>
-<!-- ACTION CARDS -->
-
-    <div class="action-cards">
-
-<!-- DESIGN -->
-<section class="customer-card action-card">
-<div class="action-icon">✦</div>
-<span class="customer-dark-eyebrow">WANT TO CREATE A NEW ORDER?</span>
-<h3>Create a New Order</h3>
-<p>Have a new concept? Send us your design, product and requirements.</p>
+<span class="customer-dark-eyebrow">QUICK ACTIONS</span>
+<h2 class="dash-h2">What would you like to do?</h2>
+<div class="dash-actions">
 <a href="~/CreateOrder.aspx" runat="server" class="customer-btn customer-btn-orange">Create a New Order</a>
+<a href="~/MyOrders.aspx" runat="server" class="customer-btn customer-outline">View My Orders and Payments</a>
+<a href="~/Profile.aspx" runat="server" class="customer-btn customer-outline">Manage My Profile</a>
+</div>
 </section>
-
-<!-- PAYMENTS -->
-<section class="customer-card action-card">
-<div class="action-icon">R</div>
-<span class="customer-dark-eyebrow">PAYMENTS</span>
-<h3>Payment History</h3>
-<p>View your previous payments, balances, methods and payment status.</p>
-<a href="~/MyOrders.aspx" runat="server" class="customer-btn customer-outline">View Payments</a>
-</section>
-
+</div>
 </div>
 </main>
 </div>
+<script>
+    function doTrack() {
+        var q = document.getElementById('trackInput').value.replace(/^\s+|\s+$/g, '');
+        window.location.href = window.location.pathname + (q ? '?track=' + encodeURIComponent(q) + '#track' : '');
+    }
+    document.addEventListener('DOMContentLoaded', function () {
+        var box = document.getElementById('trackInput');
+        if (box) box.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); doTrack(); } });
+    });
+</script>
 </asp:Content>

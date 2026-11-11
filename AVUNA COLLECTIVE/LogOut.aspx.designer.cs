@@ -11,7 +11,7 @@ namespace AVUNA_COLLECTIVE
 {
 
 
-    public partial class CUSTOMERDASHBOARD
+    public partial class Log_Out
     {
     }
 }

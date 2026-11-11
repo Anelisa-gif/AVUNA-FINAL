@@ -36,6 +36,7 @@
 .avuna-order .qbtn-alt{background:#f47b20;color:#fff}.avuna-order .qbtn-alt:hover{background:#d9650e}.avuna-order .qbtn:disabled{opacity:.6;cursor:wait}
 .avuna-order .quote-msg{display:none;margin:8px 0 2px;padding:10px 12px;border-radius:10px;font-size:13px;line-height:1.5}
 .avuna-order .quote-msg.ok{display:block;background:#e7f4eb;color:#277446}.avuna-order .quote-msg.bad{display:block;background:#fdeaea;color:#b03a3a}
+.avuna-order .hero{background-color:#2a2118;background-image:linear-gradient(90deg,rgba(24,17,10,.90) 0%,rgba(24,17,10,.74) 42%,rgba(24,17,10,.28) 100%),url("<%= ResolveUrl("~/images/customer-hero.jpg") %>");background-size:auto,cover;background-position:center,center;background-repeat:no-repeat}
 .av-logo-tile{position:relative;z-index:2;width:190px;height:190px;min-width:190px;flex:none;background:#fff;border:2px solid #d9a52c;border-radius:50%;display:flex;align-items:center;justify-content:center;overflow:hidden}
 .av-logo-tile img{width:100%;height:100%;object-fit:contain;display:block}
 .avuna-manager-hero:before,.avuna-manager-hero:after,.customer-hero:before,.customer-hero:after,.rp-hero:before,.rp-hero:after,.rp-kpi:after,.customer-stat:after,.action-card:after,.avuna-modal-head:after,.edit-modal-head:before,.avuna-order .hero:before{display:none !important}
@@ -44,7 +45,7 @@
 @media (max-width:700px){.av-logo-tile{width:130px;height:130px;min-width:130px}}
 </style>
 <div class="avuna-order" id="createOrderPage">
-<section class="hero"><div class="hero-copy"><div class="eyebrow">AVUNA COLLECTIVE CUSTOMER PORTAL</div><h1>Your vision is our creation.</h1><p>Choose an item, size and multiple available colours, upload your design and review your quotation.</p><a runat="server" href="~/CustomerDashboard" class="back">Back to Dashboard</a></div><div class="av-logo-tile hero-mark-logo"><img runat="server" src="~/avuna-logo.png" alt="Avuna Collective" /></div></section>
+<section class="hero"><div class="hero-copy"><div class="eyebrow">AVUNA COLLECTIVE · CUSTOMER PORTAL</div><h1>Your vision,<br />our creation.</h1><p>Choose an item, size and multiple available colours, upload your design and review your quotation.</p><a runat="server" href="~/CustomerDashboard" class="back">Back to Dashboard</a></div><div class="av-logo-tile hero-mark-logo"><img runat="server" src="~/avuna-logo.png" alt="Avuna Collective" /></div></section>
 <div class="wrap"><div class="intro"><div><strong>Create a new order</strong><p class="muted">Your custom order details for AVUNA COLLECTIVE.</p></div><span class="pill">NEW ORDER</span></div>
 <div class="layout"><div class="panel"><span class="tag">ORDER DETAILS</span><h2>Customize Your Order</h2><p class="muted">Only available inventory combinations can be selected.</p>
 <div class="fields">
@@ -79,7 +80,7 @@
 <div class="rowline"><span>Subtotal including VAT</span><strong id="quoteSubtotal">R 0.00</strong></div>
 <div class="rowline"><span>Markup (10% after VAT)</span><strong id="quoteMarkup">R 0.00</strong></div>
 <div class="total"><span>ESTIMATED ORDER TOTAL</span><strong id="quoteTotal">R 0.00</strong></div>
-<div class="note">Inventory and prices are retrieved from Auna Collective. The design package is based on the number of selected garment colours. Submitting saves your pending order and uploaded design. Stock is checked again before saving, and available inventory quantities are deducted when the order is successfully submitted.</div>
+<div class="note">Inventory and prices are retrieved from GroupWst2 using the normal page load. The design package is based on the number of selected garment colours. Submitting saves your pending order and uploaded design. Stock is checked again before saving, and available inventory quantities are deducted when the order is successfully submitted.</div>
 </div></div></div></div>
 <script>
     (function () {
@@ -316,4 +317,3 @@
     })();
 </script>
 </asp:Content>
-

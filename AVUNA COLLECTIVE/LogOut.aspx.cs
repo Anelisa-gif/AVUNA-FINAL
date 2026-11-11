@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Web;
-using System.Web.UI;
-using System.Web.UI.WebControls;
 
 namespace AVUNA_COLLECTIVE
 {
@@ -11,7 +7,14 @@ namespace AVUNA_COLLECTIVE
     {
         protected void Page_Load(object sender, EventArgs e)
         {
+            // stop the browser keeping a copy, so the Back button cannot show customer pages again
+            Response.Cache.SetCacheability(HttpCacheability.NoCache);
+            Response.Cache.SetNoStore();
 
+            // end the login: customer_ID and everything else in the session is removed
+            Session.Clear();
+            Session.Abandon();
         }
     }
 }
+
