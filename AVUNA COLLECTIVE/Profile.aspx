@@ -94,12 +94,23 @@
 .profile-box label { display: block; color: #888; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; font-weight: 800; margin-bottom: 7px; }
 .profile-box strong { font-size: 14px; color: #222; }
 
-/* ---------- EDIT PROFILE BUTTON + MESSAGE ---------- */
+/* ---------- EDIT PROFILE BUTTON ---------- */
 .profile-edit-btn { padding: 12px 22px; border: none; border-radius: 10px; background: var(--avuna-orange); color: #fff; font-weight: 700; font-size: 14px; cursor: pointer; box-shadow: 0 8px 20px rgba(244,123,32,.25); transition: all .25s ease; white-space: nowrap; }
 .profile-edit-btn:hover { background: #ff8b32; transform: translateY(-2px); }
-.customer-inline-message { display: block; margin-bottom: 18px; font-size: 14px; font-weight: 700; }
-.msg-success { color: var(--avuna-green); background: #eaf6f0; border: 1px solid #cfe9dc; padding: 12px 16px; border-radius: 10px; }
-.msg-error { color: var(--avuna-red); background: #fbeceb; border: 1px solid #f1cfcd; padding: 12px 16px; border-radius: 10px; }
+
+/* ---------- POPUP MESSAGES (TOASTS) - sit above the edit window ---------- */
+.av-toast-host { position: fixed; top: 24px; left: 50%; transform: translateX(-50%); z-index: 100000; display: flex; flex-direction: column; gap: 10px; width: 460px; max-width: calc(100% - 32px); pointer-events: none; }
+.av-toast { pointer-events: auto; display: flex; align-items: flex-start; gap: 14px; background: #ffffff; border-radius: 14px; padding: 16px 18px; box-shadow: 0 20px 55px rgba(0,0,0,.35); border-left: 6px solid #c94b45; animation: avToastIn .3s ease; }
+.av-toast-success { border-left-color: #27845b; }
+.av-toast-out { opacity: 0; transform: translateY(-12px); transition: all .25s ease; }
+.av-toast-icon { flex: 0 0 30px; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 800; font-size: 16px; background: #c94b45; }
+.av-toast-success .av-toast-icon { background: #27845b; }
+.av-toast-text { flex: 1; min-width: 0; }
+.av-toast-text strong { display: block; font-size: 14px; color: #181818; margin-bottom: 3px; }
+.av-toast-text span { display: block; font-size: 14px; line-height: 1.45; color: #444; word-wrap: break-word; }
+.av-toast-close { flex: 0 0 auto; border: none; background: transparent; color: #999; font-size: 22px; line-height: 1; cursor: pointer; padding: 0 2px; }
+.av-toast-close:hover { color: #222; }
+@keyframes avToastIn { from { opacity: 0; transform: translateY(-16px); } to { opacity: 1; transform: translateY(0); } }
 
 /* ---------- EDIT PROFILE MODAL ---------- */
 .edit-overlay { position: fixed; inset: 0; z-index: 9999; background: rgba(17,17,17,.62); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; padding: 20px; }
@@ -118,7 +129,14 @@
 .edit-field .edit-input { width: 100%; box-sizing: border-box; padding: 14px 16px; border: 1px solid var(--avuna-border); border-radius: 12px; background: #f8f7f4; font-size: 15px; color: #222; }
 .edit-field .edit-input:focus { outline: none; border-color: var(--avuna-orange); background: #fff; box-shadow: 0 0 0 3px rgba(244,123,32,.15); }
 .edit-field .edit-input[readonly] { opacity: .65; cursor: not-allowed; }
+.edit-field-full { grid-column: 1 / -1; }
 .edit-note { grid-column: 1 / -1; margin: -6px 0 0; font-size: 12px; color: #888; }
+.edit-section-title { grid-column: 1 / -1; margin-top: 8px; padding-top: 20px; border-top: 1px solid var(--avuna-border); }
+.edit-section-title span { display: block; color: var(--avuna-orange); font-size: 11px; font-weight: 800; letter-spacing: 2px; margin-bottom: 4px; }
+.edit-section-title p { margin: 0; font-size: 12px; color: #888; }
+.edit-section-title p.pw-hint { margin-top: 8px; }
+.pw-hint.ok { color: #27845b; font-weight: 700; }
+.pw-hint.bad { color: #c94b45; font-weight: 700; }
 .edit-modal-foot { display: flex; justify-content: flex-end; gap: 12px; padding: 20px 32px 30px; }
 .edit-btn-cancel { padding: 14px 26px; border: 1px solid var(--avuna-border); background: #fff; border-radius: 12px; font-weight: 700; cursor: pointer; color: #222; }
 .edit-btn-cancel:hover { background: #f6f4ef; }
@@ -170,24 +188,20 @@
     <!-- WELCOME -->
     <div class="customer-welcome">
       <div>
-        <strong>Your account details</strong>
-        <span>Your information used for AVUNA COLLECTIVE orders.</span>
+        <strong>Your personal account details</strong>
+        <span>Your information used for your Avuna Collective orders.</span>
       </div>
-      <span class="customer-demo">DATA</span>
     </div>
 
     <!-- PROFILE -->
     <section class="customer-card profile-section">
       <div class="customer-card-heading">
         <div>
-          <span class="customer-dark-eyebrow">CUSTOMER DETAILS</span>
           <h2>My Profile</h2>
-          <p>Your information used for AVUNA COLLECTIVE orders.</p>
+          <p>Your information used for your Avuna Collective orders.</p>
         </div>
         <button type="button" class="profile-edit-btn" onclick="openEditProfile()">Edit profile</button>
       </div>
-
-      <asp:Label ID="lblProfileMessage" runat="server" CssClass="customer-inline-message" />
 
       <div class="profile-grid">
         <div class="profile-box">
@@ -209,6 +223,14 @@
         <div class="profile-box">
           <label>Address</label>
           <strong><asp:Label ID="lblAddress" runat="server" /></strong>
+        </div>
+        <div class="profile-box">
+          <label>Username</label>
+          <strong><asp:Label ID="lblUsername" runat="server" /></strong>
+        </div>
+        <div class="profile-box">
+          <label>Password</label>
+          <strong><asp:Label ID="lblPassword" runat="server" /></strong>
         </div>
       </div>
     </section>
@@ -265,19 +287,43 @@
       </div>
 
       <p class="edit-note">Your first name can't be changed here. Contact AVUNA support if it needs correcting.</p>
+
+      <!-- ---------- LOGIN DETAILS ---------- -->
+      <div class="edit-section-title">
+        <span>LOGIN DETAILS</span>
+        <p>Leave the password fields empty if you don't want to change your password.</p>
+        <p class="pw-hint" id="pwHint">New passwords must be at least 8 characters and contain an uppercase letter, a lowercase letter, a number and a special character.</p>
+      </div>
+
+      <div class="edit-field edit-field-full">
+        <label for="<%= txtUsername.ClientID %>">Username</label>
+        <asp:TextBox ID="txtUsername" runat="server" CssClass="edit-input" MaxLength="50" autocomplete="off" />
+      </div>
+
+      <div class="edit-field">
+        <label for="<%= txtNewPassword.ClientID %>">New password</label>
+        <asp:TextBox ID="txtNewPassword" runat="server" CssClass="edit-input" TextMode="Password" MaxLength="100" autocomplete="new-password" onkeyup="updatePasswordHint()" oninput="updatePasswordHint()" />
+      </div>
+      <div class="edit-field">
+        <label for="<%= txtConfirmPassword.ClientID %>">Confirm new password</label>
+        <asp:TextBox ID="txtConfirmPassword" runat="server" CssClass="edit-input" TextMode="Password" MaxLength="100" autocomplete="new-password" />
+      </div>
     </div>
 
     <div class="edit-modal-foot">
       <button type="button" class="edit-btn-cancel" onclick="closeEditProfile()">Cancel</button>
-      <asp:Button ID="btnSaveProfile" runat="server" Text="Save changes" CssClass="edit-btn-save" OnClick="btnSaveProfile_Click" />
+      <asp:Button ID="btnSaveProfile" runat="server" Text="Save changes" CssClass="edit-btn-save" OnClick="btnSaveProfile_Click" OnClientClick="return checkPasswordBeforeSave();" />
     </div>
   </div>
 </div>
 
+<!-- Popup messages appear here, above the edit window -->
+<div class="av-toast-host" id="avToastHost"></div>
+
 <script>
-    function openEditProfile() { document.getElementById('editProfileOverlay').classList.add('open'); }
-    function closeEditProfile() { document.getElementById('editProfileOverlay').classList.remove('open'); }
-    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeEditProfile(); });
+  function openEditProfile() { document.getElementById('editProfileOverlay').classList.add('open'); }
+  function closeEditProfile() { document.getElementById('editProfileOverlay').classList.remove('open'); }
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeEditProfile(); });
 </script>
 </asp:Content>
 
