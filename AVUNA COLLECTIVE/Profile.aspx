@@ -174,9 +174,9 @@
   <!-- ===================================================== HERO ===================================================== -->
   <section class="customer-hero">
     <div class="customer-hero-copy">
-      <span class="customer-eyebrow">AVUNA COLLECTIVE · CUSTOMER PORTAL</span>
-      <h1 style="color: white;">Your details, your control.</h1>
-      <p>Keep your contact information and account details up to date for a smoother AVUNA experience.</p>
+    
+      <h1 style="color: white;">Your personal details, your control.</h1>
+      <p>Keep your contact information and account details up to date.</p>
       <div class="customer-hero-actions">
         <a href="CustomerDashboard.aspx" class="customer-btn customer-btn-light">Back to Dashboard</a>
       </div>
@@ -187,18 +187,13 @@
   <!-- ===================================================== PROFILE BODY ===================================================== -->
   <main class="customer-body">
     <!-- WELCOME -->
-    <div class="customer-welcome">
-      <div>
-        <strong>Your personal account details</strong>
-        <span>Your information used for your Avuna Collective orders.</span>
-      </div>
-    </div>
+    
 
     <!-- PROFILE -->
     <section class="customer-card profile-section">
       <div class="customer-card-heading">
         <div>
-          <h2>My Profile</h2>
+          <h2><strong>My Profile</strong></h2>
           <p>Your information used for your Avuna Collective orders.</p>
         </div>
         <button type="button" class="profile-edit-btn" onclick="openEditProfile()">Edit profile</button>
