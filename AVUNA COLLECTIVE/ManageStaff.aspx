@@ -686,12 +686,12 @@ min-height: 470px;
 <span class="avuna-stat-description">Currently in progress</span>
 </article>
 </section>
-<!-- STAFF LIST -->
+<!-- ADMIN STAFF LIST -->
 <section class="avuna-card">
 <div class="avuna-card-header">
 <div>
-<h2>Staff Members</h2>
-<p><asp:Literal ID="litDirectorySubtitle" runat="server" /></p>
+<h2>Admin Staff</h2>
+<p>Managers and administrators</p>
 </div>
 <a href="Reports.aspx?report=staff" class="avuna-view-all">Staff report</a>
 </div>
@@ -704,12 +704,38 @@ min-height: 470px;
 <th>ROLE</th>
 <th>EMAIL</th>
 <th>PHONE</th>
-<th>ACTION</th>
+<th>PAYMENTS</th>
 <th>ACTION</th>
 </tr>
 </thead>
 <tbody>
-<asp:Literal ID="litStaffRows" runat="server" />
+<asp:Literal ID="litAdminRows" runat="server" />
+</tbody>
+</table>
+</div>
+</section>
+<!-- PRODUCTION STAFF LIST -->
+<section class="avuna-card">
+<div class="avuna-card-header">
+<div>
+<h2>Production Staff</h2>
+<p>The team making the orders</p>
+</div>
+</div>
+<div class="avuna-table-wrap">
+<table class="avuna-table">
+<thead>
+<tr>
+<th>STAFF NO.</th>
+<th>NAME</th>
+<th>ROLE</th>
+<th>EMAIL</th>
+<th>PHONE</th>
+<th>ACTION</th>
+</tr>
+</thead>
+<tbody>
+<asp:Literal ID="litProductionRows" runat="server" />
 </tbody>
 </table>
 </div>
@@ -718,3 +744,4 @@ min-height: 470px;
 </div>
 
 </asp:Content>
+
