@@ -249,7 +249,7 @@ right: -35px; bottom: -35px; background: rgba(244,123,32,.05);
 <!-- ===================================================== HERO ===================================================== -->
 <section class="customer-hero">
 <div class="customer-hero-copy">
-<span class="customer-eyebrow">AVUNA COLLECTIVE · CUSTOMER PORTAL</span>
+<span class="customer-eyebrow">AVUNA COLLECTIVE CUSTOMER PORTAL</span>
 <h1 style="color: white;">Welcome back<asp:Literal ID="litGreetName" runat="server" /></h1>
 <p>Your AVUNA space for orders, payments, designs and account information all in one place.</p>
 <div class="customer-hero-actions">
