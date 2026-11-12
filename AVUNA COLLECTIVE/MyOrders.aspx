@@ -123,36 +123,6 @@
 .design-viewer-close { position: absolute; top: -14px; right: -14px; width: 38px; height: 38px; border-radius: 50%; border: none; background: var(--avuna-orange); color: white; font-size: 22px; font-weight: 800; line-height: 1; cursor: pointer; box-shadow: 0 6px 16px rgba(0,0,0,.35); }
 .design-viewer-close:hover { background: #ff8b32; }
 
-/* =========================================================
-   RATE AN ORDER
-   ========================================================= */
-.rate-order-btn { display: inline-block; padding: 8px 14px; border-radius: 8px; border: 1px solid var(--avuna-gold); background: #fff8e6; color: #a67a15; font-size: 11px; font-weight: 800; letter-spacing: .5px; cursor: pointer; white-space: nowrap; transition: all .2s ease; }
-.rate-order-btn:hover { background: var(--avuna-gold); color: white; transform: translateY(-2px); box-shadow: 0 6px 14px rgba(217,164,65,.35); }
-.rated-badge { color: #e9a208; font-size: 15px; letter-spacing: 1px; white-space: nowrap; }
-.rated-badge .rated-off { color: #ddd; }
-.rate-flash { display: block; background: #e4f5ec; color: #287a52; border: 1px solid #bfe3d0; padding: 12px 16px; border-radius: 10px; font-size: 13px; font-weight: 700; margin-bottom: 18px; }
-
-.rate-overlay { display: none; position: fixed; inset: 0; z-index: 99998; background: rgba(0,0,0,.7); align-items: center; justify-content: center; padding: 20px; }
-.rate-overlay.open { display: flex; }
-.rate-modal { position: relative; background: white; width: 460px; max-width: 100%; border-radius: 18px; padding: 32px 30px 26px; box-shadow: 0 25px 70px rgba(0,0,0,.45); }
-.rate-modal h3 { margin: 0 0 4px; font-size: 22px; color: #181818; }
-.rate-modal .rate-sub { margin: 0 0 18px; color: #777; font-size: 13px; }
-.rate-close { position: absolute; top: 14px; right: 14px; width: 34px; height: 34px; border-radius: 50%; border: none; background: #f1eee8; color: #555; font-size: 20px; line-height: 1; cursor: pointer; }
-.rate-close:hover { background: var(--avuna-orange); color: white; }
-.rate-stars { display: flex; gap: 6px; margin-bottom: 16px; }
-.rate-stars span { font-size: 40px; line-height: 1; color: #ddd; cursor: pointer; transition: transform .12s ease, color .12s ease; user-select: none; }
-.rate-stars span.on { color: #f5a50a; }
-.rate-stars span:hover { transform: scale(1.15); }
-.rate-text { width: 100%; box-sizing: border-box; padding: 12px 14px; border: 1px solid var(--avuna-border); border-radius: 10px; font-size: 14px; font-family: inherit; resize: vertical; }
-.rate-text:focus { outline: none; border-color: var(--avuna-orange); box-shadow: 0 0 0 3px rgba(244,123,32,.15); }
-.rate-count { text-align: right; color: #999; font-size: 11px; margin-top: 4px; }
-.rate-error { display: block; color: var(--avuna-red); font-size: 13px; font-weight: 700; min-height: 18px; margin: 8px 0 0; }
-.rate-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 14px; }
-.rate-submit { background: var(--avuna-orange); color: white; border: none; padding: 12px 22px; border-radius: 10px; font-weight: 800; font-size: 13px; cursor: pointer; box-shadow: 0 8px 20px rgba(244,123,32,.25); }
-.rate-submit:hover { background: #ff8b32; }
-.rate-cancel { background: white; color: #555; border: 1px solid var(--avuna-border); padding: 12px 20px; border-radius: 10px; font-weight: 700; font-size: 13px; cursor: pointer; }
-.rate-cancel:hover { background: #f7f5f1; }
-
 /* RESPONSIVE */
 @media(max-width: 1000px) {
   .customer-stat-grid { grid-template-columns: repeat(2,1fr); }
@@ -175,14 +145,28 @@
 .avuna-modal-avatar,.edit-avatar,.customer-avatar{border-radius:50% !important;background:#fff url("avuna-logo.png") center/contain no-repeat !important;color:transparent !important;font-size:0 !important;border:1px solid #d9a52c}
 .avuna-modal-close,.edit-close,.design-viewer-close,.av-nav-btn{border-radius:50% !important}
 @media (max-width:700px){.av-logo-tile{width:130px;height:130px;min-width:130px}}
+
+/* ORDER CANCELLATION */
+.cancel-order-btn{padding:9px 14px;border:1px solid #c94b45;background:#fff1ef;color:#b22d28;border-radius:8px;font-size:11px;font-weight:800;cursor:pointer;white-space:nowrap}
+.cancel-order-btn:hover{background:#c94b45;color:#fff}
+.avuna-cancel-overlay{display:none;position:fixed;inset:0;z-index:100001;align-items:center;justify-content:center;background:rgba(0,0,0,.65);padding:18px}
+.avuna-cancel-overlay.open{display:flex}
+.avuna-cancel-dialog{width:100%;max-width:440px;background:#fff;color:#222;border-radius:18px;padding:32px;text-align:center;box-shadow:0 25px 90px rgba(0,0,0,.25)}
+.avuna-cancel-dialog h2{font-size:25px;margin:0 0 14px}
+.avuna-cancel-dialog p{color:#555;line-height:1.6;margin:0 0 16px}
+.avuna-cancel-actions{display:flex;gap:12px;justify-content:center;margin-top:24px;flex-wrap:wrap}
+.avuna-cancel-keep,.avuna-cancel-confirm,.avuna-notice-ok{border:0;border-radius:9px;padding:12px 22px;font-weight:800;cursor:pointer}
+.avuna-cancel-keep{background:#f1f1f1;color:#333}
+.avuna-cancel-confirm{background:#c94b45;color:#fff}
+.avuna-notice-ok{background:#f47b20;color:#fff;min-width:130px}
 </style>
 <div class="customer-dashboard">
   <!-- ===================================================== HERO ===================================================== -->
   <section class="customer-hero">
     <div class="customer-hero-copy">
-      
+      <span class="customer-eyebrow">AVUNA COLLECTIVE · CUSTOMER PORTAL</span>
       <h1 style="color: white;">Your orders, tracked end to end.</h1>
-      <p>Check the status, progress and value of everything you've ordered before from Avuna Collective.</p>
+      <p>Check the status, progress and value of everything you've ordered from AVUNA.</p>
       <div class="customer-hero-actions">
         <a href="~/CreateOrder.aspx" runat="server" class="customer-btn customer-btn-orange">Create a New Order</a>
         <a href="CustomerDashboard.aspx" class="customer-btn customer-btn-light">Back to Dashboard</a>
@@ -193,7 +177,13 @@
   <!-- ===================================================== ORDERS BODY ===================================================== -->
   <main class="customer-body">
     <!-- WELCOME -->
-    
+    <div class="customer-welcome">
+      <div>
+        <strong>Your order history</strong>
+        <span>Here is the current state of everything you've ordered.</span>
+      </div>
+      <span class="customer-demo">DATA</span>
+    </div>
     <!-- ORDER STATISTICS -->
     <section class="customer-stat-grid">
       <article class="customer-stat stat-green">
@@ -225,14 +215,11 @@
     <section class="customer-card">
       <div class="customer-card-heading">
         <div>
-    
-        <h2><strong>All My Orders</strong></h2>  
-            <p>Track the progress and value of every order you've placed.</p>
+          <span class="customer-dark-eyebrow">ORDER ACTIVITY</span>
+          <h2>All My Orders</h2>
+          <p>Track the progress and value of every order you've placed.</p>
         </div>
       </div>
-
-      <asp:Label ID="lblRateMsg" runat="server" CssClass="rate-flash" Visible="false" />
-
       <div style="overflow-x:auto;">
         <asp:GridView ID="gvOrders" runat="server" AutoGenerateColumns="False" CssClass="orders-table" GridLines="None"
             EmptyDataText="You haven't placed any orders yet.">
@@ -255,9 +242,9 @@
               </ItemTemplate>
             </asp:TemplateField>
             <asp:BoundField DataField="orderItem_Subtotal" HeaderText="Subtotal" DataFormatString="R {0:N2}" />
-            <asp:TemplateField HeaderText="Rating">
+            <asp:TemplateField HeaderText="Action">
               <ItemTemplate>
-                <%# RenderRating(Eval("order_ID"), Eval("order_Status"), Eval("rating_Score"), Eval("RowNo")) %>
+                <%# RenderCancel(Eval("order_Status"), Eval("order_ID"), Eval("ItemRowNumber")) %>
               </ItemTemplate>
             </asp:TemplateField>
           </Columns>
@@ -279,35 +266,6 @@
     <div id="designViewerCaption" class="design-viewer-caption"></div>
   </div>
 </div>
-
-<!-- RATE AN ORDER POPUP -->
-<asp:HiddenField ID="hfRateOrderID" runat="server" />
-<asp:HiddenField ID="hfScore" runat="server" Value="0" />
-
-<div id="rateOverlay" class="rate-overlay" aria-hidden="true">
-  <div class="rate-modal" role="dialog" aria-labelledby="rateTitle">
-    <button type="button" id="rateClose" class="rate-close" aria-label="Close">&times;</button>
-    <h3 id="rateTitle">Rate your order</h3>
-    <p class="rate-sub">Order <strong id="rateOrderLabel"></strong> &mdash; tell us how we did.</p>
-
-    <div class="rate-stars" id="rateStars" aria-label="Star rating">
-      <span data-v="1">&#9733;</span><span data-v="2">&#9733;</span><span data-v="3">&#9733;</span><span data-v="4">&#9733;</span><span data-v="5">&#9733;</span>
-    </div>
-
-    <asp:TextBox ID="txtReview" runat="server" TextMode="MultiLine" Rows="4" MaxLength="200"
-        CssClass="rate-text" placeholder="Write your comment here..." />
-    <div class="rate-count"><span id="rateCount">0</span>/200</div>
-
-    <asp:Label ID="lblRateError" runat="server" CssClass="rate-error" />
-
-    <div class="rate-actions">
-      <button type="button" id="rateCancel" class="rate-cancel">Cancel</button>
-      <asp:Button ID="btnSubmitRating" runat="server" Text="Submit Rating" CssClass="rate-submit"
-          OnClientClick="return validateRating();" OnClick="btnSubmitRating_Click" />
-    </div>
-  </div>
-</div>
-
 <script>
     (function () {
         var viewer = document.getElementById('designViewer');
@@ -337,68 +295,59 @@
         });
         document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeViewer(); });
     })();
-
-    // ---------- Rate an order ----------
-    (function () {
-        var overlay = document.getElementById('rateOverlay');
-        var hfOrder = document.getElementById('<%= hfRateOrderID.ClientID %>');
-        var hfScore = document.getElementById('<%= hfScore.ClientID %>');
-        var txt = document.getElementById('<%= txtReview.ClientID %>');
-        var err = document.getElementById('<%= lblRateError.ClientID %>');
-        var label = document.getElementById('rateOrderLabel');
-        var count = document.getElementById('rateCount');
-        var stars = document.querySelectorAll('#rateStars span');
-
-        function paint(v) {
-            for (var i = 0; i < stars.length; i++) {
-                var on = parseInt(stars[i].getAttribute('data-v'), 10) <= v;
-                if (on) stars[i].classList.add('on'); else stars[i].classList.remove('on');
-            }
-        }
-        function updateCount() { count.textContent = txt.value.length; }
-
-        // keep = true: reopen without clearing what the customer already entered
-        window.openRate = function (orderId, keep) {
-            hfOrder.value = orderId;
-            label.textContent = orderId;
-            if (!keep) {
-                hfScore.value = '0';
-                txt.value = '';
-                err.textContent = '';
-            }
-            paint(parseInt(hfScore.value, 10) || 0);
-            updateCount();
-            overlay.classList.add('open');
-            overlay.setAttribute('aria-hidden', 'false');
-        };
-        function closeRate() {
-            overlay.classList.remove('open');
-            overlay.setAttribute('aria-hidden', 'true');
-        }
-
-        window.validateRating = function () {
-            var s = parseInt(hfScore.value, 10) || 0;
-            if (s < 1) { err.textContent = 'Please choose a star rating.'; return false; }
-            if (txt.value.replace(/\s/g, '').length === 0) { err.textContent = 'Please write a short comment.'; return false; }
-            return true;
-        };
-
-        document.addEventListener('click', function (e) {
-            var t = e.target;
-            var openBtn = t.closest ? t.closest('.rate-order-btn') : null;
-            if (openBtn) { window.openRate(openBtn.getAttribute('data-order'), false); return; }
-
-            if (t.parentNode && t.parentNode.id === 'rateStars') {
-                var v = parseInt(t.getAttribute('data-v'), 10);
-                hfScore.value = v;
-                paint(v);
-                err.textContent = '';
-                return;
-            }
-            if (t === overlay || t.id === 'rateClose' || t.id === 'rateCancel') closeRate();
-        });
-        document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeRate(); });
-        txt.addEventListener('input', updateCount);
-    })();
 </script>
+
+<!-- CONFIRM CANCEL: the ASP.NET button performs the server-side cancellation -->
+<input type="hidden" id="avunaCancelOrderId" name="avunaCancelOrderId" value="" />
+<div id="avunaCancelModal" class="avuna-cancel-overlay" role="dialog" aria-modal="true" aria-labelledby="avunaCancelHeading" aria-hidden="true">
+  <div class="avuna-cancel-dialog">
+    <h2 id="avunaCancelHeading">Cancel this order?</h2>
+    <p id="avunaCancelMessage"></p>
+    <p>Only <strong>Pending</strong> orders can be cancelled. The reserved quantities will be returned to inventory.</p>
+    <div class="avuna-cancel-actions">
+      <button type="button" id="avunaCancelKeep" class="avuna-cancel-keep">No, Keep Order</button>
+      <asp:Button ID="btnConfirmCancel" runat="server" Text="Yes, Cancel Order"
+          CssClass="avuna-cancel-confirm" CausesValidation="false"
+          OnClick="btnConfirmCancel_Click" />
+    </div>
+  </div>
+</div>
+<div id="avunaNoticeModal" class="avuna-cancel-overlay" role="alertdialog" aria-modal="true" aria-labelledby="avunaNoticeHeading" aria-hidden="true">
+  <div class="avuna-cancel-dialog">
+    <h2 id="avunaNoticeHeading"></h2>
+    <p id="avunaNoticeMessage"></p>
+    <button type="button" id="avunaNoticeOkay" class="avuna-notice-ok">OK</button>
+  </div>
+</div>
+<script>
+(function(){
+  var modal = document.getElementById('avunaCancelModal');
+  var keep = document.getElementById('avunaCancelKeep');
+  var hidden = document.getElementById('avunaCancelOrderId');
+  function closeCancel(){modal.classList.remove('open');modal.setAttribute('aria-hidden','true');hidden.value='';}
+  document.addEventListener('click',function(e){
+    var button = e.target.closest ? e.target.closest('.cancel-order-btn') : null;
+    if(button){
+      hidden.value=button.getAttribute('data-order');
+      document.getElementById('avunaCancelMessage').textContent='Are you sure you want to cancel order '+hidden.value+'?';
+      modal.classList.add('open');modal.setAttribute('aria-hidden','false');keep.focus();
+    }
+    if(e.target===modal) closeCancel();
+  });
+  keep.addEventListener('click',closeCancel);
+  document.addEventListener('keydown',function(e){if(e.key==='Escape')closeCancel();});
+})();
+window.avunaShowNotice=function(title,message,success){
+  var modal=document.getElementById('avunaNoticeModal');
+  document.getElementById('avunaNoticeHeading').textContent=title;
+  document.getElementById('avunaNoticeMessage').textContent=message;
+  modal.classList.add('open');modal.setAttribute('aria-hidden','false');
+  document.getElementById('avunaNoticeOkay').focus();
+};
+document.getElementById('avunaNoticeOkay').addEventListener('click',function(){
+  var modal=document.getElementById('avunaNoticeModal');
+  modal.classList.remove('open');modal.setAttribute('aria-hidden','true');
+});
+</script>
+
 </asp:Content>

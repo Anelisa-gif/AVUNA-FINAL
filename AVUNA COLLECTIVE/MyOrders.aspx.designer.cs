@@ -51,15 +51,6 @@ namespace AVUNA_COLLECTIVE
         protected global::System.Web.UI.WebControls.Literal litTotal;
 
         /// <summary>
-        /// lblRateMsg control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Label lblRateMsg;
-
-        /// <summary>
         /// gvOrders control.
         /// </summary>
         /// <remarks>
@@ -69,48 +60,12 @@ namespace AVUNA_COLLECTIVE
         protected global::System.Web.UI.WebControls.GridView gvOrders;
 
         /// <summary>
-        /// hfRateOrderID control.
+        /// btnConfirmCancel control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.HiddenField hfRateOrderID;
-
-        /// <summary>
-        /// hfScore control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.HiddenField hfScore;
-
-        /// <summary>
-        /// txtReview control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtReview;
-
-        /// <summary>
-        /// lblRateError control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Label lblRateError;
-
-        /// <summary>
-        /// btnSubmitRating control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Button btnSubmitRating;
+        protected global::System.Web.UI.WebControls.Button btnConfirmCancel;
     }
 }
