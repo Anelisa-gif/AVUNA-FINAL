@@ -32,8 +32,9 @@
 .avuna-confirm-close:hover,.avuna-confirm-close:focus{background:#d9650e}
 .avuna-choose-buttons{display:flex;gap:12px;margin-top:25px}.avuna-choose-buttons button{flex:1;border:0;border-radius:10px;padding:14px 10px;font-weight:800;cursor:pointer;background:#142d23;color:white}.avuna-choose-buttons button+button{background:#f47b20}.avuna-cancel-choice{border:0;background:transparent;color:#666;padding:12px;margin-top:10px;cursor:pointer}
 </style>
+
 <div class="avuna-order" id="createOrderPage">
-<section class="hero"><div class="hero-copy"><div class="eyebrow">AVUNA COLLECTIVE · CUSTOMER PORTAL</div><h1>Your vision,<br />our creation.</h1><p>Choose an item, size and multiple available colours, upload your design and review your quotation.</p><a runat="server" href="~/CustomerDashboard" class="back">Back to Dashboard</a></div><div class="hero-mark"><strong>AV</strong><small>CREATE<br />ORDER</small></div></section>
+<section class="hero"><div class="hero-copy"><h1>Your vision,<br />our creation.</h1><p>Choose an item, size and multiple available colours, upload your design and review your quotation.</p><a runat="server" href="~/CustomerDashboard" class="back">Back to Dashboard</a></div><div class="hero-mark"><strong>AV</strong><small>CREATE<br />ORDER</small></div></section>
 <div class="wrap"><div class="intro"><div><strong>Create a new order</strong><p class="muted">Your custom order details for AVUNA COLLECTIVE.</p></div><span class="pill">NEW ORDER</span></div>
 <div class="layout"><div class="panel"><span class="tag">ORDER DETAILS</span><h2>Customize Your Order</h2><p class="muted">Only available inventory combinations can be selected.</p>
 <div class="fields">
@@ -52,7 +53,6 @@
 <div id="orderMessage" class="feedback" role="alert" aria-live="polite"></div>
 <div id="choosePaymentOverlay" class="avuna-confirm-overlay" role="presentation" style="display:none">
  <div class="avuna-confirm-dialog" role="dialog" aria-modal="true" aria-labelledby="choosePaymentTitle">
-  <div class="avuna-confirm-icon" aria-hidden="true">✓</div>
   <h2 id="choosePaymentTitle">How would you like to pay?</h2>
   <p>Your order will be saved and stock deducted when you select an option.</p>
   <p class="avuna-confirm-muted">Pay Later keeps your order Pending. Pay Now opens the payment page after saving.</p>
