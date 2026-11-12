@@ -170,6 +170,31 @@
         .avuna-navbar .nav-link { font-size: 16px; padding: 8px 14px !important; white-space: nowrap; }
         .avuna-navbar .navbar-nav > .nav-item:last-child { margin-left: auto; }
         @media (max-width: 991px) { .avuna-navbar .navbar-nav { flex-direction: column; align-items: flex-start; } .avuna-navbar .navbar-nav > .nav-item:last-child { margin-left: 0; } }
+        /* WhatsApp consultant button - shows on every customer page */
+        .avuna-whatsapp {
+            position: fixed;
+            right: 20px;
+            bottom: 20px;
+            z-index: 9990;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 13px 20px 13px 16px;
+            background: #25D366;
+            color: #ffffff !important;
+            border-radius: 50px;
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            text-decoration: none !important;
+            box-shadow: 0 6px 18px rgba(0,0,0,.25);
+            transition: transform .2s ease, background .2s ease;
+        }
+        .avuna-whatsapp:hover { background: #1ebe5a; transform: translateY(-3px); color: #ffffff !important; }
+        .avuna-whatsapp svg { width: 24px; height: 24px; flex: none; }
+        body.modal-open .avuna-whatsapp { display: none; }
+        @media (max-width: 600px) { .avuna-whatsapp span { display: none; } .avuna-whatsapp { padding: 14px; } }
+        @media print { .avuna-whatsapp { display: none !important; } }
     </style>
     <link href="~/favicon.ico" rel="shortcut icon" type="image/x-icon" />
     <asp:ContentPlaceHolder ID="head" runat="server">
@@ -542,9 +567,28 @@
                 return "I'm sorry, I don't have an answer for that yet. Please visit the Contact page on our website for assistance from the Avuna Collective team.";
             }
         </script>
+        <!-- WhatsApp: opens a chat with the AVUNA consultant -->
+        <a class="avuna-whatsapp" href="https://wa.me/27714860091?text=Hello%20AVUNA%20COLLECTIVE%2C%20I%20would%20like%20to%20speak%20to%20a%20consultant." target="_blank" rel="noopener noreferrer" title="Chat with a consultant on WhatsApp" aria-label="Chat with a consultant on WhatsApp">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 0 1-12.4 7.4L3 20.5l1.7-5.4A8.5 8.5 0 1 1 21 11.5z"/><path d="M9 8.5c.3 2.6 2.6 5.1 5.5 6l1.4-1.5-2-1-.8.8c-.9-.4-1.7-1.2-2.1-2.1l.8-.8-1-2z"/></svg>
+            <span>Chat with a consultant</span>
+        </a>
+        <script>
+            // Phones: wa.me opens the WhatsApp app straight to the chat.
+            // Computers: go directly to WhatsApp Web with the chat box ready to type.
+            (function () {
+                var a = document.querySelector('.avuna-whatsapp');
+                if (!a) return;
+                var mobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+                if (!mobile) {
+                    a.href = 'https://web.whatsapp.com/send?phone=27714860091&text=' +
+                        encodeURIComponent('Hello AVUNA COLLECTIVE, I would like to speak to a consultant.');
+                }
+            })();
+        </script>
     </form>
     <asp:PlaceHolder runat="server">
         <%: Scripts.Render("~/Scripts/bootstrap.js") %>
     </asp:PlaceHolder>
 </body>
 </html>
+
