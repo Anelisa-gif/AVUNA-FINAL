@@ -249,9 +249,8 @@ right: -35px; bottom: -35px; background: rgba(244,123,32,.05);
 <!-- ===================================================== HERO ===================================================== -->
 <section class="customer-hero">
 <div class="customer-hero-copy">
-<span class="customer-eyebrow">AVUNA COLLECTIVE · CUSTOMER PORTAL</span>
 <h1 style="color: white;">Welcome back<asp:Literal ID="litGreetName" runat="server" /></h1>
-<p>Your AVUNA space for orders, payments, designs and account information all in one place.</p>
+<p>Your Avuna Collectives space for orders, payments, designs and account information all in one place.</p>
 <div class="customer-hero-actions">
 <a href="~/CreateOrder.aspx" runat="server" class="customer-btn customer-btn-orange">Create a New Order</a>
 <a href="MyOrders.aspx" class="customer-btn customer-btn-light">View My Orders</a>
@@ -267,8 +266,8 @@ right: -35px; bottom: -35px; background: rgba(244,123,32,.05);
 <section class="customer-card">
 <div class="customer-card-heading">
 <div>
-<span class="customer-dark-eyebrow">ORDERS</span>
-<h2>Your Recent Orders</h2>
+
+<h2><strong>Your Recent Orders</strong></h2>
 <p><asp:Literal ID="litRecentSub" runat="server" /></p>
 </div>
 <a href="MyOrders.aspx" class="view-link">View all orders &rarr;</a>
@@ -287,8 +286,8 @@ right: -35px; bottom: -35px; background: rgba(244,123,32,.05);
 <div class="dash-side">
 <!-- TRACK AN ORDER -->
 <section class="customer-card" id="track">
-<span class="customer-dark-eyebrow">TRACK</span>
-<h2 class="dash-h2">Track an Order</h2>
+
+<h2 class="dash-h2"><strong>Track an Order</strong></h2>
 <div class="dash-search">
 <input type="text" id="trackInput" maxlength="20" autocomplete="off" placeholder="Order number, e.g. ORD001" value="<%: TrackValue %>" />
 <button type="button" onclick="doTrack()">Track</button>
@@ -297,8 +296,7 @@ right: -35px; bottom: -35px; background: rgba(244,123,32,.05);
 </section>
 <!-- QUICK ACTIONS -->
 <section class="customer-card">
-<span class="customer-dark-eyebrow">QUICK ACTIONS</span>
-<h2 class="dash-h2">What would you like to do?</h2>
+<h2 class="dash-h2"><strong>What would you like to do?</strong></h2>
 <div class="dash-actions">
 <a href="~/CreateOrder.aspx" runat="server" class="customer-btn customer-btn-orange">Create a New Order</a>
 <a href="~/MyOrders.aspx" runat="server" class="customer-btn customer-outline">View My Orders and Payments</a>
