@@ -225,9 +225,9 @@
     <section class="customer-card">
       <div class="customer-card-heading">
         <div>
-          <span class="customer-dark-eyebrow">ORDER ACTIVITY</span>
-          <h2>All My Orders</h2>
-          <p>Track the progress and value of every order you've placed.</p>
+    
+        <h2><strong>All My Orders</strong></h2>  
+            <p>Track the progress and value of every order you've placed.</p>
         </div>
       </div>
 
