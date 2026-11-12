@@ -47,6 +47,126 @@ namespace AVUNA_COLLECTIVE
                     ShowPopup("Order Cancelled Successfully!",
                         "Order " + cancelledId + " was moved to ArchivedOrder, and its reserved stock was returned to inventory.", true);
                 }
+
+                string ratedId = Session["AvunaRatedOrderId"] as string;
+                if (!String.IsNullOrEmpty(ratedId))
+                {
+                    Session.Remove("AvunaRatedOrderId");
+                    ShowPopup("Thank you for your feedback!",
+                        "Your rating for order " + ratedId + " has been saved.", true);
+                }
+            }
+        }
+
+        // Called by the "Submit Rating" button in the rating modal.
+        protected void btnSubmitRating_Click(object sender, EventArgs e)
+        {
+            int customerId = GetLoggedInCustomerId();
+            if (customerId <= 0)
+            {
+                Response.Redirect("~/Login.aspx", false);
+                Context.ApplicationInstance.CompleteRequest();
+                return;
+            }
+
+            string orderId, scoreText, review;
+            try
+            {
+                orderId = (Request.Form["avunaRateOrderId"] ?? "").Trim();
+                scoreText = (Request.Form["avunaRatingScore"] ?? "").Trim();
+                review = (Request.Form["avunaRatingReview"] ?? "").Trim();
+            }
+            catch (HttpRequestValidationException)
+            {
+                // ASP.NET blocks text like <script> in form fields.
+                LoadOrders(customerId);
+                ShowPopup("Rating not saved", "Please remove special characters such as < or > from your comment and try again.", false);
+                return;
+            }
+
+            int score;
+            if (orderId.Length == 0 || orderId.Length > 50)
+            {
+                LoadOrders(customerId);
+                ShowPopup("Rating not saved", "Please select a valid order.", false);
+                return;
+            }
+            if (!int.TryParse(scoreText, out score) || score < 1 || score > 5)
+            {
+                LoadOrders(customerId);
+                ShowPopup("Rating not saved", "Please choose a star rating between 1 and 5.", false);
+                return;
+            }
+            if (review.Length == 0)
+            {
+                LoadOrders(customerId);
+                ShowPopup("Rating not saved", "Please write a short comment.", false);
+                return;
+            }
+            if (review.Length > 50)   // dbo.Rating.rating_Review is VARCHAR(50)
+            {
+                LoadOrders(customerId);
+                ShowPopup("Rating not saved", "Your comment can be at most 50 characters.", false);
+                return;
+            }
+
+            try
+            {
+                SaveRating(customerId, orderId, score, review);
+                // Redirect after POST prevents refreshing the page from saving the rating twice.
+                Session["AvunaRatedOrderId"] = orderId;
+                Response.Redirect(Request.Path, false);
+                Context.ApplicationInstance.CompleteRequest();
+            }
+            catch (InvalidOperationException ex)
+            {
+                LoadOrders(customerId);
+                ShowPopup("Rating not saved", ex.Message, false);
+            }
+            catch (SqlException)
+            {
+                LoadOrders(customerId);
+                ShowPopup("Rating not saved", "The database could not save your rating. Please try again.", false);
+            }
+        }
+
+        // Saves one rating into dbo.Rating (RAT023, RAT024, ...).
+        // The insert only happens when the order belongs to this customer, is Completed/Delivered
+        // and has not been rated yet, so it cannot be abused from the browser.
+        private static void SaveRating(int customerId, string orderId, int score, string review)
+        {
+            const string sql = @"
+SET XACT_ABORT ON;
+BEGIN TRAN;
+DECLARE @next INT = ISNULL((SELECT MAX(TRY_CAST(SUBSTRING(rating_ID, 4, 10) AS INT))
+                            FROM dbo.Rating WITH (UPDLOCK, HOLDLOCK)), 0) + 1;
+INSERT INTO dbo.Rating (rating_ID, rating_Date, rating_Review, rating_Score, order_ID)
+SELECT 'RAT' + CASE WHEN @next < 1000
+                    THEN RIGHT('000' + CAST(@next AS VARCHAR(10)), 3)
+                    ELSE CAST(@next AS VARCHAR(10)) END,
+       CAST(GETDATE() AS DATE), @Review, @Score, o.order_ID
+FROM dbo.[Order] o
+WHERE o.order_ID = @OrderId
+  AND o.customer_ID = @CustomerId
+  AND LOWER(LTRIM(RTRIM(o.order_Status))) IN ('completed', 'delivered')
+  AND NOT EXISTS (SELECT 1 FROM dbo.Rating r WHERE r.order_ID = o.order_ID);
+DECLARE @rc INT = @@ROWCOUNT;
+COMMIT;
+SELECT @rc;";
+
+            string cs = ConfigurationManager.ConnectionStrings["GroupWst2"].ConnectionString;
+            using (var con = new SqlConnection(cs))
+            using (var cmd = new SqlCommand(sql, con))
+            {
+                cmd.Parameters.Add("@Review", SqlDbType.VarChar, 50).Value = review;
+                cmd.Parameters.Add("@Score", SqlDbType.Int).Value = score;
+                cmd.Parameters.Add("@OrderId", SqlDbType.VarChar, 50).Value = orderId;
+                cmd.Parameters.Add("@CustomerId", SqlDbType.Int).Value = customerId;
+                con.Open();
+                int inserted = Convert.ToInt32(cmd.ExecuteScalar());
+                if (inserted == 0)
+                    throw new InvalidOperationException(
+                        "This order can't be rated. It must be your own order, completed, and not already rated.");
             }
         }
 
@@ -356,7 +476,9 @@ IF @@ROWCOUNT <> (SELECT COUNT(*) FROM #RestoreItem)
                        oi.item, oi.DesignPackage, oi.orderItem_Quantity,
                        oi.orderItem_Size, oi.orderItem_Colour, oi.orderItem_Subtotal,
                        oi.designFile_ID,
-                       ROW_NUMBER() OVER(PARTITION BY o.order_ID ORDER BY oi.orderItem_ID) AS ItemRowNumber
+                       ROW_NUMBER() OVER(PARTITION BY o.order_ID ORDER BY oi.orderItem_ID) AS ItemRowNumber,
+                       (SELECT COUNT(*) FROM [dbo].[Rating] r WHERE r.order_ID = o.order_ID) AS RatingCount,
+                       (SELECT TOP 1 r.rating_Score FROM [dbo].[Rating] r WHERE r.order_ID = o.order_ID) AS RatingScore
                 FROM [dbo].[Order] o
                 LEFT JOIN [dbo].[OrderItem] oi ON oi.order_ID = o.order_ID
                 WHERE o.customer_ID = @CustomerId
@@ -431,6 +553,38 @@ IF @@ROWCOUNT <> (SELECT COUNT(*) FROM #RestoreItem)
             litCompleted.Text = completed.ToString();
             litActive.Text = active.ToString();
             litOutstanding.Text = "R" + outstanding.ToString("N2", CultureInfo.InvariantCulture);
+        }
+
+        // Action column: Cancel for Pending orders, Rate Order (or the given score) for
+        // Completed/Delivered orders. Only the first row of each order shows a button.
+        protected string RenderAction(object status, object orderId, object rowNumber,
+            object ratingCount, object ratingScore)
+        {
+            string s = (status == null || status == DBNull.Value)
+                ? "" : Convert.ToString(status).Trim().ToLowerInvariant();
+
+            if (s == "completed" || s == "delivered")
+            {
+                if (orderId == null || orderId == DBNull.Value ||
+                    rowNumber == null || rowNumber == DBNull.Value ||
+                    Convert.ToInt32(rowNumber) != 1)
+                    return "<span class='no-design'>—</span>";
+
+                int count = (ratingCount == null || ratingCount == DBNull.Value) ? 0 : Convert.ToInt32(ratingCount);
+                if (count > 0)
+                {
+                    string score = (ratingScore == null || ratingScore == DBNull.Value)
+                        ? "" : Convert.ToString(ratingScore);
+                    return "<span class='status status-completed'>&#9733; " +
+                           HttpUtility.HtmlEncode(score) + "/5</span>";
+                }
+
+                return "<button type='button' class='rate-order-btn' data-order='" +
+                       HttpUtility.HtmlAttributeEncode(Convert.ToString(orderId)) +
+                       "'>Rate Order</button>";
+            }
+
+            return RenderCancel(status, orderId, rowNumber);
         }
 
         // Only show ONE Cancel button per pending order (even if it contains multiple items).

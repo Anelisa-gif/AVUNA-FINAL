@@ -46,14 +46,14 @@
 <div class="wrap">
 <div class="layout"><div class="panel"><span class="tag">ORDER DETAILS</span><h2>Customize Your Order</h2><p class="muted">Only available inventory combinations can be selected.</p>
 <div class="fields">
-<div class="field"><label for="itemName">ITEM NAME *</label><select id="itemName"><option value="">Select an item</option></select></div>
+<div class="field"><label for="itemName">ITEM NAME </label><select id="itemName"><option value="">Select an item</option></select></div>
 <div class="field"><label for="quantity">TOTAL QUANTITY</label><input type="number" id="quantity" min="1" step="1" readonly placeholder="Calculated from colours" /><div class="hint" id="quantityHint">Enter quantities next to the colours you select.</div></div>
-<div class="field"><label for="itemSize">SIZE *</label><select id="itemSize" disabled><option value="">Select an item first</option></select></div>
-<div class="field"><label>COLOURS AND QUANTITIES *</label><div id="colourPicker" class="colour-picker"><span class="hint">Select an item and size first.</span></div><p class="hint">Tick each available colour and enter the number of garments for that colour.</p></div>
-<div class="field"><label>AUTOMATIC DESIGN PACKAGE</label><div class="auto-package" id="detectedPackage">Select colours to calculate the package</div><p class="hint">1 colour: Bronze · 2: Silver · 3: Gold · 4+: Platinum. Design fee charged once.</p></div>
+<div class="field"><label for="itemSize">SIZE </label><select id="itemSize" disabled><option value="">Select an item first</option></select></div>
+<div class="field"><label>COLOURS AND QUANTITIES </label><div id="colourPicker" class="colour-picker"><span class="hint">Select an item and size first.</span></div><p class="hint">Tick each available colour and enter the number of garments for that colour.</p></div>
+<div class="field"><label>AUTOMATIC DESIGN PACKAGE</label><div class="auto-package" id="detectedPackage">Select colours to calculate the package</div><p class="hint">1 Colour: Bronze · 2 Colours: Silver · 3 Colours: Gold · 4+ Colours: Platinum. Design fee charged once.</p></div>
 </div>
 <div id="stockMessage" class="stock warn" role="status">Select an item and size, then choose colours and quantities.</div>
-<div class="field"><label for="designFile">UPLOAD YOUR DESIGN *</label><div class="upload"><div class="upload-icon">&#8682;</div><strong>Upload your custom design</strong><p class="hint">PNG, JPG, JPEG or WEBP, maximum 5 MB</p><input type="file" id="designFile" name="designFile" accept=".png,.jpg,.jpeg,.webp,image/png,image/jpeg,image/webp" /><img id="designPreview" alt="Uploaded design preview" /></div></div>
+<div class="field"><label for="designFile">UPLOAD YOUR DESIGN</label><div class="upload"><div class="upload-icon">&#8682;</div><strong>Upload your custom design</strong><p class="hint">PNG, JPG, JPEG or WEBP, maximum 5 MB</p><input type="file" id="designFile" name="designFile" accept=".png,.jpg,.jpeg,.webp,image/png,image/jpeg,image/webp" /><img id="designPreview" alt="Uploaded design preview" /></div></div>
     <style>
 .avuna-order .mock-wrap{margin:4px 0 24px;border:1px solid #e5dccd;border-radius:12px;background:#fbf8f2;padding:16px}
 .avuna-order .mock-wrap h3{margin:0 0 4px;font-size:17px}
@@ -319,7 +319,7 @@
 <div class="rowline"><span>Subtotal including VAT</span><strong id="quoteSubtotal">R 0.00</strong></div>
 <div class="rowline"><span>Markup (10% after VAT)</span><strong id="quoteMarkup">R 0.00</strong></div>
 <div class="total"><span>ESTIMATED ORDER TOTAL</span><strong id="quoteTotal">R 0.00</strong></div>
-<div class="note">Inventory and prices are retrieved from GroupWst2 using the normal page load. The design package is based on the number of selected garment colours. Submitting saves your pending order and uploaded design. Stock is checked again before saving, and available inventory quantities are deducted when the order is successfully submitted.</div>
+<div class="note">The design package is based on the number of selected garment colours. Submitting saves your pending order and uploaded design. Stock is checked again before saving, and available inventory quantities are deducted when the order is successfully submitted.</div>
 </div></div></div></div>
 <script>
     (function () {

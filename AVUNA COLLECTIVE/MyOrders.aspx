@@ -177,6 +177,22 @@
 .avuna-cancel-keep{background:#f1f1f1;color:#333}
 .avuna-cancel-confirm{background:#c94b45;color:#fff}
 .avuna-notice-ok{background:#0f2a1f;color:#fff;min-width:130px}
+
+/* ORDER RATING */
+.rate-order-btn{display:inline-block;padding:9px 14px;border:1px solid #9a7536;background:#f2e2c9;color:#6f5428;border-radius:8px;font-size:11px;font-weight:800;letter-spacing:.5px;cursor:pointer;white-space:nowrap;transition:all .2s ease}
+.rate-order-btn:hover{background:#9a7536;color:#fff;transform:translateY(-2px);box-shadow:0 6px 14px rgba(196,154,69,.3)}
+.avuna-stars{display:flex;flex-direction:row-reverse;justify-content:center;gap:4px;margin:4px 0 18px}
+.avuna-stars input{position:absolute;opacity:0;width:0;height:0}
+.avuna-stars label{font-size:42px;line-height:1;color:#d9d3c5;cursor:pointer;transition:color .15s ease,transform .15s ease}
+.avuna-stars label:hover{transform:scale(1.12)}
+.avuna-stars input:checked ~ label,.avuna-stars label:hover,.avuna-stars label:hover ~ label{color:#c49a45}
+.avuna-stars input:focus-visible + label{outline:2px solid #9a7536;border-radius:6px}
+.avuna-rate-text{display:block;width:100%;box-sizing:border-box;padding:12px;border:1px solid #e5dccd;border-radius:10px;font:inherit;font-size:14px;resize:none;background:#fff;color:#222}
+.avuna-rate-text:focus{outline:2px solid #c49a45;border-color:#c49a45}
+.avuna-rate-count{text-align:right;font-size:12px;color:#888;margin:6px 0 0}
+.avuna-rate-submit{border:0;border-radius:9px;padding:12px 22px;font-weight:800;cursor:pointer;background:#9a7536;color:#fff}
+.avuna-rate-submit:hover{background:#173c2c}
+.avuna-rate-error{display:none;color:#c94b45;font-size:13px;font-weight:700;margin:10px 0 0}
 </style>
 <div class="customer-dashboard">
   <!-- ===================================================== HERO ===================================================== -->
@@ -256,7 +272,7 @@
             <asp:BoundField DataField="orderItem_Subtotal" HeaderText="Subtotal" DataFormatString="R {0:N2}" />
             <asp:TemplateField HeaderText="Action">
               <ItemTemplate>
-                <%# RenderCancel(Eval("order_Status"), Eval("order_ID"), Eval("ItemRowNumber")) %>
+                <%# RenderAction(Eval("order_Status"), Eval("order_ID"), Eval("ItemRowNumber"), Eval("RatingCount"), Eval("RatingScore")) %>
               </ItemTemplate>
             </asp:TemplateField>
           </Columns>
@@ -360,6 +376,75 @@
         var modal = document.getElementById('avunaNoticeModal');
         modal.classList.remove('open'); modal.setAttribute('aria-hidden', 'true');
     });
+</script>
+
+<!-- RATE ORDER: the ASP.NET button saves the rating into dbo.Rating -->
+<input type="hidden" id="avunaRateOrderId" name="avunaRateOrderId" value="" />
+<div id="avunaRateModal" class="avuna-cancel-overlay" role="dialog" aria-modal="true" aria-labelledby="avunaRateHeading" aria-hidden="true">
+  <div class="avuna-cancel-dialog">
+    <h2 id="avunaRateHeading">Rate your order</h2>
+    <p id="avunaRateMessage"></p>
+    <div class="avuna-stars" role="radiogroup" aria-label="Star rating">
+      <input type="radio" id="avStar5" name="avunaRatingScore" value="5" /><label for="avStar5" title="5 - Excellent">&#9733;</label>
+      <input type="radio" id="avStar4" name="avunaRatingScore" value="4" /><label for="avStar4" title="4 - Good">&#9733;</label>
+      <input type="radio" id="avStar3" name="avunaRatingScore" value="3" /><label for="avStar3" title="3 - Average">&#9733;</label>
+      <input type="radio" id="avStar2" name="avunaRatingScore" value="2" /><label for="avStar2" title="2 - Poor">&#9733;</label>
+      <input type="radio" id="avStar1" name="avunaRatingScore" value="1" /><label for="avStar1" title="1 - Terrible">&#9733;</label>
+    </div>
+    <textarea id="avunaRatingReview" name="avunaRatingReview" class="avuna-rate-text" rows="3" maxlength="50"
+        placeholder="Tell us about your order (max 50 characters)"></textarea>
+    <div class="avuna-rate-count"><span id="avunaRateCount">0</span>/50</div>
+    <div id="avunaRateError" class="avuna-rate-error" role="alert"></div>
+    <div class="avuna-cancel-actions">
+      <button type="button" id="avunaRateCancel" class="avuna-cancel-keep">Cancel</button>
+      <asp:Button ID="btnSubmitRating" runat="server" Text="Submit Rating"
+          CssClass="avuna-rate-submit" CausesValidation="false"
+          OnClientClick="return avunaCheckRating();"
+          OnClick="btnSubmitRating_Click" />
+    </div>
+  </div>
+</div>
+<script>
+    (function () {
+        var modal = document.getElementById('avunaRateModal');
+        var hidden = document.getElementById('avunaRateOrderId');
+        var review = document.getElementById('avunaRatingReview');
+        var count = document.getElementById('avunaRateCount');
+        var error = document.getElementById('avunaRateError');
+
+        function closeRate() { modal.classList.remove('open'); modal.setAttribute('aria-hidden', 'true'); hidden.value = ''; }
+        function selectedScore() {
+            var checked = modal.querySelector('input[name="avunaRatingScore"]:checked');
+            return checked ? checked.value : '';
+        }
+
+        document.addEventListener('click', function (e) {
+            var button = e.target.closest ? e.target.closest('.rate-order-btn') : null;
+            if (button) {
+                hidden.value = button.getAttribute('data-order');
+                document.getElementById('avunaRateMessage').textContent = 'How was order ' + hidden.value + '?';
+                var radios = modal.querySelectorAll('input[name="avunaRatingScore"]');
+                for (var i = 0; i < radios.length; i++) radios[i].checked = false;
+                review.value = '';
+                count.textContent = '0';
+                error.style.display = 'none';
+                modal.classList.add('open'); modal.setAttribute('aria-hidden', 'false');
+                return;
+            }
+            if (e.target === modal || e.target.id === 'avunaRateCancel') closeRate();
+        });
+        document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeRate(); });
+        review.addEventListener('input', function () { count.textContent = review.value.length; });
+
+        // Runs before the postback; returning false stops the submit.
+        window.avunaCheckRating = function () {
+            var message = '';
+            if (!selectedScore()) message = 'Please choose a star rating.';
+            else if (!review.value.replace(/\s+/g, '')) message = 'Please write a short comment.';
+            if (message) { error.textContent = message; error.style.display = 'block'; return false; }
+            return true;
+        };
+    })();
 </script>
 
 </asp:Content>
