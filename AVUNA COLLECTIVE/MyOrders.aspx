@@ -164,7 +164,7 @@
   <!-- ===================================================== HERO ===================================================== -->
   <section class="customer-hero">
     <div class="customer-hero-copy">
-      <span class="customer-eyebrow">AVUNA COLLECTIVE · CUSTOMER PORTAL</span>
+
       <h1 style="color: white;">Your orders, tracked end to end.</h1>
       <p>Check the status, progress and value of everything you've ordered from AVUNA.</p>
       <div class="customer-hero-actions">
@@ -176,14 +176,8 @@
   </section>
   <!-- ===================================================== ORDERS BODY ===================================================== -->
   <main class="customer-body">
-    <!-- WELCOME -->
-    <div class="customer-welcome">
-      <div>
-        <strong>Your order history</strong>
-        <span>Here is the current state of everything you've ordered.</span>
-      </div>
-      <span class="customer-demo">DATA</span>
-    </div>
+
+    
     <!-- ORDER STATISTICS -->
     <section class="customer-stat-grid">
       <article class="customer-stat stat-green">

@@ -90,16 +90,21 @@ namespace AVUNA_COLLECTIVE
 
                     // Profile cards
                     lblFullName.Text = Server.HtmlEncode((first + " " + last).Trim());
-                    lblEmail.Text = Server.HtmlEncode(email);
-                    lblPhone.Text = Server.HtmlEncode(phone);
+
+                    lblEmail.Text = email.Length > 0
+                        ? "<a href=\"mailto:" + HttpUtility.HtmlAttributeEncode(email) + "\">" + Server.HtmlEncode(email) + "</a>"
+                        : "Not set";
+
+                    lblPhone.Text = phone.Length > 0
+                        ? "<a href=\"tel:" + HttpUtility.HtmlAttributeEncode(Regex.Replace(phone, @"[^\d+]", "")) + "\">" + Server.HtmlEncode(phone) + "</a>"
+                        : "Not set";
+
                     lblType.Text = Server.HtmlEncode(type);
                     lblAddress.Text = Server.HtmlEncode(BuildAddress(house, street, suburb, town));
                     lblUsername.Text = username.Length > 0 ? Server.HtmlEncode(username) : "Not set";
 
                     // Never display the real password - only whether one exists
-                    lblPassword.Text = password.Length > 0
-                        ? "\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022"
-                        : "Not set";
+                    lblPassword.Text = password.Length > 0 ? "Password is set" : "Not set";
 
                     // Modal header
                     lblModalName.Text = Server.HtmlEncode((first + " " + last).Trim());

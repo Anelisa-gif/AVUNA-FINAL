@@ -43,7 +43,7 @@
 
 <div class="avuna-order" id="createOrderPage">
 <section class="hero"><div class="hero-copy"><h1>Your vision,<br />our creation.</h1><p>Choose an item, size and multiple available colours, upload your design and review your quotation.</p><a runat="server" href="~/CustomerDashboard" class="back">Back to Dashboard</a></div><div class="hero-mark-logo"><img runat="server" src="~/avuna-logo.png" alt="Avuna Collective" /></div></section>
-<div class="wrap"><div class="intro"><div><strong>Create a new order</strong><p class="muted">Your custom order details for AVUNA COLLECTIVE.</p></div><span class="pill">NEW ORDER</span></div>
+<div class="wrap"><div class="intro"><div><strong>Create a new order</strong><p class="muted">Your custom order details for Avuna Collective.</p></div><span class="pill">NEW ORDER</span></div>
 <div class="layout"><div class="panel"><span class="tag">ORDER DETAILS</span><h2>Customize Your Order</h2><p class="muted">Only available inventory combinations can be selected.</p>
 <div class="fields">
 <div class="field"><label for="itemName">ITEM NAME *</label><select id="itemName"><option value="">Select an item</option></select></div>

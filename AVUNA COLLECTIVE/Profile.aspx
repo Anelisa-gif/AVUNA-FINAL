@@ -1,106 +1,74 @@
 ﻿<%@ Page Title="" Language="C#" MasterPageFile="~/Customer_master.Master" AutoEventWireup="true" CodeBehind="Profile.aspx.cs" Inherits="AVUNA_COLLECTIVE.ProfilePage" %>
 <asp:Content ID="BodyContent" ContentPlaceHolderID="MainContent" runat="server">
 <style>
-/* =========================================================
-   AVUNA MY PROFILE — shared page shell (same as Dashboard)
-   ========================================================= */
 .customer-dashboard {
   --avuna-orange: #f47b20;
   --avuna-orange-dark: #d95f0b;
   --avuna-gold: #d9a441;
-  --avuna-black: #111111;
-  --avuna-dark: #1c1c1c;
-  --avuna-light: #f7f5f1;
-  --avuna-white: #ffffff;
   --avuna-grey: #6f6f6f;
   --avuna-border: #e8e4dc;
-  --avuna-green: #27845b;
-  --avuna-red: #c94b45;
   --avuna-shadow: 0 10px 35px rgba(0,0,0,.08);
   width: 100%;
   min-height: 100vh;
   background: #f6f4ef;
-  padding-bottom: 60px;
+  padding-bottom: 100px;
   color: #202020;
 }
-/* HERO */
+
+/* hero */
 .customer-hero {
   position: relative;
   overflow: hidden;
-  min-height: 390px;
-  padding: 70px 8%;
+  min-height: 260px;
+  padding: 40px 8% 60px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: linear-gradient(120deg, #111111 0%, #191919 60%, #252525 100%);
   color: white;
-}
-.customer-hero:before {
-  content: "";
-  position: absolute;
-  width: 380px; height: 380px;
-  border: 70px solid rgba(244,123,32,.08);
-  border-radius: 50%;
-  right: -120px; top: -170px;
-}
-.customer-hero:after {
-  content: "";
-  position: absolute;
-  width: 180px; height: 180px;
-  background: rgba(217,164,65,.08);
-  transform: rotate(45deg);
-  left: -70px; bottom: -100px;
+  background-color: #2a2118;
+  background-image: linear-gradient(90deg, rgba(24,17,10,.90) 0%, rgba(24,17,10,.74) 42%, rgba(24,17,10,.28) 100%), url("<%= ResolveUrl("~/images/customer-hero.jpg") %>");
+  background-size: auto, cover;
+  background-position: center, center;
+  background-repeat: no-repeat;
 }
 .customer-hero-copy { position: relative; z-index: 2; max-width: 720px; }
-.customer-eyebrow { display: inline-block; color: #f47b20; font-size: 12px; font-weight: 800; letter-spacing: 2px; margin-bottom: 14px; }
-.customer-hero h1 { font-size: clamp(38px, 5vw, 64px); line-height: 1; margin: 0 0 20px; font-weight: 800; letter-spacing: -2px; }
-.customer-hero p { color: #d4d4d4; font-size: 17px; line-height: 1.7; max-width: 650px; margin-bottom: 30px; }
+.customer-hero h1 { font-size: clamp(32px, 4vw, 48px); line-height: 1.05; margin: 0 0 12px; font-weight: 800; letter-spacing: -1.5px; }
+.customer-hero p { color: #d4d4d4; font-size: 17px; line-height: 1.7; max-width: 650px; margin-bottom: 20px; }
 .customer-hero-actions { display: flex; gap: 14px; flex-wrap: wrap; }
 .customer-btn { display: inline-flex; align-items: center; justify-content: center; padding: 13px 22px; border-radius: 10px; text-decoration: none !important; font-weight: 700; transition: all .25s ease; }
-.customer-btn-orange { background: var(--avuna-orange); color: white !important; box-shadow: 0 8px 20px rgba(244,123,32,.25); }
-.customer-btn-orange:hover { background: #ff8b32; transform: translateY(-3px); box-shadow: 0 12px 28px rgba(244,123,32,.35); }
 .customer-btn-light { border: 1px solid rgba(255,255,255,.35); color: white !important; background: rgba(255,255,255,.06); }
 .customer-btn-light:hover { background: white; color: #111 !important; transform: translateY(-3px); }
-/* HERO BADGE */
-.customer-hero-badge {
-  position: relative; z-index: 2;
-  width: 190px; height: 190px;
-  border-radius: 50%;
-  border: 2px solid rgba(244,123,32,.6);
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  background: radial-gradient(circle, rgba(244,123,32,.18), rgba(255,255,255,.02) 60%);
-  box-shadow: 0 0 0 18px rgba(244,123,32,.03), 0 0 60px rgba(244,123,32,.12);
-}
-.customer-hero-badge strong { font-size: 42px; letter-spacing: 3px; color: white; }
-.customer-hero-badge span { color: #f47b20; text-transform: uppercase; font-size: 10px; font-weight: 800; letter-spacing: 2px; text-align: center; margin-top: 5px; }
-/* BODY */
+
+.av-logo-tile { position: relative; z-index: 2; width: 130px; height: 130px; min-width: 130px; flex: none; background: #fff; border: 2px solid #d9a52c; border-radius: 50%; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.av-logo-tile img { width: 100%; height: 100%; object-fit: contain; display: block; }
+
+/* body */
 .customer-body { width: 90%; max-width: 1400px; margin: -35px auto 0; position: relative; z-index: 5; }
-/* WELCOME STRIP */
-.customer-welcome { background: white; border: 1px solid var(--avuna-border); border-radius: 16px; padding: 20px 25px; display: flex; align-items: center; justify-content: space-between; box-shadow: var(--avuna-shadow); margin-bottom: 24px; }
-.customer-welcome strong { display: block; font-size: 18px; margin-bottom: 4px; }
-.customer-welcome span { color: var(--avuna-grey); font-size: 14px; }
-.customer-demo { background: #fff4e9; color: var(--avuna-orange); padding: 8px 13px; border-radius: 20px; font-size: 11px; font-weight: 800; letter-spacing: 1px; }
-/* CARD */
 .customer-card { background: white; border: 1px solid var(--avuna-border); border-radius: 18px; padding: 28px; box-shadow: 0 6px 25px rgba(0,0,0,.05); }
-.customer-card-heading { display: flex; justify-content: space-between; align-items: flex-start; gap: 15px; margin-bottom: 25px; }
+.customer-card-heading { display: flex; justify-content: space-between; align-items: flex-start; gap: 15px; margin-bottom: 20px; }
 .customer-card-heading h2 { margin: 5px 0 7px; font-size: 24px; color: #181818; }
 .customer-card-heading p { color: #777; margin: 0; font-size: 13px; }
-.customer-dark-eyebrow { color: var(--avuna-orange); font-size: 10px; letter-spacing: 1.7px; font-weight: 800; }
-.orange-text { color: var(--avuna-orange); }
-/* PROFILE SECTION */
-.profile-section { margin-bottom: 30px; }
-.profile-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 18px; }
-.profile-box { background: #f8f7f4; border: 1px solid #ebe7df; border-radius: 12px; padding: 18px; }
-.profile-box label { display: block; color: #888; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; font-weight: 800; margin-bottom: 7px; }
-.profile-box strong { font-size: 14px; color: #222; }
 
-/* ---------- EDIT PROFILE BUTTON ---------- */
+/* profile fields */
+.profile-group-title { margin: 26px 0 12px; font-size: 11px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; color: var(--avuna-orange); }
+.profile-group-title.first { margin-top: 0; }
+.profile-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+.profile-grid.cols-2 { grid-template-columns: repeat(2, 1fr); }
+.profile-box { background: #f8f7f4; border: 1px solid #ebe7df; border-radius: 12px; padding: 18px; transition: box-shadow .2s ease, transform .2s ease; }
+.profile-box:hover { box-shadow: 0 6px 18px rgba(0,0,0,.07); transform: translateY(-1px); }
+.profile-box label { display: block; color: #5f5f5f; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; font-weight: 800; margin-bottom: 7px; }
+.profile-box strong { font-size: 16px; font-weight: 600; color: #222; word-break: break-word; }
+.profile-box a { color: #222; text-decoration: none; }
+.profile-box a:hover { color: var(--avuna-orange-dark); text-decoration: underline; }
+.profile-link { display: inline-block; margin-top: 6px; font-size: 13px; font-weight: 700; color: var(--avuna-orange-dark) !important; }
+.type-pill { display: inline-block; padding: 4px 14px; border-radius: 999px; background: #fff4e9; color: var(--avuna-orange-dark); font-size: 13px; font-weight: 700; }
+
 .profile-edit-btn { padding: 12px 22px; border: none; border-radius: 10px; background: var(--avuna-orange); color: #fff; font-weight: 700; font-size: 14px; cursor: pointer; box-shadow: 0 8px 20px rgba(244,123,32,.25); transition: all .25s ease; white-space: nowrap; }
 .profile-edit-btn:hover { background: #ff8b32; transform: translateY(-2px); }
 
-/* ---------- POPUP MESSAGES (TOASTS) - sit above the edit window ---------- */
+/* toasts */
 .av-toast-host { position: fixed; top: 24px; left: 50%; transform: translateX(-50%); z-index: 100000; display: flex; flex-direction: column; gap: 10px; width: 460px; max-width: calc(100% - 32px); pointer-events: none; }
-.av-toast { pointer-events: auto; display: flex; align-items: flex-start; gap: 14px; background: #ffffff; border-radius: 14px; padding: 16px 18px; box-shadow: 0 20px 55px rgba(0,0,0,.35); border-left: 6px solid #c94b45; animation: avToastIn .3s ease; }
+.av-toast { pointer-events: auto; display: flex; align-items: flex-start; gap: 14px; background: #fff; border-radius: 14px; padding: 16px 18px; box-shadow: 0 20px 55px rgba(0,0,0,.35); border-left: 6px solid #c94b45; animation: avToastIn .3s ease; }
 .av-toast-success { border-left-color: #27845b; }
 .av-toast-out { opacity: 0; transform: translateY(-12px); transition: all .25s ease; }
 .av-toast-icon { flex: 0 0 30px; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 800; font-size: 16px; background: #c94b45; }
@@ -112,12 +80,11 @@
 .av-toast-close:hover { color: #222; }
 @keyframes avToastIn { from { opacity: 0; transform: translateY(-16px); } to { opacity: 1; transform: translateY(0); } }
 
-/* ---------- EDIT PROFILE MODAL ---------- */
+/* edit modal */
 .edit-overlay { position: fixed; inset: 0; z-index: 9999; background: rgba(17,17,17,.62); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; padding: 20px; }
 .edit-overlay.open { display: flex; }
 .edit-modal { background: #fff; width: 680px; max-width: 100%; max-height: 95vh; overflow-y: auto; border-radius: 24px; box-shadow: 0 30px 80px rgba(0,0,0,.4); }
-.edit-modal-head { position: relative; overflow: hidden; display: flex; align-items: center; gap: 18px; padding: 30px 32px; color: #fff; background: linear-gradient(120deg, #111111 0%, #191919 60%, #252525 100%); }
-.edit-modal-head:before { content: ""; position: absolute; width: 200px; height: 200px; border: 40px solid rgba(244,123,32,.10); border-radius: 50%; right: -60px; top: -90px; }
+.edit-modal-head { position: relative; overflow: hidden; display: flex; align-items: center; gap: 18px; padding: 30px 32px; color: #fff; background: linear-gradient(120deg, #111 0%, #191919 60%, #252525 100%); }
 .edit-avatar { position: relative; z-index: 2; flex: 0 0 62px; width: 62px; height: 62px; border-radius: 50%; background: var(--avuna-orange); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 22px; }
 .edit-modal-title { position: relative; z-index: 2; }
 .edit-eyebrow { display: block; color: var(--avuna-orange); font-size: 11px; font-weight: 800; letter-spacing: 2px; margin-bottom: 4px; }
@@ -143,38 +110,26 @@
 .edit-btn-save { padding: 14px 26px; border: none; background: var(--avuna-orange); color: #fff; border-radius: 12px; font-weight: 800; cursor: pointer; box-shadow: 0 8px 20px rgba(244,123,32,.25); }
 .edit-btn-save:hover { background: var(--avuna-orange-dark); }
 
-/* RESPONSIVE */
-@media(max-width: 1000px) {
-  .profile-grid { grid-template-columns: repeat(2,1fr); }
-  .customer-hero { padding: 60px 6%; }
+@media (max-width: 1000px) {
+  .profile-grid { grid-template-columns: repeat(2, 1fr); }
+  .customer-hero { padding: 40px 6% 60px; }
   .customer-card-heading { flex-direction: column; align-items: flex-start; gap: 12px; }
 }
-@media(max-width: 650px) {
-  .customer-hero { padding: 50px 25px; min-height: auto; }
-  .customer-hero-badge { display: none; }
+@media (max-width: 650px) {
+  .customer-hero { padding: 40px 25px 60px; min-height: auto; }
+  .av-logo-tile { display: none; }
   .customer-body { width: 94%; }
-  .customer-welcome { flex-direction: column; align-items: flex-start; gap: 12px; }
   .customer-card { padding: 20px; }
-  .profile-grid { grid-template-columns: 1fr; }
+  .profile-grid, .profile-grid.cols-2 { grid-template-columns: 1fr; }
   .edit-modal-body { grid-template-columns: 1fr; padding: 24px 22px 6px; }
   .edit-modal-head { padding: 26px 22px; }
   .edit-modal-foot { padding: 16px 22px 24px; }
 }
-
-.customer-hero{background-color:#2a2118;background-image:linear-gradient(90deg,rgba(24,17,10,.90) 0%,rgba(24,17,10,.74) 42%,rgba(24,17,10,.28) 100%),url("<%= ResolveUrl("~/images/customer-hero.jpg") %>");background-size:auto,cover;background-position:center,center;background-repeat:no-repeat}
-.av-logo-tile{position:relative;z-index:2;width:190px;height:190px;min-width:190px;flex:none;background:#fff;border:2px solid #d9a52c;border-radius:50%;display:flex;align-items:center;justify-content:center;overflow:hidden}
-.av-logo-tile img{width:100%;height:100%;object-fit:contain;display:block}
-.avuna-manager-hero:before,.avuna-manager-hero:after,.customer-hero:before,.customer-hero:after,.rp-hero:before,.rp-hero:after,.rp-kpi:after,.customer-stat:after,.action-card:after,.avuna-modal-head:after,.edit-modal-head:before,.avuna-order .hero:before{~/images/avuna_collective_background.jpg}
-.avuna-modal-avatar,.edit-avatar,.customer-avatar{border-radius:50% !important;background:#fff url("avuna-logo.png") center/contain no-repeat !important;color:transparent !important;font-size:0 !important;border:1px solid #d9a52c}
-.avuna-modal-close,.edit-close,.design-viewer-close,.av-nav-btn{border-radius:50% !important}
-@media (max-width:700px){.av-logo-tile{width:130px;height:130px;min-width:130px}}
 </style>
 
 <div class="customer-dashboard">
-  <!-- ===================================================== HERO ===================================================== -->
   <section class="customer-hero">
     <div class="customer-hero-copy">
-    
       <h1 style="color: white;">Your personal details, your control.</h1>
       <p>Keep your contact information and account details up to date.</p>
       <div class="customer-hero-actions">
@@ -184,26 +139,30 @@
     <div class="av-logo-tile"><img runat="server" src="~/avuna-logo.png" alt="Avuna Collective" /></div>
   </section>
 
-  <!-- ===================================================== PROFILE BODY ===================================================== -->
   <main class="customer-body">
-    <!-- WELCOME -->
-    
-
-    <!-- PROFILE -->
-    <section class="customer-card profile-section">
+    <section class="customer-card">
       <div class="customer-card-heading">
         <div>
-          <h2><strong>My Profile</strong></h2>
+          <h2>My Profile</h2>
           <p>Your information used for your Avuna Collective orders.</p>
         </div>
         <button type="button" class="profile-edit-btn" onclick="openEditProfile()">Edit profile</button>
       </div>
 
-      <div class="profile-grid">
+      <div class="profile-group-title first">Personal</div>
+      <div class="profile-grid cols-2">
         <div class="profile-box">
           <label>Full Name</label>
           <strong><asp:Label ID="lblFullName" runat="server" /></strong>
         </div>
+        <div class="profile-box">
+          <label>Customer Type</label>
+          <strong><asp:Label ID="lblType" runat="server" CssClass="type-pill" /></strong>
+        </div>
+      </div>
+
+      <div class="profile-group-title">Contact</div>
+      <div class="profile-grid">
         <div class="profile-box">
           <label>Email</label>
           <strong><asp:Label ID="lblEmail" runat="server" /></strong>
@@ -213,27 +172,27 @@
           <strong><asp:Label ID="lblPhone" runat="server" /></strong>
         </div>
         <div class="profile-box">
-          <label>Customer Type</label>
-          <strong><asp:Label ID="lblType" runat="server" /></strong>
-        </div>
-        <div class="profile-box">
           <label>Address</label>
           <strong><asp:Label ID="lblAddress" runat="server" /></strong>
         </div>
+      </div>
+
+      <div class="profile-group-title">Account</div>
+      <div class="profile-grid cols-2">
         <div class="profile-box">
           <label>Username</label>
           <strong><asp:Label ID="lblUsername" runat="server" /></strong>
         </div>
         <div class="profile-box">
           <label>Password</label>
-          <strong><asp:Label ID="lblPassword" runat="server" /></strong>
+          <strong><asp:Label ID="lblPassword" runat="server" /></strong><br />
+          <a href="#" class="profile-link" onclick="openEditProfile(); return false;">Change password</a>
         </div>
       </div>
     </section>
   </main>
 </div>
 
-<!-- ===================================================== EDIT PROFILE MODAL ===================================================== -->
 <div class="edit-overlay" id="editProfileOverlay">
   <div class="edit-modal">
     <div class="edit-modal-head">
@@ -284,7 +243,6 @@
 
       <p class="edit-note">Your first name can't be changed here. Contact AVUNA support if it needs correcting.</p>
 
-      <!-- ---------- LOGIN DETAILS ---------- -->
       <div class="edit-section-title">
         <span>LOGIN DETAILS</span>
         <p>Leave the password fields empty if you don't want to change your password.</p>
@@ -313,13 +271,68 @@
   </div>
 </div>
 
-<!-- Popup messages appear here, above the edit window -->
 <div class="av-toast-host" id="avToastHost"></div>
 
 <script>
-  function openEditProfile() { document.getElementById('editProfileOverlay').classList.add('open'); }
-  function closeEditProfile() { document.getElementById('editProfileOverlay').classList.remove('open'); }
-  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeEditProfile(); });
+  var PW_RULE = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
+  var PW_MESSAGE = 'Password must be at least 8 characters and contain an uppercase letter, a lowercase letter, a number and a special character.';
+
+  function openEditProfile() {
+    document.getElementById('editProfileOverlay').classList.add('open');
+  }
+
+  function closeEditProfile() {
+    document.getElementById('editProfileOverlay').classList.remove('open');
+  }
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') closeEditProfile();
+  });
+
+  function showToast(message, type) {
+    var host = document.getElementById('avToastHost');
+    var ok = type === 'success';
+    var toast = document.createElement('div');
+    toast.className = 'av-toast' + (ok ? ' av-toast-success' : '');
+    toast.innerHTML =
+      '<div class="av-toast-icon">' + (ok ? '&#10003;' : '!') + '</div>' +
+      '<div class="av-toast-text"><strong>' + (ok ? 'Success' : 'Please check') + '</strong><span></span></div>' +
+      '<button type="button" class="av-toast-close" aria-label="Close">&times;</button>';
+    toast.querySelector('span').textContent = message;
+
+    function dismiss() {
+      toast.classList.add('av-toast-out');
+      setTimeout(function () { toast.remove(); }, 250);
+    }
+
+    toast.querySelector('.av-toast-close').onclick = dismiss;
+    host.appendChild(toast);
+    setTimeout(dismiss, 6000);
+  }
+
+  function updatePasswordHint() {
+    var pw = document.getElementById('<%= txtNewPassword.ClientID %>').value;
+    var hint = document.getElementById('pwHint');
+    hint.classList.remove('ok', 'bad');
+    if (pw.length === 0) return;
+    hint.classList.add(PW_RULE.test(pw) ? 'ok' : 'bad');
+  }
+
+  function checkPasswordBeforeSave() {
+    var pw = document.getElementById('<%= txtNewPassword.ClientID %>').value;
+    var confirm = document.getElementById('<%= txtConfirmPassword.ClientID %>').value;
+
+        if (pw.length === 0 && confirm.length === 0) return true;
+
+        if (!PW_RULE.test(pw)) {
+            showToast(PW_MESSAGE, 'error');
+            return false;
+        }
+        if (pw !== confirm) {
+            showToast('The new password and confirmation do not match.', 'error');
+            return false;
+        }
+        return true;
+    }
 </script>
 </asp:Content>
-
