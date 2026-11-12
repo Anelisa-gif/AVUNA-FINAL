@@ -196,7 +196,7 @@ VALUES(@id,@amount,@method,'Paid',@date,@order,NULL,0)", con, tx))
                         }
                     }
                     using (var cmd = new SqlCommand(@"UPDATE dbo.[Order]
-SET order_Status='Paid'
+SET order_Status='InProgress'
 WHERE order_ID=@order AND customer_ID=@customer", con, tx))
                     {
                         cmd.Parameters.Add("@order", SqlDbType.VarChar, 50).Value = orderId;
