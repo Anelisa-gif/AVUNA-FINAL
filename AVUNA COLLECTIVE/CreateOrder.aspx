@@ -9,6 +9,8 @@
 .avuna-order .back{display:inline-block;border:1px solid #777;background:#ffffff12;color:white!important;text-decoration:none;border-radius:10px;padding:13px 20px;font-weight:700;margin-top:12px}
 .avuna-order .hero-mark{border:2px solid #b75e1b;border-radius:50%;width:170px;height:170px;flex:none;display:flex;flex-direction:column;justify-content:center;align-items:center;box-shadow:0 0 0 18px #f47b2009;position:relative}
 .avuna-order .hero-mark strong{font-size:43px;color:white}.avuna-order .hero-mark small{color:#f47b20;text-align:center;font-size:10px;font-weight:800;letter-spacing:2px}
+.avuna-order .hero-mark-logo{position:relative;z-index:2;width:190px;height:190px;min-width:190px;flex:none;background:#fff;border:2px solid #d9a52c;border-radius:50%;display:flex;align-items:center;justify-content:center;overflow:hidden;box-shadow:0 0 0 18px #f47b2009}
+.avuna-order .hero-mark-logo img{width:100%;height:100%;object-fit:contain;display:block}
 .avuna-order .wrap{max-width:1280px;width:calc(100% - 40px);margin:-35px auto 0;position:relative;z-index:2}.avuna-order .intro,.avuna-order .panel{background:white;border:1px solid #e9e4dd;border-radius:16px;padding:26px;box-shadow:0 10px 30px #00000010}
 .avuna-order .intro{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px}.avuna-order .muted{font-size:13px;color:#777;margin:8px 0}.avuna-order .pill{border-radius:30px;padding:10px 14px;background:#fff0e4;color:#8b6147;font-size:11px;letter-spacing:1px;font-weight:800}
 .avuna-order .layout{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(300px,1fr);gap:22px;align-items:start}.avuna-order h2{font-size:24px;font-weight:700;margin:9px 0;color:#171717}.avuna-order h3{font-size:19px;font-weight:700;margin:22px 0 12px}
@@ -19,7 +21,7 @@
 .avuna-order .submit{background:#f47b20;color:#fff;border:0;border-radius:10px;width:100%;padding:16px;font-weight:800;box-shadow:0 8px 22px #f47b2035;cursor:pointer}.avuna-order .submit:hover{background:#d9650e}
 .avuna-order .rowline{display:flex;align-items:start;justify-content:space-between;gap:14px;border-bottom:1px solid #eee;padding:14px 0;font-size:14px}.avuna-order .rowline span{color:#777}.avuna-order .rowline strong{text-align:right;overflow-wrap:anywhere}.avuna-order .total{border-radius:12px;background:#191919;color:#fff;padding:22px;margin-top:20px}.avuna-order .total span{color:#bbb;font-size:11px;letter-spacing:1px}.avuna-order .total strong{display:block;color:#f47b20;font-size:30px;margin-top:8px}.avuna-order .note{background:#fff4e9;color:#81542f;padding:15px;border-radius:10px;font-size:12px;line-height:1.6;margin-top:20px}
 .avuna-order .colour-picker{background:#faf9f7;border:1px solid #e5dfd8;border-radius:10px;padding:12px;min-height:52px}.avuna-order .colour-option{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:10px 6px;border-bottom:1px solid #ece8e2}.avuna-order .colour-option:last-child{border-bottom:0}.avuna-order .colour-option label{display:inline-flex;align-items:center;gap:8px;margin:0;font-size:13px;letter-spacing:0;color:#222;text-transform:none;flex:1;min-width:110px}.avuna-order .colour-option input[type=checkbox]{width:17px;height:17px;accent-color:#f47b20}.avuna-order .colour-option input[type=number]{width:112px;height:42px}.avuna-order input[readonly]{background:#f0eeeb;color:#666}.avuna-order .feedback{margin-top:17px;border-radius:10px;padding:14px;display:none;font-size:13px;line-height:1.7}.avuna-order .feedback.error{display:block;background:#fff0ed;color:#a52c21;border:1px solid #efc7bf}.avuna-order .feedback.success{display:block;background:#edfaef;color:#256339;border:1px solid #b5ddbd}.avuna-order .feedback ul{margin:5px 0 0;padding-left:20px}
-@media(max-width:850px){.avuna-order .layout{grid-template-columns:1fr}.avuna-order .hero-mark{display:none}}@media(max-width:550px){.avuna-order .fields{grid-template-columns:1fr}.avuna-order .intro{gap:10px}.avuna-order .pill{font-size:9px}}
+@media(max-width:850px){.avuna-order .layout{grid-template-columns:1fr}.avuna-order .hero-mark,.avuna-order .hero-mark-logo{display:none}}@media(max-width:550px){.avuna-order .fields{grid-template-columns:1fr}.avuna-order .intro{gap:10px}.avuna-order .pill{font-size:9px}}
 
 /* Confirmation popup displayed after successful database commit */
 .avuna-confirm-overlay{position:fixed;inset:0;z-index:2147483000;background:rgba(0,0,0,.66);display:flex;align-items:center;justify-content:center;padding:20px}
@@ -40,7 +42,7 @@
 </style>
 
 <div class="avuna-order" id="createOrderPage">
-<section class="hero"><div class="hero-copy"><h1>Your vision,<br />our creation.</h1><p>Choose an item, size and multiple available colours, upload your design and review your quotation.</p><a runat="server" href="~/CustomerDashboard" class="back">Back to Dashboard</a></div><div class="hero-mark"><strong>AV</strong><small>CREATE<br />ORDER</small></div></section>
+<section class="hero"><div class="hero-copy"><h1>Your vision,<br />our creation.</h1><p>Choose an item, size and multiple available colours, upload your design and review your quotation.</p><a runat="server" href="~/CustomerDashboard" class="back">Back to Dashboard</a></div><div class="hero-mark-logo"><img runat="server" src="~/avuna-logo.png" alt="Avuna Collective" /></div></section>
 <div class="wrap"><div class="intro"><div><strong>Create a new order</strong><p class="muted">Your custom order details for AVUNA COLLECTIVE.</p></div><span class="pill">NEW ORDER</span></div>
 <div class="layout"><div class="panel"><span class="tag">ORDER DETAILS</span><h2>Customize Your Order</h2><p class="muted">Only available inventory combinations can be selected.</p>
 <div class="fields">
@@ -52,6 +54,238 @@
 </div>
 <div id="stockMessage" class="stock warn" role="status">Select an item and size, then choose colours and quantities.</div>
 <div class="field"><label for="designFile">UPLOAD YOUR DESIGN *</label><div class="upload"><div class="upload-icon">&#8682;</div><strong>Upload your custom design</strong><p class="hint">PNG, JPG, JPEG or WEBP, maximum 5 MB</p><input type="file" id="designFile" name="designFile" accept=".png,.jpg,.jpeg,.webp,image/png,image/jpeg,image/webp" /><img id="designPreview" alt="Uploaded design preview" /></div></div>
+    <style>
+.avuna-order .mock-wrap{margin:4px 0 24px;border:1px solid #e5dfd8;border-radius:12px;background:#faf9f7;padding:16px}
+.avuna-order .mock-wrap h3{margin:0 0 4px;font-size:17px}
+.avuna-order .mock-note{color:#777;font-size:12px;margin:0 0 12px}
+.avuna-order .mock-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+.avuna-order .mock-card{background:#fff;border:1px solid #ece8e2;border-radius:10px;padding:8px 8px 10px;text-align:center}
+.avuna-order .mock-photo{width:100%;height:auto;max-height:300px;object-fit:contain;display:block;filter:drop-shadow(0 8px 10px rgba(0,0,0,.22))}
+.avuna-order .mock-card svg{width:100%;height:auto;max-height:230px;display:block}
+.avuna-order .mock-cap{font-size:11px;font-weight:800;letter-spacing:1px;color:#666;margin-top:4px}
+.avuna-order .mock-cap b{color:#f47b20}
+.avuna-order .mock-colour{font-size:13px;font-weight:700;margin:0 0 6px;color:#222}
+.avuna-order .mock-empty{font-size:13px;color:#777;margin:0}
+</style>
+<div class="field mock-wrap" id="mockupSection">
+    <h3>Before and after preview</h3>
+    <p class="mock-note">An approximate preview of how your item will look. The final print position is confirmed by our team.</p>
+    <div id="mockupBody"><p class="mock-empty">Select an item, size and colour to see your item here.</p></div>
+</div>
+<script>
+    (function () {
+        "use strict";
+        function el(id) { return document.getElementById(id); }
+        var item = el("itemName"), picker = el("colourPicker"), file = el("designFile"), body = el("mockupBody");
+        if (!item || !picker || !file || !body) return;
+        var designUrl = null, uid = 0;
+
+        var COLOURS = [["white", "#ffffff"], ["black", "#1f1f1f"], ["navy", "#16243f"], ["royal", "#2250a8"], ["light blue", "#8dbbe8"],
+        ["sky", "#8dbbe8"], ["blue", "#2b5fb3"], ["maroon", "#6d1a2a"], ["burgundy", "#6d1a2a"], ["red", "#c62d2d"], ["orange", "#f08a24"],
+        ["gold", "#d9a52c"], ["yellow", "#f2cf4a"], ["lime", "#8fc93a"], ["bottle", "#1f5a3a"], ["forest", "#25573a"], ["green", "#2f8a4a"],
+        ["teal", "#1f8a8a"], ["purple", "#6b3fa0"], ["pink", "#ec7fa9"], ["brown", "#6b4a32"], ["beige", "#d9c7a3"], ["cream", "#f1e8d2"],
+        ["khaki", "#b9a877"], ["charcoal", "#454545"], ["silver", "#c4c4c4"], ["grey", "#9a9a9a"], ["gray", "#9a9a9a"]];
+
+        function colourHex(name) {
+            var n = String(name || "").toLowerCase();
+            for (var i = 0; i < COLOURS.length; i++) if (n.indexOf(COLOURS[i][0]) !== -1) return COLOURS[i][1];
+            return "#d9d4cc";
+        }
+        function shade(hex, amount) {
+            var n = parseInt(hex.slice(1), 16), r = n >> 16, g = (n >> 8) & 255, b = n & 255;
+            function f(c) { return Math.max(0, Math.min(255, Math.round(c + amount))); }
+            return "rgb(" + f(r) + "," + f(g) + "," + f(b) + ")";
+        }
+        function kind() {
+            var n = String(item.value || "").toLowerCase();
+            if (/cap|hat|beanie/.test(n)) return "cap";
+            if (/hood|jacket|sweat|jersey/.test(n) && !/t-?shirt|tee/.test(n)) return /jersey/.test(n) ? "tee" : "hoodie";
+            return "tee";
+        }
+        var BODY = {
+            tee: "M70 20 L40 32 L8 70 L34 92 L52 76 L52 202 L148 202 L148 76 L166 92 L192 70 L160 32 L130 20 Q100 46 70 20 Z",
+            hoodie: "M68 26 L36 42 L14 134 L40 140 L52 96 L52 206 L148 206 L148 96 L160 140 L186 134 L164 42 L132 26 Q100 56 68 26 Z",
+            cap: "M38 124 Q32 48 100 43 Q168 48 162 124 Q100 134 38 124 Z"
+        };
+        var FOLDS = {
+            tee: [["M60 92 Q74 138 62 198", "#000", 8, .14], ["M140 96 Q128 142 140 198", "#000", 8, .12], ["M100 108 Q94 150 102 200", "#fff", 11, .12],
+            ["M72 70 Q100 96 128 70", "#000", 6, .10], ["M22 76 L42 90", "#000", 6, .14], ["M178 76 L158 90", "#000", 6, .14], ["M58 160 Q100 172 142 160", "#000", 6, .08]],
+            hoodie: [["M58 100 Q72 150 60 204", "#000", 9, .15], ["M142 100 Q128 150 140 204", "#000", 9, .13], ["M100 112 Q94 160 102 204", "#fff", 12, .11],
+            ["M26 60 Q34 100 24 132", "#000", 7, .14], ["M174 60 Q166 100 176 132", "#000", 7, .14], ["M72 76 Q100 100 128 76", "#000", 6, .10]],
+            cap: [["M62 60 Q52 96 54 124", "#000", 9, .16], ["M138 60 Q148 96 146 124", "#000", 9, .16], ["M100 56 Q98 90 100 124", "#fff", 14, .10]]
+        };
+        function details(type, fill, edge, dark) {
+            var st = 'fill="none" stroke="' + shade(fill, -55) + '" stroke-width="1.1" stroke-dasharray="2.5 2" opacity=".75"';
+            if (type === "tee")
+                return '<path d="M72 21 Q100 40 128 21 Q100 58 72 21 Z" fill="' + shade(fill, -70) + '"/>' +
+                    '<path d="M70 20 Q100 48 130 20" fill="none" stroke="' + dark + '" stroke-width="5.5" stroke-linecap="round"/>' +
+                    '<path d="M71 24 Q100 52 129 24" ' + st + '/>' +
+                    '<path d="M54 194 L146 194" ' + st + '/><path d="M12 72 L35 90" ' + st + '/><path d="M188 72 L165 90" ' + st + '/>' +
+                    '<path d="M52 78 Q60 96 56 112" fill="none" stroke="' + edge + '" stroke-width="1.2" opacity=".55"/>' +
+                    '<path d="M148 78 Q140 96 144 112" fill="none" stroke="' + edge + '" stroke-width="1.2" opacity=".55"/>';
+            if (type === "hoodie")
+                return '<path d="M62 34 Q100 -16 138 34 Q100 66 62 34 Z" fill="' + dark + '" stroke="' + edge + '" stroke-width="2" stroke-linejoin="round"/>' +
+                    '<path d="M74 34 Q100 62 126 34 Q100 12 74 34 Z" fill="' + shade(fill, -75) + '"/>' +
+                    '<path d="M92 56 L90 92" stroke="#f3efe8" stroke-width="2.2" stroke-linecap="round"/><path d="M108 56 L110 92" stroke="#f3efe8" stroke-width="2.2" stroke-linecap="round"/>' +
+                    '<circle cx="90" cy="94" r="2.4" fill="#e8e2d6"/><circle cx="110" cy="94" r="2.4" fill="#e8e2d6"/>' +
+                    '<path d="M66 152 L134 152 L142 194 L58 194 Z" fill="' + shade(fill, -8) + '" stroke="' + edge + '" stroke-width="1.6" stroke-linejoin="round"/>' +
+                    '<path d="M54 198 L146 198" ' + st + '/><path d="M17 126 L41 132" ' + st + '/><path d="M183 126 L159 132" ' + st + '/>';
+            return '<path d="M40 122 Q100 132 160 122" fill="none" stroke="' + shade(fill, -45) + '" stroke-width="2"/>' +
+                '<path d="M100 44 L100 124" fill="none" stroke="' + edge + '" stroke-width="1.2" opacity=".6"/>' +
+                '<path d="M68 52 Q60 90 58 123" fill="none" stroke="' + edge + '" stroke-width="1.1" opacity=".55"/>' +
+                '<path d="M132 52 Q140 90 142 123" fill="none" stroke="' + edge + '" stroke-width="1.1" opacity=".55"/>' +
+                '<path d="M44 118 Q100 128 156 118" ' + st + '/>' +
+                '<circle cx="100" cy="44" r="4.5" fill="' + dark + '" stroke="' + edge + '" stroke-width="1.2"/>' +
+                '<circle cx="62" cy="82" r="1.8" fill="' + shade(fill, -60) + '"/><circle cx="138" cy="82" r="1.8" fill="' + shade(fill, -60) + '"/>';
+        }
+        function brim(fill, edge, id) {
+            return '<defs><linearGradient id="br' + id + '" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="' + shade(fill, -35) + '"/><stop offset=".6" stop-color="' + shade(fill, -8) + '"/><stop offset="1" stop-color="' + shade(fill, -30) + '"/></linearGradient></defs>' +
+                '<path d="M28 124 Q100 106 172 124 Q188 154 100 162 Q12 154 28 124 Z" fill="url(#br' + id + ')" stroke="' + edge + '" stroke-width="2" stroke-linejoin="round"/>' +
+                '<path d="M34 130 Q100 116 166 130" fill="none" stroke="#fff" stroke-width="2.2" opacity=".18"/>' +
+                '<path d="M30 126 Q100 109 170 126" fill="none" stroke="' + shade(fill, -60) + '" stroke-width="1" stroke-dasharray="2.5 2" opacity=".7"/>';
+        }
+        function area(type) { return type === "cap" ? { x: 70, y: 60, w: 60, h: 48 } : type === "hoodie" ? { x: 68, y: 62, w: 64, h: 70 } : { x: 66, y: 58, w: 68, h: 76 }; }
+        function foldLayer(type, op) {
+            return FOLDS[type].map(function (f) {
+                return '<path d="' + f[0] + '" fill="none" stroke="' + f[1] + '" stroke-width="' + f[2] + '" stroke-linecap="round" opacity="' + (f[3] * op) + '"/>';
+            }).join("");
+        }
+        function svg(type, fill, withDesign) {
+            var id = ++uid, a = area(type), edge = shade(fill, -48), dark = shade(fill, -26), body = BODY[type];
+            var out = '<svg viewBox="' + (type === "cap" ? "10 30 180 150" : "0 0 200 220") + '" role="img" aria-labelledby="t' + id + '"><title id="t' + id + '">' + (withDesign ? "Item with your design" : "Plain item") + '</title>' +
+                '<defs><clipPath id="c' + id + '"><path d="' + body + '"/></clipPath>' +
+                '<filter id="b' + id + '" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="2.4"/></filter>' +
+                '<filter id="s' + id + '" x="-20%" y="-20%" width="140%" height="150%"><feDropShadow dx="0" dy="4" stdDeviation="3.5" flood-color="#000" flood-opacity=".28"/></filter>' +
+                '<linearGradient id="g' + id + '" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#000" stop-opacity=".26"/><stop offset=".22" stop-color="#000" stop-opacity=".02"/>' +
+                '<stop offset=".5" stop-color="#fff" stop-opacity=".12"/><stop offset=".78" stop-color="#000" stop-opacity=".03"/><stop offset="1" stop-color="#000" stop-opacity=".3"/></linearGradient>' +
+                '<linearGradient id="v' + id + '" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".14"/><stop offset="1" stop-color="#000" stop-opacity=".14"/></linearGradient></defs>';
+            out += '<g filter="url(#s' + id + ')">' + (type === "cap" ? brim(fill, edge, id) : "") +
+                '<path d="' + body + '" fill="' + fill + '" stroke="' + edge + '" stroke-width="2" stroke-linejoin="round"/></g>';
+            out += '<g clip-path="url(#c' + id + ')"><rect width="200" height="220" fill="url(#g' + id + ')"/><rect width="200" height="220" fill="url(#v' + id + ')"/>' +
+                '<g filter="url(#b' + id + ')">' + foldLayer(type, 1) + '</g></g>';
+            out += details(type, fill, edge, dark);
+            if (withDesign && designUrl) {
+                out += '<g clip-path="url(#c' + id + ')"><image href="' + designUrl + '" x="' + a.x + '" y="' + a.y + '" width="' + a.w + '" height="' + a.h + '" preserveAspectRatio="xMidYMid meet" opacity=".96"/></g>' +
+                    '<g clip-path="url(#c' + id + ')"><rect width="200" height="220" fill="url(#g' + id + ')" opacity=".6"/><g filter="url(#b' + id + ')">' + foldLayer(type, .75) + '</g></g>';
+            } else if (withDesign) {
+                out += '<rect x="' + a.x + '" y="' + a.y + '" width="' + a.w + '" height="' + a.h + '" rx="4" fill="none" stroke="' + shade(fill, -70) + '" stroke-width="1.5" stroke-dasharray="4 3" opacity=".7"/>';
+            }
+            return out + '</svg>';
+        }
+        function chosenColours() {
+            var out = [];
+            Array.prototype.forEach.call(picker.querySelectorAll(".colour-option"), function (row) {
+                var cb = row.querySelector("input[type=checkbox]");
+                if (cb && cb.checked) out.push(row.textContent.trim());
+            });
+            return out;
+        }
+        function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+
+        // ---------- Photo-realistic mode (used when the item photos exist in ~/images/mockups/) ----------
+        var PHOTO_BASE = "<%= ResolveUrl("~/images/mockups/") %>";
+        var PHOTOS = {
+            tee: { file: "tshirt.png", area: { x: .30, y: .22, w: .40, h: .38 } },
+            hoodie: { file: "hoodie.png", area: { x: .31, y: .27, w: .38, h: .30 } },
+            cap: { file: "cap.png", area: { x: .31, y: .22, w: .38, h: .30 } }
+        };
+        var photoCache = {}, designImg = null;
+        function loadImg(src) {
+            return new Promise(function (ok) { var i = new Image(); i.onload = function () { ok(i); }; i.onerror = function () { ok(null); }; i.src = src; });
+        }
+        function photoFor(type) {
+            if (!photoCache[type]) photoCache[type] = loadImg(PHOTO_BASE + PHOTOS[type].file);
+            return photoCache[type];
+        }
+        function rgbOf(hex) { var n = parseInt(hex.slice(1), 16); return [n >> 16, (n >> 8) & 255, n & 255]; }
+        function drawPhoto(canvas, photo, hex, withDesign, area) {
+            var W = 560, H = Math.round(W * photo.height / photo.width);
+            canvas.width = W; canvas.height = H;
+            var ctx = canvas.getContext("2d");
+            ctx.drawImage(photo, 0, 0, W, H);
+            var img = ctx.getImageData(0, 0, W, H), d = img.data, n = W * H, lum = new Float32Array(n), hist = new Uint32Array(256), count = 0, i;
+            for (i = 0; i < n; i++) {
+                if (d[i * 4 + 3] < 8) continue;
+                var l = (0.299 * d[i * 4] + 0.587 * d[i * 4 + 1] + 0.114 * d[i * 4 + 2]);
+                lum[i] = l; hist[l | 0]++; count++;
+            }
+            var acc = 0, ref = 255, target = count * 0.92;
+            for (i = 0; i < 256; i++) { acc += hist[i]; if (acc >= target) { ref = Math.max(i, 60); break; } }
+            var c = rgbOf(hex), k;
+            for (i = 0; i < n; i++) {
+                if (d[i * 4 + 3] < 8) continue;
+                var f = Math.min(1.08, lum[i] / ref); lum[i] = f;
+                var glow = Math.max(0, f - 0.94) * 255 * 1.4;
+                for (k = 0; k < 3; k++) d[i * 4 + k] = Math.max(0, Math.min(255, c[k] * f + glow));
+            }
+            if (withDesign && designImg) {
+                var off = document.createElement("canvas"); off.width = W; off.height = H;
+                var oc = off.getContext("2d"), ax = area.x * W, ay = area.y * H, aw = area.w * W, ah = area.h * H;
+                var sc = Math.min(aw / designImg.width, ah / designImg.height), dw = designImg.width * sc, dh = designImg.height * sc;
+                oc.drawImage(designImg, ax + (aw - dw) / 2, ay + (ah - dh) / 2, dw, dh);
+                var dd = oc.getImageData(0, 0, W, H).data;
+                for (i = 0; i < n; i++) {
+                    var da = dd[i * 4 + 3] / 255;
+                    if (da <= 0 || d[i * 4 + 3] < 8) continue;
+                    var fold = Math.max(0.55, Math.min(1, 1 - (1 - lum[i]) * 1.5)) * 0.98;
+                    for (k = 0; k < 3; k++) d[i * 4 + k] = d[i * 4 + k] * (1 - da) + dd[i * 4 + k] * fold * da;
+                }
+            }
+            ctx.putImageData(img, 0, 0);
+        }
+        var renderToken = 0;
+        function fillSlot(slot, type, hex, withDesign) {
+            var tok = renderToken;
+            photoFor(type).then(function (photo) {
+                if (tok !== renderToken) return;
+                if (photo) {
+                    var cv = document.createElement("canvas");
+                    cv.className = "mock-photo";
+                    drawPhoto(cv, photo, hex, withDesign, PHOTOS[type].area);
+                    slot.innerHTML = ""; slot.appendChild(cv);
+                } else {
+                    slot.innerHTML = svg(type, hex, withDesign);
+                }
+            });
+        }
+
+        function render() {
+            renderToken++;
+            if (!item.value) { body.innerHTML = '<p class="mock-empty">Select an item, size and colour to see your item here.</p>'; return; }
+            var type = kind(), colours = chosenColours();
+            if (!colours.length) colours = [""];
+            var html = "", shown = colours.slice(0, 4);
+            shown.forEach(function (c) {
+                html += (c ? '<p class="mock-colour">' + esc(c) + '</p>' : "") + '<div class="mock-row">' +
+                    '<div class="mock-card"><div class="mock-slot"></div><div class="mock-cap"><b>BEFORE</b> &middot; plain item</div></div>' +
+                    '<div class="mock-card"><div class="mock-slot"></div><div class="mock-cap"><b>AFTER</b> &middot; ' + (designUrl ? "with your design" : "upload your design below") + '</div></div></div>';
+            });
+            if (colours.length > shown.length) html += '<p class="mock-empty">Showing the first 4 of ' + colours.length + ' selected colours.</p>';
+            body.innerHTML = html;
+            var slots = body.querySelectorAll(".mock-slot");
+            shown.forEach(function (c, idx) {
+                var hex = colourHex(c || "white");
+                fillSlot(slots[idx * 2], type, hex, false);
+                fillSlot(slots[idx * 2 + 1], type, hex, true);
+            });
+        }
+        file.addEventListener("change", function () {
+            if (designUrl) { URL.revokeObjectURL(designUrl); designUrl = null; }
+            var f = file.files[0];
+            designImg = null;
+            if (f && ["image/png", "image/jpeg", "image/webp"].indexOf(f.type) !== -1 && f.size > 0 && f.size <= 5 * 1024 * 1024) {
+                designUrl = URL.createObjectURL(f);
+                loadImg(designUrl).then(function (im) { designImg = im; render(); });
+                render();
+            } else render();
+        });
+        item.addEventListener("change", render);
+        new MutationObserver(render).observe(picker, { childList: true, subtree: true });
+        picker.addEventListener("change", render);
+        render();
+    })();
+</script>
+
 <input type="hidden" id="checkoutPayload" name="checkoutPayload" />
 <input type="hidden" id="checkoutSubmit" name="checkoutSubmit" value="" />
 <input type="hidden" id="checkoutIntent" name="checkoutIntent" value="later" />
@@ -324,4 +558,3 @@
     })();
 </script>
 </asp:Content>
-

@@ -248,7 +248,7 @@
 
             <div class="avuna-row-between">
                
-                <a href="#">Forgot password?</a>
+                <a href="ForgotPassword.aspx">Forgot password?</a>
             </div>
 
             <asp:Button ID="btnLogin" runat="server" Text="Log In" CssClass="avuna-auth-submit" OnClick="btnLogin_Click" />

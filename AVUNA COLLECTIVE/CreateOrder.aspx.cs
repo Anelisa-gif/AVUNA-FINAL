@@ -300,12 +300,12 @@ namespace AVUNA_COLLECTIVE
 			catch (System.Net.Mail.SmtpException ex)
 			{
 				System.Diagnostics.Trace.TraceError("Quote email SMTP error: " + ex);
-				message = "We could not send the email right now. Please try again later or use Print / PDF.";
+				message = "We could not send the email right now. Please try again later or use Print / PDF." + EmailDetail(ex);
 			}
 			catch (Exception ex)
 			{
 				System.Diagnostics.Trace.TraceError("Quote email error: " + ex);
-				message = "We could not send the email right now. Please try again later or use Print / PDF.";
+				message = "We could not send the email right now. Please try again later or use Print / PDF." + EmailDetail(ex);
 			}
 
 			Response.Clear();
@@ -314,7 +314,13 @@ namespace AVUNA_COLLECTIVE
 			Response.Write(new JavaScriptSerializer().Serialize(new { ok = ok, message = message }));
 			Response.End();
 		}
-
+		private static string EmailDetail(Exception ex)
+		{
+			if (HttpContext.Current == null || !HttpContext.Current.IsDebuggingEnabled) return "";
+			Exception root = ex;
+			while (root.InnerException != null) root = root.InnerException;
+			return " [Technical detail: " + root.Message + "]";
+		}
 		private static string MaskEmail(string address)
 		{
 			int at = address.IndexOf('@');
