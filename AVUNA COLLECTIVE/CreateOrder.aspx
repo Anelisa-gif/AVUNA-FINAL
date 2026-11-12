@@ -1,49 +1,49 @@
 ﻿<%@ Page Title="Create Order" Language="C#" MasterPageFile="~/Customer_master.Master" AutoEventWireup="true" CodeBehind="CreateOrder.aspx.cs" Inherits="AVUNA_COLLECTIVE.CreateOrder" %>
 <asp:Content ID="BodyContent" ContentPlaceHolderID="MainContent" runat="server">
 <style>
-.avuna-order{background:#f6f4ef;color:#191919;min-height:100vh;padding-bottom:65px;font-family:Arial,sans-serif}
+.avuna-order{background:#f5efe6;color:#191919;min-height:100vh;padding-bottom:65px;font-family:Arial,sans-serif}
 .avuna-order *{box-sizing:border-box}.avuna-order .hero{background:linear-gradient(120deg,#111,#262626);color:white;padding:70px max(5%,30px) 95px;display:flex;justify-content:space-between;align-items:center;gap:20px;position:relative;overflow:hidden}
-.avuna-order .hero:before{content:"";position:absolute;width:370px;height:370px;border:60px solid #f47b2014;border-radius:50%;right:-130px;top:-200px}
-.avuna-order .hero-copy{position:relative;z-index:1}.avuna-order .eyebrow,.avuna-order .tag{color:#f47b20;font-size:11px;font-weight:800;letter-spacing:2px}
+.avuna-order .hero:before{content:"";position:absolute;width:370px;height:370px;border:60px solid #c49a4514;border-radius:50%;right:-130px;top:-200px}
+.avuna-order .hero-copy{position:relative;z-index:1}.avuna-order .eyebrow,.avuna-order .tag{color:#8a6a35;font-size:11px;font-weight:800;letter-spacing:2px}
 .avuna-order h1{font-size:clamp(40px,5vw,66px);line-height:1.06;letter-spacing:-2px;font-weight:800;margin:20px 0;color:#fff}.avuna-order .hero p{color:#ddd;font-size:16px;line-height:1.8;max-width:640px}
 .avuna-order .back{display:inline-block;border:1px solid #777;background:#ffffff12;color:white!important;text-decoration:none;border-radius:10px;padding:13px 20px;font-weight:700;margin-top:12px}
-.avuna-order .hero-mark{border:2px solid #b75e1b;border-radius:50%;width:170px;height:170px;flex:none;display:flex;flex-direction:column;justify-content:center;align-items:center;box-shadow:0 0 0 18px #f47b2009;position:relative}
-.avuna-order .hero-mark strong{font-size:43px;color:white}.avuna-order .hero-mark small{color:#f47b20;text-align:center;font-size:10px;font-weight:800;letter-spacing:2px}
-.avuna-order .hero-mark-logo{position:relative;z-index:2;width:190px;height:190px;min-width:190px;flex:none;background:#fff;border:2px solid #d9a52c;border-radius:50%;display:flex;align-items:center;justify-content:center;overflow:hidden;box-shadow:0 0 0 18px #f47b2009}
+.avuna-order .hero-mark{border:2px solid #c49a45;border-radius:50%;width:170px;height:170px;flex:none;display:flex;flex-direction:column;justify-content:center;align-items:center;box-shadow:0 0 0 18px #c49a4509;position:relative}
+.avuna-order .hero-mark strong{font-size:43px;color:white}.avuna-order .hero-mark small{color:#8a6a35;text-align:center;font-size:10px;font-weight:800;letter-spacing:2px}
+.avuna-order .hero-mark-logo{position:relative;z-index:2;width:190px;height:190px;min-width:190px;flex:none;background:#fbf8f2;border:2px solid #c49a45;border-radius:50%;display:flex;align-items:center;justify-content:center;overflow:hidden;box-shadow:0 0 0 18px #c49a4509}
 .avuna-order .hero-mark-logo img{width:100%;height:100%;object-fit:contain;display:block}
-.avuna-order .wrap{max-width:1280px;width:calc(100% - 40px);margin:-35px auto 0;position:relative;z-index:2}.avuna-order .intro,.avuna-order .panel{background:white;border:1px solid #e9e4dd;border-radius:16px;padding:26px;box-shadow:0 10px 30px #00000010}
-.avuna-order .intro{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px}.avuna-order .muted{font-size:13px;color:#777;margin:8px 0}.avuna-order .pill{border-radius:30px;padding:10px 14px;background:#fff0e4;color:#8b6147;font-size:11px;letter-spacing:1px;font-weight:800}
+.avuna-order .wrap{max-width:1280px;width:calc(100% - 40px);margin:-35px auto 0;position:relative;z-index:2}.avuna-order .intro,.avuna-order .panel{background:#fbf8f2;border:1px solid #e5dccd;border-radius:16px;padding:26px;box-shadow:0 10px 30px #00000010}
+.avuna-order .intro{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px}.avuna-order .muted{font-size:13px;color:#777;margin:8px 0}.avuna-order .pill{border-radius:30px;padding:10px 14px;background:#f2e2c9;color:#8b6147;font-size:11px;letter-spacing:1px;font-weight:800}
 .avuna-order .layout{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(300px,1fr);gap:22px;align-items:start}.avuna-order h2{font-size:24px;font-weight:700;margin:9px 0;color:#171717}.avuna-order h3{font-size:19px;font-weight:700;margin:22px 0 12px}
 .avuna-order .fields{display:grid;grid-template-columns:1fr 1fr;gap:0 20px;margin-top:24px}.avuna-order .field{margin-bottom:21px}.avuna-order label{display:block;font-size:11px;font-weight:800;letter-spacing:1px;color:#666;margin-bottom:9px}
-.avuna-order select,.avuna-order input[type=number]{width:100%;height:52px;border:1px solid #e5dfd8;border-radius:10px;background:#faf9f7;padding:12px;color:#222;font-size:15px}.avuna-order select:focus,.avuna-order input:focus{outline:2px solid #f47b2080;outline-offset:1px}.avuna-order select:disabled{opacity:.6;cursor:not-allowed}
-.avuna-order .auto-package{padding:15px 12px;background:#fff5eb;border:1px solid #f5d9bd;border-radius:10px;color:#8a4b16;font-size:14px;font-weight:700;min-height:52px}.avuna-order .hint{color:#777;font-size:12px;margin:8px 0 0}.avuna-order .stock{font-size:13px;padding:11px 14px;border-radius:9px;background:#f3f6f3;color:#2e6844;margin-bottom:20px}.avuna-order .stock.warn{background:#fff2ec;color:#af4d22}
-.avuna-order .upload{border:2px dashed #dcd3ca;border-radius:12px;background:#faf9f7;text-align:center;padding:26px 14px}.avuna-order .upload-icon{font-size:35px;color:#f47b20}.avuna-order .upload strong{display:block;margin:8px 0}.avuna-order .upload input{max-width:100%;margin:14px 0 0}.avuna-order #designPreview{display:none;max-width:100%;max-height:220px;object-fit:contain;margin:18px auto 0;border-radius:9px}
-.avuna-order .submit{background:#f47b20;color:#fff;border:0;border-radius:10px;width:100%;padding:16px;font-weight:800;box-shadow:0 8px 22px #f47b2035;cursor:pointer}.avuna-order .submit:hover{background:#d9650e}
-.avuna-order .rowline{display:flex;align-items:start;justify-content:space-between;gap:14px;border-bottom:1px solid #eee;padding:14px 0;font-size:14px}.avuna-order .rowline span{color:#777}.avuna-order .rowline strong{text-align:right;overflow-wrap:anywhere}.avuna-order .total{border-radius:12px;background:#191919;color:#fff;padding:22px;margin-top:20px}.avuna-order .total span{color:#bbb;font-size:11px;letter-spacing:1px}.avuna-order .total strong{display:block;color:#f47b20;font-size:30px;margin-top:8px}.avuna-order .note{background:#fff4e9;color:#81542f;padding:15px;border-radius:10px;font-size:12px;line-height:1.6;margin-top:20px}
-.avuna-order .colour-picker{background:#faf9f7;border:1px solid #e5dfd8;border-radius:10px;padding:12px;min-height:52px}.avuna-order .colour-option{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:10px 6px;border-bottom:1px solid #ece8e2}.avuna-order .colour-option:last-child{border-bottom:0}.avuna-order .colour-option label{display:inline-flex;align-items:center;gap:8px;margin:0;font-size:13px;letter-spacing:0;color:#222;text-transform:none;flex:1;min-width:110px}.avuna-order .colour-option input[type=checkbox]{width:17px;height:17px;accent-color:#f47b20}.avuna-order .colour-option input[type=number]{width:112px;height:42px}.avuna-order input[readonly]{background:#f0eeeb;color:#666}.avuna-order .feedback{margin-top:17px;border-radius:10px;padding:14px;display:none;font-size:13px;line-height:1.7}.avuna-order .feedback.error{display:block;background:#fff0ed;color:#a52c21;border:1px solid #efc7bf}.avuna-order .feedback.success{display:block;background:#edfaef;color:#256339;border:1px solid #b5ddbd}.avuna-order .feedback ul{margin:5px 0 0;padding-left:20px}
+.avuna-order select,.avuna-order input[type=number]{width:100%;height:52px;border:1px solid #e5dccd;border-radius:10px;background:#fbf8f2;padding:12px;color:#222;font-size:15px}.avuna-order select:focus,.avuna-order input:focus{outline:2px solid #c49a4580;outline-offset:1px}.avuna-order select:disabled{opacity:.6;cursor:not-allowed}
+.avuna-order .auto-package{padding:15px 12px;background:#f2e2c9;border:1px solid #e3d0ae;border-radius:10px;color:#6e5133;font-size:14px;font-weight:700;min-height:52px}.avuna-order .hint{color:#777;font-size:12px;margin:8px 0 0}.avuna-order .stock{font-size:13px;padding:11px 14px;border-radius:9px;background:#f3f6f3;color:#2e6844;margin-bottom:20px}.avuna-order .stock.warn{background:#fff2ec;color:#af4d22}
+.avuna-order .upload{border:2px dashed #dcd3ca;border-radius:12px;background:#fbf8f2;text-align:center;padding:26px 14px}.avuna-order .upload-icon{font-size:35px;color:#8a6a35}.avuna-order .upload strong{display:block;margin:8px 0}.avuna-order .upload input{max-width:100%;margin:14px 0 0}.avuna-order #designPreview{display:none;max-width:100%;max-height:220px;object-fit:contain;margin:18px auto 0;border-radius:9px}
+.avuna-order .submit{background:#0f2a1f;color:#fff;border:0;border-radius:10px;width:100%;padding:16px;font-weight:800;box-shadow:0 8px 22px #c49a4535;cursor:pointer}.avuna-order .submit:hover{background:#173c2c}
+.avuna-order .rowline{display:flex;align-items:start;justify-content:space-between;gap:14px;border-bottom:1px solid #eee;padding:14px 0;font-size:14px}.avuna-order .rowline span{color:#777}.avuna-order .rowline strong{text-align:right;overflow-wrap:anywhere}.avuna-order .total{border-radius:12px;background:#191919;color:#fff;padding:22px;margin-top:20px}.avuna-order .total span{color:#bbb;font-size:11px;letter-spacing:1px}.avuna-order .total strong{display:block;color:#8a6a35;font-size:30px;margin-top:8px}.avuna-order .note{background:#f2e2c9;color:#81542f;padding:15px;border-radius:10px;font-size:12px;line-height:1.6;margin-top:20px}
+.avuna-order .colour-picker{background:#fbf8f2;border:1px solid #e5dccd;border-radius:10px;padding:12px;min-height:52px}.avuna-order .colour-option{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:10px 6px;border-bottom:1px solid #ece8e2}.avuna-order .colour-option:last-child{border-bottom:0}.avuna-order .colour-option label{display:inline-flex;align-items:center;gap:8px;margin:0;font-size:13px;letter-spacing:0;color:#222;text-transform:none;flex:1;min-width:110px}.avuna-order .colour-option input[type=checkbox]{width:17px;height:17px;accent-color:#0f2a1f}.avuna-order .colour-option input[type=number]{width:112px;height:42px}.avuna-order input[readonly]{background:#f0eeeb;color:#666}.avuna-order .feedback{margin-top:17px;border-radius:10px;padding:14px;display:none;font-size:13px;line-height:1.7}.avuna-order .feedback.error{display:block;background:#fff0ed;color:#a52c21;border:1px solid #efc7bf}.avuna-order .feedback.success{display:block;background:#edfaef;color:#256339;border:1px solid #b5ddbd}.avuna-order .feedback ul{margin:5px 0 0;padding-left:20px}
 @media(max-width:850px){.avuna-order .layout{grid-template-columns:1fr}.avuna-order .hero-mark,.avuna-order .hero-mark-logo{display:none}}@media(max-width:550px){.avuna-order .fields{grid-template-columns:1fr}.avuna-order .intro{gap:10px}.avuna-order .pill{font-size:9px}}
 
 /* Confirmation popup displayed after successful database commit */
 .avuna-confirm-overlay{position:fixed;inset:0;z-index:2147483000;background:rgba(0,0,0,.66);display:flex;align-items:center;justify-content:center;padding:20px}
-.avuna-confirm-dialog{box-sizing:border-box;background:#fff;color:#202020;border-radius:18px;box-shadow:0 22px 70px #0006;text-align:center;width:min(100%,440px);padding:36px 28px;font-family:Arial,sans-serif}
+.avuna-confirm-dialog{box-sizing:border-box;background:#fbf8f2;color:#202020;border-radius:18px;box-shadow:0 22px 70px #0006;text-align:center;width:min(100%,440px);padding:36px 28px;font-family:Arial,sans-serif}
 .avuna-confirm-icon{width:66px;height:66px;border-radius:50%;background:#e7f8eb;color:#24733d;margin:0 auto 18px;display:flex;align-items:center;justify-content:center;font-size:34px;font-weight:900}
-.avuna-confirm-dialog h2{font-size:25px;color:#132c22;margin:0 0 12px}
+.avuna-confirm-dialog h2{font-size:25px;color:#173c2c;margin:0 0 12px}
 .avuna-confirm-dialog p{line-height:1.6;font-size:15px;margin:8px 0;overflow-wrap:anywhere}
 .avuna-confirm-muted{color:#666}
-.avuna-confirm-close{margin-top:20px;border:0;background:#f47b20;color:#fff;border-radius:10px;padding:13px 36px;font-size:15px;font-weight:700;cursor:pointer}
-.avuna-confirm-close:hover,.avuna-confirm-close:focus{background:#d9650e}
-.avuna-choose-buttons{display:flex;gap:12px;margin-top:25px}.avuna-choose-buttons button{flex:1;border:0;border-radius:10px;padding:14px 10px;font-weight:800;cursor:pointer;background:#142d23;color:white}.avuna-choose-buttons button+button{background:#f47b20}.avuna-cancel-choice{border:0;background:transparent;color:#666;padding:12px;margin-top:10px;cursor:pointer}
+.avuna-confirm-close{margin-top:20px;border:0;background:#0f2a1f;color:#fff;border-radius:10px;padding:13px 36px;font-size:15px;font-weight:700;cursor:pointer}
+.avuna-confirm-close:hover,.avuna-confirm-close:focus{background:#173c2c}
+.avuna-choose-buttons{display:flex;gap:12px;margin-top:25px}.avuna-choose-buttons button{flex:1;border:0;border-radius:10px;padding:14px 10px;font-weight:800;cursor:pointer;background:#173c2c;color:white}.avuna-choose-buttons button+button{background:#0f2a1f}.avuna-cancel-choice{border:0;background:transparent;color:#666;padding:12px;margin-top:10px;cursor:pointer}
 .avuna-order .quote-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:22px 0 4px}.avuna-order .quote-head h3{margin:0}
 .avuna-order .quote-actions{display:flex;gap:8px;flex-wrap:wrap}
-.avuna-order .qbtn{border:1.5px solid #f47b20;background:#fff;color:#f47b20;border-radius:10px;padding:9px 14px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;font-family:inherit}.avuna-order .qbtn:hover{background:#fff0e4}
-.avuna-order .qbtn-alt{background:#f47b20;color:#fff}.avuna-order .qbtn-alt:hover{background:#d9650e}.avuna-order .qbtn:disabled{opacity:.6;cursor:wait}
+.avuna-order .qbtn{border:1.5px solid #c49a45;background:#fbf8f2;color:#8a6a35;border-radius:10px;padding:9px 14px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;font-family:inherit}.avuna-order .qbtn:hover{background:#f2e2c9}
+.avuna-order .qbtn-alt{background:#0f2a1f;color:#fff}.avuna-order .qbtn-alt:hover{background:#173c2c}.avuna-order .qbtn:disabled{opacity:.6;cursor:wait}
 .avuna-order .quote-msg{display:none;margin:8px 0 2px;padding:10px 12px;border-radius:10px;font-size:13px;line-height:1.5}
 .avuna-order .quote-msg.ok{display:block;background:#e7f4eb;color:#277446}.avuna-order .quote-msg.bad{display:block;background:#fdeaea;color:#b03a3a}
 </style>
 
 <div class="avuna-order" id="createOrderPage">
 <section class="hero"><div class="hero-copy"><h1>Your vision,<br />our creation.</h1><p>Choose an item, size and multiple available colours, upload your design and review your quotation.</p><a runat="server" href="~/CustomerDashboard" class="back">Back to Dashboard</a></div><div class="hero-mark-logo"><img runat="server" src="~/avuna-logo.png" alt="Avuna Collective" /></div></section>
-<div class="wrap"><div class="intro"><div><strong>Create a new order</strong><p class="muted">Your custom order details for Avuna Collective.</p></div><span class="pill">NEW ORDER</span></div>
+<div class="wrap">
 <div class="layout"><div class="panel"><span class="tag">ORDER DETAILS</span><h2>Customize Your Order</h2><p class="muted">Only available inventory combinations can be selected.</p>
 <div class="fields">
 <div class="field"><label for="itemName">ITEM NAME *</label><select id="itemName"><option value="">Select an item</option></select></div>
@@ -55,15 +55,15 @@
 <div id="stockMessage" class="stock warn" role="status">Select an item and size, then choose colours and quantities.</div>
 <div class="field"><label for="designFile">UPLOAD YOUR DESIGN *</label><div class="upload"><div class="upload-icon">&#8682;</div><strong>Upload your custom design</strong><p class="hint">PNG, JPG, JPEG or WEBP, maximum 5 MB</p><input type="file" id="designFile" name="designFile" accept=".png,.jpg,.jpeg,.webp,image/png,image/jpeg,image/webp" /><img id="designPreview" alt="Uploaded design preview" /></div></div>
     <style>
-.avuna-order .mock-wrap{margin:4px 0 24px;border:1px solid #e5dfd8;border-radius:12px;background:#faf9f7;padding:16px}
+.avuna-order .mock-wrap{margin:4px 0 24px;border:1px solid #e5dccd;border-radius:12px;background:#fbf8f2;padding:16px}
 .avuna-order .mock-wrap h3{margin:0 0 4px;font-size:17px}
 .avuna-order .mock-note{color:#777;font-size:12px;margin:0 0 12px}
 .avuna-order .mock-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
-.avuna-order .mock-card{background:#fff;border:1px solid #ece8e2;border-radius:10px;padding:8px 8px 10px;text-align:center}
+.avuna-order .mock-card{background:#fbf8f2;border:1px solid #ece8e2;border-radius:10px;padding:8px 8px 10px;text-align:center}
 .avuna-order .mock-photo{width:100%;height:auto;max-height:300px;object-fit:contain;display:block;filter:drop-shadow(0 8px 10px rgba(0,0,0,.22))}
 .avuna-order .mock-card svg{width:100%;height:auto;max-height:230px;display:block}
 .avuna-order .mock-cap{font-size:11px;font-weight:800;letter-spacing:1px;color:#666;margin-top:4px}
-.avuna-order .mock-cap b{color:#f47b20}
+.avuna-order .mock-cap b{color:#8a6a35}
 .avuna-order .mock-colour{font-size:13px;font-weight:700;margin:0 0 6px;color:#222}
 .avuna-order .mock-empty{font-size:13px;color:#777;margin:0}
 </style>
@@ -82,7 +82,7 @@
 
         var COLOURS = [["white", "#ffffff"], ["black", "#1f1f1f"], ["navy", "#16243f"], ["royal", "#2250a8"], ["light blue", "#8dbbe8"],
         ["sky", "#8dbbe8"], ["blue", "#2b5fb3"], ["maroon", "#6d1a2a"], ["burgundy", "#6d1a2a"], ["red", "#c62d2d"], ["orange", "#f08a24"],
-        ["gold", "#d9a52c"], ["yellow", "#f2cf4a"], ["lime", "#8fc93a"], ["bottle", "#1f5a3a"], ["forest", "#25573a"], ["green", "#2f8a4a"],
+        ["gold", "#c49a45"], ["yellow", "#f2cf4a"], ["lime", "#8fc93a"], ["bottle", "#1f5a3a"], ["forest", "#25573a"], ["green", "#2f8a4a"],
         ["teal", "#1f8a8a"], ["purple", "#6b3fa0"], ["pink", "#ec7fa9"], ["brown", "#6b4a32"], ["beige", "#d9c7a3"], ["cream", "#f1e8d2"],
         ["khaki", "#b9a877"], ["charcoal", "#454545"], ["silver", "#c4c4c4"], ["grey", "#9a9a9a"], ["gray", "#9a9a9a"]];
 
@@ -485,16 +485,16 @@
             }).join("");
             function line(label, id, strong) { return "<tr" + (strong ? " class='s'" : "") + "><td>" + label + "</td><td class='r'>" + esc(el(id).textContent) + "</td></tr>"; }
             return "<!DOCTYPE html><html><head><meta charset='utf-8'><title>Avuna Collective quotation</title><style>" +
-                "@page{margin:16mm}*{box-sizing:border-box}body{font-family:Arial,Helvetica,sans-serif;color:#2a2118;margin:0;font-size:13px}" +
-                ".head{display:flex;align-items:center;gap:16px;border-bottom:3px solid #d9a52c;padding-bottom:14px;margin-bottom:20px}" +
-                ".head img{width:70px;height:70px;border-radius:50%;border:2px solid #d9a52c;object-fit:contain}" +
-                ".head h1{margin:0;font-size:24px;color:#0a1a14}.head p{margin:3px 0 0;color:#8a7f72;font-size:12px;letter-spacing:2px;font-weight:bold}.head .d{margin-left:auto;text-align:right;color:#6b6055;font-size:12px}" +
-                "h2{font-size:12px;letter-spacing:1.5px;color:#8a7f72;margin:22px 0 8px}table{width:100%;border-collapse:collapse}" +
-                "td,th{padding:9px 10px;border-bottom:1px solid #e7dfd0;text-align:left}th{background:#f7f3ec;color:#8a7f72;font-size:11px;letter-spacing:1px}.r{text-align:right}" +
-                ".k td:first-child{color:#8a7f72;width:38%}.k td:last-child{font-weight:bold}.s td{font-weight:bold}" +
-                ".total{margin-top:18px;background:#0a1a14;color:#fff;border-radius:10px;padding:16px 20px;display:flex;justify-content:space-between;align-items:center;-webkit-print-color-adjust:exact;print-color-adjust:exact}" +
-                ".total small{color:#cfc9a0;letter-spacing:1.5px;font-size:11px}.total strong{color:#f47b20;font-size:26px}" +
-                ".note{margin-top:20px;color:#8a7f72;font-size:11px;line-height:1.6}.foot{margin-top:26px;padding-top:12px;border-top:1px solid #e7dfd0;text-align:center;color:#8a7f72;font-size:11px}" +
+                "@page{margin:16mm}*{box-sizing:border-box}body{font-family: var(--av-sans);color:#1b2a22;margin:0;font-size:13px}" +
+                ".head{display:flex;align-items:center;gap:16px;border-bottom:3px solid #c49a45;padding-bottom:14px;margin-bottom:20px}" +
+                ".head img{width:70px;height:70px;border-radius:50%;border:2px solid #c49a45;object-fit:contain}" +
+                ".head h1{margin:0;font-size:24px;color:#0f2a1f}.head p{margin:3px 0 0;color:#6c736d;font-size:12px;letter-spacing:2px;font-weight:bold}.head .d{margin-left:auto;text-align:right;color:#6b6055;font-size:12px}" +
+                "h2{font-size:12px;letter-spacing:1.5px;color:#6c736d;margin:22px 0 8px}table{width:100%;border-collapse:collapse}" +
+                "td,th{padding:9px 10px;border-bottom:1px solid #e5dccd;text-align:left}th{background:#f5efe6;color:#6c736d;font-size:11px;letter-spacing:1px}.r{text-align:right}" +
+                ".k td:first-child{color:#6c736d;width:38%}.k td:last-child{font-weight:bold}.s td{font-weight:bold}" +
+                ".total{margin-top:18px;background:#0f2a1f;color:#fff;border-radius:10px;padding:16px 20px;display:flex;justify-content:space-between;align-items:center;-webkit-print-color-adjust:exact;print-color-adjust:exact}" +
+                ".total small{color:#cfc9a0;letter-spacing:1.5px;font-size:11px}.total strong{color:#8a6a35;font-size:26px}" +
+                ".note{margin-top:20px;color:#6c736d;font-size:11px;line-height:1.6}.foot{margin-top:26px;padding-top:12px;border-top:1px solid #e5dccd;text-align:center;color:#6c736d;font-size:11px}" +
                 "</style></head><body>" +
                 "<div class='head'><img src='" + esc(logo) + "' alt='Avuna Collective'><div><h1>Avuna Collective</h1><p>QUOTATION</p></div><div class='d'>Date<br><strong>" + esc(today) + "</strong></div></div>" +
                 "<h2>ORDER DETAILS</h2><table class='k'><tr><td>Item</td><td>" + esc(el("summaryItem").textContent) + "</td></tr><tr><td>Size</td><td>" + esc(el("summarySize").textContent) + "</td></tr>" +

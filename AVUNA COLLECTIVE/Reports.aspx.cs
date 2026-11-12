@@ -97,7 +97,7 @@ namespace AVUNA_COLLECTIVE
 		public const string ChartJsUrl = "https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js";
 
 		public static readonly string[] Palette =
-			{ "#2a2118", "#d9711f", "#d9a52c", "#2f8f83", "#7a5c99", "#c84b4b", "#3b78a8", "#687d71" };
+			{ "#173c2c", "#c49a45", "#6b8f71", "#8a6a35", "#7a5c99", "#a9503f", "#3b78a8", "#687d71" };
 
 		public static readonly string[] FinishedStatuses = { "Completed", "Delivered", "Collected", "Cancelled" };
 
@@ -125,9 +125,9 @@ namespace AVUNA_COLLECTIVE
 			if (s.Contains("paid") || s.Contains("complet") || s.Contains("success") || s.Contains("deliver") || s.Contains("collect"))
 				return "#2f8f5b";
 			if (s.Contains("progress") || s.Contains("process") || s.Contains("production"))
-				return "#d9711f";
+				return "#c49a45";
 			if (s.Contains("pend") || s.Contains("due") || s.Contains("partial") || s.Contains("outstanding") || s.Contains("await"))
-				return "#d9a52c";
+				return "#c49a45";
 			return Palette[(index + 3) % Palette.Length];
 		}
 
@@ -519,7 +519,7 @@ Chart.defaults.color = '#5d6a67';
 Chart.defaults.maintainAspectRatio = false;
 Chart.defaults.plugins.legend.labels.usePointStyle = true;
 Chart.defaults.plugins.legend.labels.boxWidth = 8;
-Chart.defaults.plugins.tooltip.backgroundColor = '#2a2118';
+Chart.defaults.plugins.tooltip.backgroundColor = '#1b2a22';
 Chart.defaults.plugins.tooltip.padding = 10;
 Chart.defaults.plugins.tooltip.cornerRadius = 8;
 function R(v){ v = Number(v) || 0; return 'R' + v.toLocaleString('en-US', {maximumFractionDigits: 2}); }
@@ -777,9 +777,9 @@ var pieCount = { legend: { position: 'bottom' }, tooltip: { callbacks: { label: 
 			// ---- page ----
 			var body = new StringBuilder();
 			body.Append("<section class=\"rp-kpis\">")
-				.Append(Rpt.Kpi("TOTAL SALES", Rpt.Money(totalSales), "All orders except cancelled", "#2a2118", "R"))
-				.Append(Rpt.Kpi("THIS MONTH", Rpt.Money(thisMonth), delta, "#d9711f", "&#9650;"))
-				.Append(Rpt.Kpi("AVERAGE ORDER", Rpt.Money(Math.Round(avg, 2)), Rpt.Int(sold.Count) + " orders counted", "#d9a52c", "&#8960;"))
+				.Append(Rpt.Kpi("TOTAL SALES", Rpt.Money(totalSales), "All orders except cancelled", "#1b2a22", "R"))
+				.Append(Rpt.Kpi("THIS MONTH", Rpt.Money(thisMonth), delta, "#c49a45", "&#9650;"))
+				.Append(Rpt.Kpi("AVERAGE ORDER", Rpt.Money(Math.Round(avg, 2)), Rpt.Int(sold.Count) + " orders counted", "#c49a45", "&#8960;"))
 				.Append(Rpt.Kpi("LARGEST ORDER", Rpt.Money(largest), "Biggest single order", "#2f8f83", "&#9733;"))
 				.Append(Rpt.Kpi("PAYMENTS RECORDED", Rpt.Money(paymentsTotal), Rpt.Int(pays.Count) + " payments in total", "#7a5c99", "&#10003;"))
 				.Append("</section><div class=\"rp-grid\">")
@@ -795,12 +795,12 @@ var pieCount = { legend: { position: 'bottom' }, tooltip: { callbacks: { label: 
 
 			const string charts = @"
 mk('cMonthly', { type: 'bar', data: { labels: __ML__, datasets: [
-  { type: 'bar', label: 'Sales', data: __MS__, backgroundColor: '#d9711f', borderRadius: 8, maxBarThickness: 46, order: 2 },
-  { type: 'bar', label: 'Orders', data: __MC__, backgroundColor: '#2a2118', borderRadius: 8, maxBarThickness: 46, yAxisID: 'y1', order: 1 } ] },
+  { type: 'bar', label: 'Sales', data: __MS__, backgroundColor: '#c49a45', borderRadius: 8, maxBarThickness: 46, order: 2 },
+  { type: 'bar', label: 'Orders', data: __MC__, backgroundColor: '#1b2a22', borderRadius: 8, maxBarThickness: 46, yAxisID: 'y1', order: 1 } ] },
   options: { interaction: { mode: 'index', intersect: false },
     scales: { x: noGrid, y: moneyY, y1: { position: 'right', beginAtZero: true, grid: { drawOnChartArea: false }, ticks: { precision: 0 } } },
     plugins: { legend: { position: 'top', align: 'end' }, tooltip: { callbacks: { label: function(c){ return ' ' + c.dataset.label + ': ' + (c.dataset.yAxisID === 'y1' ? c.parsed.y + ' orders' : R(c.parsed.y)); } } } } } });
-mk('cCum', { type: 'line', data: { labels: __ML__, datasets: [{ label: 'Cumulative sales', data: __CUM__, borderColor: '#d9711f', backgroundColor: 'rgba(217,113,31,.18)', fill: true, tension: .35, borderWidth: 3, pointBackgroundColor: '#fff', pointBorderColor: '#d9711f', pointBorderWidth: 2, pointRadius: 4 }] },
+mk('cCum', { type: 'line', data: { labels: __ML__, datasets: [{ label: 'Cumulative sales', data: __CUM__, borderColor: '#c49a45', backgroundColor: 'rgba(196,154,69,.18)', fill: true, tension: .35, borderWidth: 3, pointBackgroundColor: '#fff', pointBorderColor: '#c49a45', pointBorderWidth: 2, pointRadius: 4 }] },
   options: { scales: { x: noGrid, y: moneyY }, plugins: { legend: { display: false }, tooltip: moneyTip } } });
 mk('cTop', { type: 'bar', data: { labels: __TL__, datasets: [{ data: __TV__, backgroundColor: P, borderRadius: 8, maxBarThickness: 30 }] },
   options: { indexAxis: 'y', scales: { x: moneyY, y: noGrid }, plugins: { legend: { display: false }, tooltip: moneyTipH } } });
@@ -810,7 +810,7 @@ mk('cPayStatus', { type: 'pie', data: { labels: __PSL__, datasets: [{ data: __PS
   options: { plugins: pieMoney } });
 mk('cDay', { type: 'bar', data: { labels: __WL__, datasets: [{ label: 'Sales', data: __WV__, backgroundColor: P, borderRadius: 8, maxBarThickness: 36 }] },
   options: { scales: { x: noGrid, y: moneyY }, plugins: { legend: { display: false }, tooltip: moneyTip } } });
-mk('cDist', { type: 'bar', data: { labels: __DL__, datasets: [{ label: 'Orders', data: __DV__, backgroundColor: ['#2f8f83', '#3b78a8', '#d9a52c', '#d9711f', '#c84b4b'], borderRadius: 8, maxBarThickness: 50 }] },
+mk('cDist', { type: 'bar', data: { labels: __DL__, datasets: [{ label: 'Orders', data: __DV__, backgroundColor: ['#2f8f83', '#3b78a8', '#c49a45', '#c49a45', '#c84b4b'], borderRadius: 8, maxBarThickness: 50 }] },
   options: { scales: { x: noGrid, y: countY }, plugins: { legend: { display: false } } } });
 ";
 
@@ -940,9 +940,9 @@ mk('cDist', { type: 'bar', data: { labels: __DL__, datasets: [{ label: 'Orders',
 
 			var body = new StringBuilder();
 			body.Append("<section class=\"rp-kpis\">")
-				.Append(Rpt.Kpi("TOTAL ORDERS", Rpt.Int(orders.Count), "All orders recorded", "#2a2118", "#"))
-				.Append(Rpt.Kpi("PENDING", Rpt.Int(pending), "Not yet started", "#d9a52c", "!"))
-				.Append(Rpt.Kpi("IN PROGRESS", Rpt.Int(inProgress), "Currently being made", "#d9711f", "&#9881;"))
+				.Append(Rpt.Kpi("TOTAL ORDERS", Rpt.Int(orders.Count), "All orders recorded", "#1b2a22", "#"))
+				.Append(Rpt.Kpi("PENDING", Rpt.Int(pending), "Not yet started", "#c49a45", "!"))
+				.Append(Rpt.Kpi("IN PROGRESS", Rpt.Int(inProgress), "Currently being made", "#c49a45", "&#9881;"))
 				.Append(Rpt.Kpi("COMPLETED", Rpt.Int(completed), "Fulfilled orders", "#2f8f5b", "&#10003;"))
 				.Append(Rpt.Kpi("OPEN ORDER VALUE", Rpt.Money(openValue), Rpt.Int(open.Count) + " orders not finished yet", "#7a5c99", "R"))
 				.Append("</section><div class=\"rp-grid\">")
@@ -960,7 +960,7 @@ mk('cStatus', { type: 'doughnut', data: { labels: __SL__, datasets: [{ data: __S
   options: { cutout: '62%', plugins: pieCount } });
 mk('cMonthly', { type: 'bar', data: { labels: __ML__, datasets: [__DS__] },
   options: { interaction: { mode: 'index', intersect: false }, scales: { x: Object.assign({ stacked: true }, noGrid), y: Object.assign({ stacked: true }, countY) }, plugins: { legend: { position: 'top', align: 'end' } } } });
-mk('cAge', { type: 'bar', data: { labels: __AL__, datasets: [{ label: 'Open orders', data: __AV__, backgroundColor: ['#2f8f5b', '#d9a52c', '#d9711f', '#c84b4b'], borderRadius: 8, maxBarThickness: 50 }] },
+mk('cAge', { type: 'bar', data: { labels: __AL__, datasets: [{ label: 'Open orders', data: __AV__, backgroundColor: ['#2f8f5b', '#c49a45', '#c49a45', '#c84b4b'], borderRadius: 8, maxBarThickness: 50 }] },
   options: { scales: { x: noGrid, y: countY }, plugins: { legend: { display: false } } } });
 mk('cDay', { type: 'bar', data: { labels: __WL__, datasets: [{ label: 'Orders', data: __WV__, backgroundColor: P, borderRadius: 8, maxBarThickness: 36 }] },
   options: { scales: { x: noGrid, y: countY }, plugins: { legend: { display: false } } } });
@@ -1049,18 +1049,18 @@ mk('cPay', { type: 'pie', data: { labels: __PL__, datasets: [{ data: __PV__, bac
 				timeline.Add(new TimelineItem
 				{
 					Date = Rpt.DateText(r.Date),
-					Title = "<span style=\"color:#d9a52c\">" + Rpt.Stars(r.Score) + "</span> &nbsp;" + r.Score + " / 5",
+					Title = "<span style=\"color:#c49a45\">" + Rpt.Stars(r.Score) + "</span> &nbsp;" + r.Score + " / 5",
 					Text = string.IsNullOrWhiteSpace(r.Review) ? "<i>No written review.</i>" : Rpt.Esc(r.Review),
-					Color = r.Score >= 4 ? "#2f8f5b" : r.Score == 3 ? "#d9a52c" : "#c84b4b"
+					Color = r.Score >= 4 ? "#2f8f5b" : r.Score == 3 ? "#c49a45" : "#c84b4b"
 				});
 			}
 
 			var body = new StringBuilder();
 			body.Append("<section class=\"rp-kpis\">")
-				.Append(Rpt.Kpi("TOTAL CUSTOMERS", Rpt.Int(customers.Count), "Registered accounts", "#2a2118", "&#9673;"))
+				.Append(Rpt.Kpi("TOTAL CUSTOMERS", Rpt.Int(customers.Count), "Registered accounts", "#1b2a22", "&#9673;"))
 				.Append(Rpt.Kpi("ACTIVE CUSTOMERS", Rpt.Int(active), "Have placed at least one order", "#2f8f5b", "&#10003;"))
-				.Append(Rpt.Kpi("REPEAT CUSTOMERS", Rpt.Int(repeat), "Ordered two or more times", "#d9711f", "&#8635;"))
-				.Append(Rpt.Kpi("AVERAGE SPEND", Rpt.Money(Math.Round(avgSpend, 2)), "Per customer who has ordered", "#d9a52c", "R"))
+				.Append(Rpt.Kpi("REPEAT CUSTOMERS", Rpt.Int(repeat), "Ordered two or more times", "#c49a45", "&#8635;"))
+				.Append(Rpt.Kpi("AVERAGE SPEND", Rpt.Money(Math.Round(avgSpend, 2)), "Per customer who has ordered", "#c49a45", "R"))
 				.Append(Rpt.Kpi("AVERAGE RATING", ratings.Count > 0 ? avgRating.ToString("0.0", CultureInfo.InvariantCulture) + " / 5" : "No ratings", Rpt.Int(ratings.Count) + " customer reviews", "#7a5c99", "&#9733;"))
 				.Append("</section><div class=\"rp-grid\">")
 				.Append(Rpt.ChartCard("cType", "Customer Types", "Individual vs business accounts", 4, 300))
@@ -1075,13 +1075,13 @@ mk('cPay', { type: 'pie', data: { labels: __PL__, datasets: [{ data: __PV__, bac
 			const string charts = @"
 mk('cType', { type: 'doughnut', data: { labels: __TL__, datasets: [{ data: __TV__, backgroundColor: P, borderColor: '#fff', borderWidth: 3 }] },
   options: { cutout: '62%', plugins: pieCount } });
-mk('cLoyal', { type: 'pie', data: { labels: ['Never ordered', 'Ordered once', 'Repeat customers'], datasets: [{ data: __LV__, backgroundColor: ['#c9d1cd', '#d9a52c', '#2f8f5b'], borderColor: '#fff', borderWidth: 3 }] },
+mk('cLoyal', { type: 'pie', data: { labels: ['Never ordered', 'Ordered once', 'Repeat customers'], datasets: [{ data: __LV__, backgroundColor: ['#c9d1cd', '#c49a45', '#2f8f5b'], borderColor: '#fff', borderWidth: 3 }] },
   options: { plugins: pieCount } });
 mk('cTown', { type: 'bar', data: { labels: __NL__, datasets: [{ label: 'Customers', data: __NV__, backgroundColor: P, borderRadius: 8, maxBarThickness: 26 }] },
   options: { indexAxis: 'y', scales: { x: countY, y: noGrid }, plugins: { legend: { display: false } } } });
 mk('cTop', { type: 'bar', data: { labels: __PL__, datasets: [{ data: __PV__, backgroundColor: P, borderRadius: 8, maxBarThickness: 30 }] },
   options: { indexAxis: 'y', scales: { x: moneyY, y: noGrid }, plugins: { legend: { display: false }, tooltip: moneyTipH } } });
-mk('cRate', { type: 'bar', data: { labels: ['1 star', '2 stars', '3 stars', '4 stars', '5 stars'], datasets: [{ label: 'Reviews', data: __RV__, backgroundColor: ['#c84b4b', '#e08a3c', '#d9a52c', '#8bb15b', '#2f8f5b'], borderRadius: 8, maxBarThickness: 56 }] },
+mk('cRate', { type: 'bar', data: { labels: ['1 star', '2 stars', '3 stars', '4 stars', '5 stars'], datasets: [{ label: 'Reviews', data: __RV__, backgroundColor: ['#c84b4b', '#e08a3c', '#c49a45', '#8bb15b', '#2f8f5b'], borderRadius: 8, maxBarThickness: 56 }] },
   options: { scales: { x: noGrid, y: countY }, plugins: { legend: { display: false } } } });
 mk('cTrend', { type: 'line', data: { labels: __ML__, datasets: [{ label: 'Average rating', data: __AV__, borderColor: '#7a5c99', backgroundColor: 'rgba(122,92,153,.15)', fill: true, tension: .35, borderWidth: 3, spanGaps: true, pointBackgroundColor: '#fff', pointBorderColor: '#7a5c99', pointBorderWidth: 2, pointRadius: 5 }] },
   options: { scales: { x: noGrid, y: { min: 0, max: 5, grid: { color: GRID }, ticks: { stepSize: 1 } } }, plugins: { legend: { display: false } } } });
@@ -1147,10 +1147,10 @@ mk('cTrend', { type: 'line', data: { labels: __ML__, datasets: [{ label: 'Averag
 
 			var body = new StringBuilder();
 			body.Append("<section class=\"rp-kpis\">")
-				.Append(Rpt.Kpi("ADMIN STAFF", Rpt.Int(admin.Count), "Managers and administrators", "#2a2118", "&#10003;"))
-				.Append(Rpt.Kpi("MANAGERS", Rpt.Int(managers), "With manager access", "#d9711f", "&#9733;"))
+				.Append(Rpt.Kpi("ADMIN STAFF", Rpt.Int(admin.Count), "Managers and administrators", "#1b2a22", "&#10003;"))
+				.Append(Rpt.Kpi("MANAGERS", Rpt.Int(managers), "With manager access", "#c49a45", "&#9733;"))
 				.Append(Rpt.Kpi("PRODUCTION STAFF", Rpt.Int(production.Count), "Making the orders", "#2f8f83", "&#9881;"))
-				.Append(Rpt.Kpi("PAYMENTS PROCESSED", Rpt.Int(handled.Count), "Payments captured by staff", "#d9a52c", "#"))
+				.Append(Rpt.Kpi("PAYMENTS PROCESSED", Rpt.Int(handled.Count), "Payments captured by staff", "#c49a45", "#"))
 				.Append(Rpt.Kpi("VALUE PROCESSED", Rpt.Money(handled.Sum(p => p.Amount)), "Total of those payments", "#7a5c99", "R"))
 				.Append("</section><div class=\"rp-grid\">")
 				.Append(Rpt.ChartCard("cRoles", "Team by Role", "How the team is made up", 4, 320))
@@ -1163,12 +1163,12 @@ mk('cRoles', { type: 'doughnut', data: { labels: __RL__, datasets: [{ data: __RV
   options: { cutout: '62%', plugins: pieCount } });
 mk('cPerStaff', { type: 'bar', data: { labels: __SL__, datasets: [
   { type: 'bar', label: 'Value', data: __SV__, backgroundColor: P, borderRadius: 8, maxBarThickness: 46, order: 2 },
-  { type: 'bar', label: 'Payments', data: __SC__, backgroundColor: '#2a2118', borderRadius: 8, maxBarThickness: 46, yAxisID: 'y1', order: 1 } ] },
+  { type: 'bar', label: 'Payments', data: __SC__, backgroundColor: '#1b2a22', borderRadius: 8, maxBarThickness: 46, yAxisID: 'y1', order: 1 } ] },
   options: { scales: { x: noGrid, y: moneyY, y1: { position: 'right', beginAtZero: true, grid: { drawOnChartArea: false }, ticks: { precision: 0 } } },
     plugins: { legend: { position: 'top', align: 'end' }, tooltip: { callbacks: { label: function(c){ return ' ' + c.dataset.label + ': ' + (c.dataset.yAxisID === 'y1' ? c.parsed.y + ' payments' : R(c.parsed.y)); } } } } } });
 mk('cMonthly', { type: 'bar', data: { labels: __ML__, datasets: [
   { type: 'bar', label: 'Value', data: __MV__, backgroundColor: '#2f8f83', borderRadius: 8, maxBarThickness: 46, order: 2 },
-  { type: 'bar', label: 'Payments', data: __MC__, backgroundColor: '#d9711f', borderRadius: 8, maxBarThickness: 46, yAxisID: 'y1', order: 1 } ] },
+  { type: 'bar', label: 'Payments', data: __MC__, backgroundColor: '#c49a45', borderRadius: 8, maxBarThickness: 46, yAxisID: 'y1', order: 1 } ] },
   options: { interaction: { mode: 'index', intersect: false }, scales: { x: noGrid, y: moneyY, y1: { position: 'right', beginAtZero: true, grid: { drawOnChartArea: false }, ticks: { precision: 0 } } },
     plugins: { legend: { position: 'top', align: 'end' }, tooltip: { callbacks: { label: function(c){ return ' ' + c.dataset.label + ': ' + (c.dataset.yAxisID === 'y1' ? c.parsed.y + ' payments' : R(c.parsed.y)); } } } } } });
 ";

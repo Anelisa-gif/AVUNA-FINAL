@@ -393,11 +393,11 @@ namespace AVUNA_COLLECTIVE
 		{
 			Func<string, string> e = s => System.Net.WebUtility.HtmlEncode(s ?? "");
 			var sb = new System.Text.StringBuilder();
-			sb.Append("<div style=\"background:#f7f3ec;padding:24px 12px;font-family:Arial,Helvetica,sans-serif;color:#2a2118\">");
-			sb.Append("<table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" style=\"max-width:620px;margin:0 auto;background:#ffffff;border:1px solid #ece4d6;border-radius:14px;overflow:hidden\">");
-			sb.Append("<tr><td style=\"background:#0a1a14;padding:20px 26px\"><table role=\"presentation\" cellpadding=\"0\" cellspacing=\"0\"><tr>");
-			sb.Append("<td style=\"padding-right:14px\"><img src=\"cid:avunalogo\" width=\"54\" height=\"54\" alt=\"Avuna Collective\" style=\"display:block;border-radius:50%;background:#ffffff;border:2px solid #d9a52c\" /></td>");
-			sb.Append("<td style=\"color:#ffffff;font-size:22px;font-weight:bold\">Avuna Collective<div style=\"color:#d9a52c;font-size:12px;letter-spacing:2px;font-weight:bold;margin-top:3px\">QUOTATION</div></td>");
+			sb.Append("<div style=\"background:#f5efe6;padding:24px 12px;font-family:Arial,Helvetica,sans-serif;color:#1b2a22\">");
+			sb.Append("<table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" style=\"max-width:620px;margin:0 auto;background:#ffffff;border:1px solid #e5dccd;border-radius:14px;overflow:hidden\">");
+			sb.Append("<tr><td style=\"background:#0f2a1f;padding:20px 26px\"><table role=\"presentation\" cellpadding=\"0\" cellspacing=\"0\"><tr>");
+			sb.Append("<td style=\"padding-right:14px\"><img src=\"cid:avunalogo\" width=\"54\" height=\"54\" alt=\"Avuna Collective\" style=\"display:block;border-radius:50%;background:#ffffff;border:2px solid #c49a45\" /></td>");
+			sb.Append("<td style=\"color:#ffffff;font-size:22px;font-weight:bold\">Avuna Collective<div style=\"color:#c49a45;font-size:12px;letter-spacing:2px;font-weight:bold;margin-top:3px\">QUOTATION</div></td>");
 			sb.Append("</tr></table></td></tr>");
 			sb.Append("<tr><td style=\"padding:26px\">");
 			sb.Append("<p style=\"margin:0 0 6px;font-size:16px\">Hi " + e(name.Length == 0 ? "there" : name) + ",</p>");
@@ -409,14 +409,14 @@ namespace AVUNA_COLLECTIVE
 			sb.Append(QuoteRow("Design package", e(q.package), false));
 			sb.Append("</table>");
 
-			sb.Append("<table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" style=\"font-size:14px;margin-bottom:18px;border:1px solid #efe7da\">");
-			sb.Append("<tr style=\"background:#f7f3ec;color:#8a7f72;font-size:11px;letter-spacing:1px\"><td style=\"padding:10px 12px\">COLOUR</td><td style=\"padding:10px 12px;text-align:right\">QTY</td><td style=\"padding:10px 12px;text-align:right\">UNIT COST</td><td style=\"padding:10px 12px;text-align:right\">TOTAL</td></tr>");
+			sb.Append("<table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" style=\"font-size:14px;margin-bottom:18px;border:1px solid #e5dccd\">");
+			sb.Append("<tr style=\"background:#f5efe6;color:#6c736d;font-size:11px;letter-spacing:1px\"><td style=\"padding:10px 12px\">COLOUR</td><td style=\"padding:10px 12px;text-align:right\">QTY</td><td style=\"padding:10px 12px;text-align:right\">UNIT COST</td><td style=\"padding:10px 12px;text-align:right\">TOTAL</td></tr>");
 			foreach (var c in q.colours)
 			{
-				sb.Append("<tr><td style=\"padding:10px 12px;border-top:1px solid #efe7da\">" + e(c.colour) + "</td>"
-					+ "<td style=\"padding:10px 12px;border-top:1px solid #efe7da;text-align:right\">" + c.quantity + "</td>"
-					+ "<td style=\"padding:10px 12px;border-top:1px solid #efe7da;text-align:right\">" + e(QuoteMoney(c.unitCents)) + "</td>"
-					+ "<td style=\"padding:10px 12px;border-top:1px solid #efe7da;text-align:right\">" + e(QuoteMoney(c.unitCents * c.quantity)) + "</td></tr>");
+				sb.Append("<tr><td style=\"padding:10px 12px;border-top:1px solid #e5dccd\">" + e(c.colour) + "</td>"
+					+ "<td style=\"padding:10px 12px;border-top:1px solid #e5dccd;text-align:right\">" + c.quantity + "</td>"
+					+ "<td style=\"padding:10px 12px;border-top:1px solid #e5dccd;text-align:right\">" + e(QuoteMoney(c.unitCents)) + "</td>"
+					+ "<td style=\"padding:10px 12px;border-top:1px solid #e5dccd;text-align:right\">" + e(QuoteMoney(c.unitCents * c.quantity)) + "</td></tr>");
 			}
 			sb.Append("</table>");
 
@@ -429,22 +429,22 @@ namespace AVUNA_COLLECTIVE
 			sb.Append(QuoteRow("Markup (10% after VAT)", e(QuoteMoney(q.markupCents)), false));
 			sb.Append("</table>");
 
-			sb.Append("<table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" style=\"margin-top:18px\"><tr><td style=\"background:#0a1a14;border-radius:10px;padding:18px 20px\">");
+			sb.Append("<table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" style=\"margin-top:18px\"><tr><td style=\"background:#0f2a1f;border-radius:10px;padding:18px 20px\">");
 			sb.Append("<div style=\"color:#cfc9a0;font-size:11px;letter-spacing:1.5px\">ESTIMATED ORDER TOTAL</div>");
-			sb.Append("<div style=\"color:#f47b20;font-size:28px;font-weight:bold;margin-top:6px\">" + e(QuoteMoney(q.totalCents)) + "</div>");
+			sb.Append("<div style=\"color:#8a6a35;font-size:28px;font-weight:bold;margin-top:6px\">" + e(QuoteMoney(q.totalCents)) + "</div>");
 			sb.Append("</td></tr></table>");
 
-			sb.Append("<p style=\"margin:20px 0 0;color:#8a7f72;font-size:12px;line-height:1.6\">This is an estimate based on current inventory and prices. Stock is checked again when you submit your order, so the final amount may change if stock or prices change.</p>");
+			sb.Append("<p style=\"margin:20px 0 0;color:#6c736d;font-size:12px;line-height:1.6\">This is an estimate based on current inventory and prices. Stock is checked again when you submit your order, so the final amount may change if stock or prices change.</p>");
 			sb.Append("</td></tr>");
-			sb.Append("<tr><td style=\"background:#f7f3ec;padding:14px 26px;color:#8a7f72;font-size:12px;text-align:center\">Avuna Collective &middot; 127 Victoria Embankment, Astron Garage, Durban</td></tr>");
+			sb.Append("<tr><td style=\"background:#f5efe6;padding:14px 26px;color:#6c736d;font-size:12px;text-align:center\">Avuna Collective &middot; 127 Victoria Embankment, Astron Garage, Durban</td></tr>");
 			sb.Append("</table></div>");
 			return sb.ToString();
 		}
 
 		private static string QuoteRow(string label, string valueHtml, bool bold)
 		{
-			return "<tr><td style=\"padding:9px 0;border-bottom:1px solid #efe7da;color:#8a7f72\">" + label + "</td>"
-				 + "<td style=\"padding:9px 0;border-bottom:1px solid #efe7da;text-align:right;" + (bold ? "font-weight:bold;" : "font-weight:bold;color:#2a2118;") + "\">" + valueHtml + "</td></tr>";
+			return "<tr><td style=\"padding:9px 0;border-bottom:1px solid #e5dccd;color:#6c736d\">" + label + "</td>"
+				 + "<td style=\"padding:9px 0;border-bottom:1px solid #e5dccd;text-align:right;" + (bold ? "font-weight:bold;" : "font-weight:bold;color:#1b2a22;") + "\">" + valueHtml + "</td></tr>";
 		}
 
 		private static string DisplayName(string itemId, string rawName)
@@ -940,3 +940,4 @@ namespace AVUNA_COLLECTIVE
 
 	}
 }
+

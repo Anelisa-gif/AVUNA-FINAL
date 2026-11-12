@@ -11,27 +11,18 @@
     <webopt:bundlereference runat="server" path="~/Content/css" />
     <link href="~/favicon.ico" rel="shortcut icon" type="image/x-icon" />
     <style>
-        .avuna-navbar { background-color: #0a1a14 !important; padding-top: 8px; padding-bottom: 8px; }
-        .avuna-navbar .container, .avuna-navbar .container-fluid { max-width: none; padding-left: 24px; padding-right: 24px; flex-wrap: nowrap; }
-        .avuna-navbar .avuna-brand { flex: none; margin-right: 28px; }
-        .avuna-navbar .avuna-brand .brand-name { font-size: 22px; letter-spacing: .3px; white-space: nowrap; }
-        .avuna-navbar .navbar-collapse { flex-grow: 1; }
-        .avuna-navbar .navbar-nav { flex-direction: row; flex-wrap: nowrap; align-items: center; gap: 6px; }
-        .avuna-navbar .nav-link { font-size: 16px; padding: 8px 14px !important; white-space: nowrap; }
-        .avuna-navbar .navbar-nav > .nav-item:last-child { margin-left: auto; }
-        @media (max-width: 991px) { .avuna-navbar .navbar-nav { flex-direction: column; align-items: flex-start; } .avuna-navbar .navbar-nav > .nav-item:last-child { margin-left: 0; } }
     </style>
     <style>
 /* =====================================================================
    REPORT PAGES — photo hero, larger type, warm palette
    ===================================================================== */
 body .rp-page {
-    --teal: #2a2118; --teal2: #3a2c1e; --ink: #3a3028; --muted: #8a7f72; --line: #ece4d6;
-    background: #f7f3ec; font-family: "Segoe UI", Arial, Helvetica, sans-serif;
+    --teal: #1b2a22; --teal2: #1b2a22; --ink: #3a3028; --muted: #6c736d; --line: #e5dccd;
+    background: #f5efe6; font-family: "Segoe UI", Arial, Helvetica, sans-serif;
 }
 body .rp-hero {
     box-sizing: border-box;
-    background-color: #3a2c1e;
+    background-color: #1b2a22;
     background-image:
         linear-gradient(90deg, rgba(34,24,16,0.90) 0%, rgba(34,24,16,0.72) 42%, rgba(34,24,16,0.30) 74%, rgba(34,24,16,0.08) 100%),
         url("images/Jersey.jpg");
@@ -62,9 +53,9 @@ body .rp-kpi-value { font-size: 30px; }
 body .rp-kpi-sub { font-size: 13px; }
 body .rp-card-h h3 { font-size: 21px; }
 body .rp-card-h p { font-size: 14px; }
-body .rp-table th { background: #f7f3ec; font-size: 11px; padding: 14px 16px; }
-body .rp-table td { border-top-color: #efe7da; font-size: 14px; padding: 14px 16px; }
-body .rp-table tbody tr:hover { background: #faf6ee; }
+body .rp-table th { background: #f5efe6; font-size: 11px; padding: 14px 16px; }
+body .rp-table td { border-top-color: #e5dccd; font-size: 14px; padding: 14px 16px; }
+body .rp-table tbody tr:hover { background: #f5efe6; }
 body .rp-badge { font-size: 11px; padding: 6px 11px; }
 body .rp-tl-date { font-size: 12px; }
 body .rp-tl-title { font-size: 15px; }
@@ -72,8 +63,129 @@ body .rp-tl-text { font-size: 14px; }
 body .rp-empty, body .rp-nodata { font-size: 15px; }
 body .rp-notice, body .rp-nochart { font-size: 14px; }
 @media (max-width: 700px) { body .rp-hero h1 { font-size: 46px; } body .rp-hero { padding: 45px 25px 100px; } }
-@media print { body .rp-hero { background-image: none !important; background: #3a2c1e !important; min-height: 0; padding: 20px 7%; } body .rp-hero h1 { font-size: 40px; } }
+@media print { body .rp-hero { background-image: none !important; background: #1b2a22 !important; min-height: 0; padding: 20px 7%; } body .rp-hero h1 { font-size: 40px; } }
     </style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+/* =====================================================================
+   AVUNA COLLECTIVE - shared theme
+   Deep forest green, warm cream, bronze gold, serif headings.
+   Loaded by Site.Master, Customer_master.Master and Manager_master.Master.
+   ===================================================================== */
+:root{
+  --av-green:#0f2a1f;      /* navigation, primary buttons */
+  --av-green-2:#173c2c;    /* hover */
+  --av-green-3:#2c5a45;    /* soft accents */
+  --av-cream:#f5efe6;      /* page background */
+  --av-card:#fbf8f2;       /* cards */
+  --av-line:#e5dccd;       /* hairlines */
+  --av-sand:#e8dec9;       /* table header */
+  --av-tan:#f2e2c9;        /* pills */
+  --av-gold:#b98a3e;
+  --av-bronze:#8a6a35;
+  --av-ink:#1b2a22;
+  --av-muted:#6c736d;
+  --av-red:#9a3b33;
+  --av-red-bg:#f4dcd7;
+  --av-ok:#2f5a3a;
+  --av-ok-bg:#dce6cf;
+  --av-serif:"Playfair Display","Libre Baskerville",Georgia,"Times New Roman",serif;
+  --av-sans:"Inter","Segoe UI",Roboto,Arial,sans-serif;
+  --av-shadow:0 1px 2px rgba(31,42,34,.05),0 8px 24px rgba(31,42,34,.06);
+}
+
+html,body{overflow-x:hidden}
+body{background:var(--av-cream);color:var(--av-ink);font-family:var(--av-sans);margin:0;-webkit-font-smoothing:antialiased}
+h1,h2,h3,h4,h5,.av-serif{font-family:var(--av-serif);color:var(--av-green);letter-spacing:0;text-transform:none}
+a{color:var(--av-bronze)}
+a:hover{color:var(--av-green)}
+.body-content{padding:0;max-width:none;margin:0}
+body > form > .body-content,.body-content{padding-left:0;padding-right:0}
+hr{display:none}
+
+/* ---------- Navigation ---------- */
+.av-nav{background:var(--av-green);padding:0;border-bottom:1px solid rgba(255,255,255,.06);position:relative;z-index:50}
+.av-nav-inner{display:flex;align-items:center;gap:8px;max-width:1500px;margin:0 auto;padding:0 28px;min-height:66px}
+.av-brand{display:flex;align-items:center;gap:12px;text-decoration:none!important;color:#fff!important;margin-right:26px;flex:none}
+.av-brand img{width:52px;height:52px;border-radius:50%;background:#fff;border:2px solid var(--av-gold);object-fit:contain;display:block}
+.av-brand span{font-family:var(--av-serif);font-size:25px;font-weight:600;color:#fff;white-space:nowrap;letter-spacing:.2px}
+.av-brand small{display:block;font-family:var(--av-sans);font-size:10px;letter-spacing:2.2px;color:#cdb98f;font-weight:600;margin-top:1px}
+.av-nav .navbar-collapse{flex-grow:1;align-items:center}
+.av-links{display:flex;align-items:stretch;list-style:none;margin:0;padding:0;gap:2px;flex-wrap:wrap}
+.av-links li{display:flex}
+.av-link{display:flex;align-items:center;gap:9px;padding:0 17px;min-height:66px;color:#e9e4d8!important;text-decoration:none!important;font-size:15px;font-weight:500;border-bottom:3px solid transparent;transition:background .15s,color .15s;white-space:nowrap}
+.av-link svg{display:none!important;width:19px;height:19px;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;flex:none;opacity:.9}
+.av-link:hover{background:rgba(255,255,255,.06);color:#fff!important}
+.av-link.active{color:#fff!important;border-bottom-color:var(--av-gold);background:rgba(255,255,255,.05)}
+.av-right{margin-left:auto;display:flex;align-items:center;gap:6px}
+.av-right .av-link{border-bottom-color:transparent}
+.av-btn-line{display:inline-flex;align-items:center;gap:8px;border:1px solid rgba(255,255,255,.35);color:#fff!important;border-radius:8px;padding:9px 18px;text-decoration:none!important;font-size:14px;font-weight:600;transition:all .15s}
+.av-btn-line:hover{background:#fff;color:var(--av-green)!important}
+.av-btn-gold{display:inline-flex;align-items:center;gap:8px;background:var(--av-gold);color:#fff!important;border-radius:8px;padding:9px 20px;text-decoration:none!important;font-size:14px;font-weight:700;border:1px solid var(--av-gold);transition:all .15s}
+.av-btn-gold:hover{background:#a67a30;border-color:#a67a30}
+.av-toggler{display:none;margin-left:auto;background:transparent;border:1px solid rgba(255,255,255,.35);border-radius:8px;padding:8px 10px;color:#fff;cursor:pointer}
+.av-toggler svg{width:22px;height:22px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;display:block}
+@media(max-width:1100px){
+  .av-toggler{display:block}
+  .av-nav-inner{flex-wrap:wrap;padding:8px 18px}
+  .av-nav .navbar-collapse{width:100%;flex-basis:100%}
+  .av-links{flex-direction:column;width:100%;padding:6px 0}
+  .av-link{min-height:46px;border-bottom:0;border-left:3px solid transparent}
+  .av-link.active{border-left-color:var(--av-gold)}
+  .av-right{margin:6px 0 10px;flex-wrap:wrap}
+}
+
+/* ---------- Footer ---------- */
+.av-footer{background:var(--av-green);color:#d9d2c0;margin-top:56px;padding:38px 28px 26px}
+.av-footer-inner{max-width:1500px;margin:0 auto;display:flex;gap:40px;flex-wrap:wrap;align-items:flex-start;justify-content:space-between}
+.av-footer .av-brand{margin:0}
+.av-footer h4{font-family:var(--av-sans);font-size:11px;letter-spacing:2px;color:var(--av-gold);margin:0 0 10px;font-weight:700;text-transform:uppercase}
+.av-footer p{margin:0;font-size:14px;line-height:1.7;color:#d9d2c0}
+.av-footer a{color:#fff}
+.av-footer-copy{max-width:1500px;margin:26px auto 0;padding-top:16px;border-top:1px solid rgba(255,255,255,.12);font-size:12.5px;color:#a9b3a9}
+
+/* ---------- Page hero (photo banner, as in the mockups) ---------- */
+.av-hero,.customer-hero,.avuna-manager-hero,.avuna-order .hero,.avuna-hero,.pay-hero{
+  position:relative;overflow:hidden;color:var(--av-ink)!important;
+  background-color:#e9dfd0!important;
+  background-image:linear-gradient(90deg,rgba(245,239,230,.98) 0%,rgba(245,239,230,.93) 36%,rgba(245,239,230,.55) 62%,rgba(245,239,230,0) 88%),var(--hero-img,url("images/avuna_collective_background.jpg"))!important;
+  background-size:auto,var(--hero-size,2000px auto)!important;background-position:center,var(--hero-pos,right 33%)!important;background-repeat:no-repeat!important;
+  border-radius:0;min-height:330px;padding:54px max(6%,40px)!important;display:flex;align-items:center;justify-content:flex-start!important;gap:20px;
+}
+.customer-hero:before,.customer-hero:after,.avuna-manager-hero:before,.avuna-manager-hero:after,.avuna-order .hero:before,.avuna-order .hero:after,.pay-hero:before,.pay-hero:after{display:none!important}
+.customer-hero-badge,.av-logo-tile,.hero-mark,.hero-mark-logo,.avuna-order .hero-mark-logo{display:none!important}
+.customer-hero h1,.avuna-manager-hero h1,.avuna-order .hero h1,.pay-hero h1,.av-hero h1{font-family:var(--av-serif)!important;color:var(--av-green)!important;font-weight:800!important;letter-spacing:-.5px!important;font-size:clamp(34px,4.4vw,56px)!important;line-height:1.08!important;text-transform:none!important;margin:10px 0 14px!important}
+.customer-hero p,.avuna-manager-hero p,.avuna-order .hero p,.pay-hero p,.av-hero p{color:#4c564f!important;font-size:17px!important;line-height:1.7!important;max-width:560px}
+.customer-eyebrow,.eyebrow,.avuna-order .eyebrow,.avuna-manager-eyebrow,.hero-eyebrow{color:var(--av-bronze)!important;font-family:var(--av-sans);letter-spacing:3px!important;font-weight:700!important;font-size:11.5px!important;text-transform:uppercase}
+
+
+/* hero secondary buttons + image framing */
+.customer-hero .customer-btn-light,.avuna-manager-hero .avuna-button-outline,.avuna-order .hero a.back,.avuna-order .hero .hero-back,.avuna-order .hero a[href*="ustomerDashboard"],.avuna-payment .hero a[href*="ustomerDashboard"]{background:rgba(255,255,255,.55)!important;color:#0f2a1f!important;border:1px solid #0f2a1f!important}
+.avuna-payment .hero{flex-direction:column;align-items:flex-start!important;justify-content:center}
+.avuna-payment .hero .tag{color:#8a6a35!important;background:none!important;padding:0!important}
+/* ---------- Buttons ---------- */
+.av-btn,.customer-btn,.customer-btn-orange,.avuna-order .submit,.avuna-order .back{border-radius:8px}
+.btn-primary,.av-btn-primary{background:var(--av-green);border-color:var(--av-green);color:#fff}
+.btn-primary:hover,.av-btn-primary:hover{background:var(--av-green-2);border-color:var(--av-green-2)}
+
+/* ---------- Chatbot ---------- */
+#chatToggle{border-color:var(--av-gold)!important}
+.chat-header{background:var(--av-green)!important;font-family:var(--av-serif)}
+.chat-header strong{font-family:var(--av-serif);font-size:17px;font-weight:600}
+.user-message{background:var(--av-green)!important}
+.bot-message{background:#e9e2d2!important}
+.chat-input-area button{background:var(--av-green)!important}
+
+@media(min-width:1101px){.av-nav .navbar-collapse{display:flex!important;flex-basis:auto}}
+
+/* ---------- Footer: social links ---------- */
+.av-social{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:9px}
+.av-social a{display:inline-flex;align-items:center;gap:11px;color:#e9e4d8!important;text-decoration:none!important;font-size:14px;transition:color .15s}
+.av-social a:hover{color:#fff!important}
+.av-social svg{width:34px;height:34px;padding:8px;border:1px solid rgba(255,255,255,.28);border-radius:50%;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;flex:none;transition:all .15s}
+.av-social a:hover svg{background:var(--av-gold);border-color:var(--av-gold);color:#fff}
+
+</style>
     <asp:ContentPlaceHolder ID="head" runat="server">
     </asp:ContentPlaceHolder>
 </head>
@@ -95,25 +207,19 @@ body .rp-notice, body .rp-nochart { font-size: 14px; }
             </Scripts>
         </asp:ScriptManager>
 
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark bg-dark avuna-navbar">
-            <div class="container">
-                <a class="navbar-brand avuna-brand" runat="server" href="~/ManagerDashboard">
-                    <img src="~/avuna-logo.png" class="avuna-logo" alt="Avuna Collective" runat="server" style="height:44px;width:44px;object-fit:cover;border-radius:50%;background:#fff;border:2px solid #d9a52c" />
-                    <span class="brand-name">Avuna Collective  Manager</span>
-                </a>
-                <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" title="Toggle navigation" aria-controls="navbarSupportedContent"
-                    aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item"><a class="nav-link" runat="server" href="~/ManagerDashboard">Dashboard</a></li>
-                        <li class="nav-item"><a class="nav-link" runat="server" href="~/ManageStaff">Manage Staff</a></li>
-                        <li class="nav-item"><a class="nav-link" runat="server" href="~/ManageCustomers">Manage Customers</a></li>
-                        <li class="nav-item"><a class="nav-link" runat="server" href="~/Inventory">Inventory Management</a></li>
-                        <li class="nav-item"><a class="nav-link" runat="server" href="~/ManageOrders">Orders</a></li>
-                        <li class="nav-item"><a class="nav-link" runat="server" href="~/ManagerLogOut">Log Out</a></li>
+        <nav class="av-nav">
+            <div class="av-nav-inner">
+                <a class="av-brand" runat="server" href="~/ManagerDashboard"><img runat="server" src="~/avuna-logo.png" alt="Avuna Collective" /><div><span>Avuna Collective</span><small>MANAGER PORTAL</small></div></a>
+                <button type="button" class="av-toggler" data-bs-toggle="collapse" data-bs-target="#avNav" aria-controls="avNav" aria-expanded="false" aria-label="Toggle navigation"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+                <div class="collapse navbar-collapse" id="avNav">
+                    <ul class="av-links">
+                        <li><a class="av-link" runat="server" href="~/ManagerDashboard"><svg viewBox="0 0 24 24"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v9.5h13V10"/><path d="M10 19.5v-5h4v5"/></svg>Dashboard</a></li>
+                        <li><a class="av-link" runat="server" href="~/ManageStaff"><svg viewBox="0 0 24 24"><rect x="3.5" y="7" width="17" height="12.5" rx="2"/><path d="M9 7V5.2A1.2 1.2 0 0 1 10.2 4h3.6A1.2 1.2 0 0 1 15 5.2V7"/><path d="M3.5 12.5h17"/></svg>Manage Staff</a></li>
+                        <li><a class="av-link" runat="server" href="~/ManageCustomers"><svg viewBox="0 0 24 24"><circle cx="9" cy="8.5" r="3.3"/><path d="M2.8 19.5c.5-3.3 3-5 6.2-5s5.7 1.7 6.2 5"/><path d="M16 5.6a3.2 3.2 0 0 1 0 5.8M18 14.8c1.9.6 3 2.2 3.3 4.7"/></svg>Manage Customers</a></li>
+                        <li><a class="av-link" runat="server" href="~/Inventory"><svg viewBox="0 0 24 24"><path d="M4 20V9l8-5 8 5v11"/><path d="M8 20v-6h8v6"/></svg>Inventory Management</a></li>
+                        <li><a class="av-link" runat="server" href="~/ManageOrders"><svg viewBox="0 0 24 24"><path d="M6 3.5h9l3.5 3.5V20.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg>Orders</a></li>
                     </ul>
+                    <div class="av-right"><a class="av-btn-line" runat="server" href="~/ManagerLogOut"><svg width="18" height="18" style="stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round" viewBox="0 0 24 24"><path d="M9.5 4.5H5.5v15h4"/><path d="M14 8.5 18 12l-4 3.5M18 12H9.5"/></svg> Log Out</a></div>
                 </div>
             </div>
         </nav>
@@ -121,11 +227,34 @@ body .rp-notice, body .rp-nochart { font-size: 14px; }
         <div class="body-content">
             <asp:ContentPlaceHolder ID="MainContent" runat="server">
             </asp:ContentPlaceHolder>
-            <hr />
-            <footer>
-                <p>&copy; <%: DateTime.Now.Year %> - Avuna Collective</p>
+            <footer class="av-footer">
+                <div class="av-footer-inner">
+                    <div><a class="av-brand" runat="server" href="~/"><img runat="server" src="~/avuna-logo.png" alt="Avuna Collective" /><div><span>Avuna Collective</span></div></a></div>
+                    <div><h4>Visit us</h4><p>127 Victoria Embankment<br />Astron Garage<br />Durban</p></div>
+                    <div><h4>Explore</h4><p>Dashboard &middot; Staff &middot; Customers &middot; Inventory &middot; Orders</p></div>
+                    <div><h4>Follow us</h4>
+                        <ul class="av-social">
+                            <li><a href="https://www.instagram.com/avunacollective" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><svg viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r=".9" fill="currentColor" stroke="none"/></svg><span>@avunacollective</span></a></li>
+                            <li><a href="https://www.facebook.com/avunacollective" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><svg viewBox="0 0 24 24"><path d="M14 8.5h2.5V5h-3c-2.4 0-3.8 1.5-3.8 3.9V11H7.5v3.4h2.2V21h3.5v-6.6h2.5l.5-3.4h-3v-1.6c0-.6.3-.9.8-.9z"/></svg><span>Avuna Collective</span></a></li>
+                            <li><a href="https://www.tiktok.com/@avunacollective" target="_blank" rel="noopener noreferrer" aria-label="TikTok"><svg viewBox="0 0 24 24"><path d="M14.5 3.5v10.2a3.6 3.6 0 1 1-3.6-3.6"/><path d="M14.5 3.5c.4 2.3 1.9 3.8 4.2 4"/></svg><span>@avunacollective</span></a></li>
+                            <li><a href="https://wa.me/27714860091" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp"><svg viewBox="0 0 24 24"><path d="M21 11.5a8.4 8.4 0 0 1-12.4 7.4L3 20.5l1.7-5.4A8.5 8.5 0 1 1 21 11.5z"/><path d="M9 8.5c.3 2.6 2.6 5.1 5.5 6l1.4-1.5-2-1-.8.8c-.9-.4-1.7-1.2-2.1-2.1l.8-.8-1-2z"/></svg><span>+27 71 486 0091</span></a></li>
+                        </ul></div>
+                </div>
+                <div class="av-footer-copy">&copy; <%: DateTime.Now.Year %> Avuna Collective. Custom apparel, made properly.</div>
             </footer>
         </div>
+    <script>
+        // Highlights the current page in the navigation bar
+        (function () {
+            var here = (location.pathname.split("/").pop() || "default").toLowerCase().replace(/\.aspx$/, "");
+            var links = document.querySelectorAll(".av-links .av-link");
+            for (var i = 0; i < links.length; i++) {
+                var h = (links[i].getAttribute("href") || "").split("?")[0].split("/").pop().toLowerCase().replace(/\.aspx$/, "");
+                if (h === "" && here === "default") h = "default";
+                if (h === here) links[i].className += " active";
+            }
+        })();
+    </script>
     </form>
     <asp:PlaceHolder runat="server">
         <%: Scripts.Render("~/Scripts/bootstrap.js") %>
@@ -134,3 +263,4 @@ body .rp-notice, body .rp-nochart { font-size: 14px; }
 </html>
 
  
+

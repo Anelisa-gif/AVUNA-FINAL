@@ -340,15 +340,37 @@
         <div class="body-content">
             <asp:ContentPlaceHolder ID="MainContent" runat="server">
             </asp:ContentPlaceHolder>
-            <hr/>
-            <footer style="text-align: center; width: 100%;">
-                <dl style="display: inline-block; text-align: center; margin: 20px auto 0;">
-                    <dt style="margin: 0; padding: 2px 0;">Address</dt>
-                    <dd style="margin: 0; padding: 2px 0;">127 Victoria Embankment</dd>
-                    <dd style="margin: 0; padding: 2px 0;">Astron Garage</dd>
-                    <dd style="margin: 0; padding: 2px 0;">Durban</dd>
-                </dl>
-                <p style="margin-top: 10px;">&copy; <%: DateTime.Now.Year %> - Avuna Collective</p>
+<style>
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap");
+.pf-footer{background:#0f2a1f;color:#d9d2c0;margin:56px 0 0;padding:38px 28px 26px;font-family:"Inter","Segoe UI",Roboto,Arial,sans-serif;text-align:left}
+.pf-inner{max-width:1500px;margin:0 auto;display:flex;gap:40px;flex-wrap:wrap;align-items:flex-start;justify-content:space-between}
+.pf-brand{display:flex;align-items:center;gap:12px;text-decoration:none!important;color:#fff!important}
+.pf-brand img{width:52px;height:52px;border-radius:50%;background:#fff;border:2px solid #b98a3e;object-fit:contain;display:block}
+.pf-brand span{font-family:"Playfair Display","Libre Baskerville",Georgia,serif;font-size:25px;font-weight:600;color:#fff;white-space:nowrap}
+.pf-footer h4{font-size:11px;letter-spacing:2px;color:#b98a3e;margin:0 0 10px;font-weight:700;text-transform:uppercase}
+.pf-footer p{margin:0;font-size:14px;line-height:1.7;color:#d9d2c0}
+.pf-footer p a{color:#fff;text-decoration:none}.pf-footer p a:hover{text-decoration:underline}
+.pf-copy{max-width:1500px;margin:26px auto 0;padding-top:16px;border-top:1px solid rgba(255,255,255,.12);font-size:12.5px;color:#a9b3a9}
+.pf-social{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:9px}
+.pf-social a{display:inline-flex;align-items:center;gap:11px;color:#e9e4d8!important;text-decoration:none!important;font-size:14px}
+.pf-social a:hover{color:#fff!important}
+.pf-social svg{width:34px;height:34px;padding:8px;border:1px solid rgba(255,255,255,.28);border-radius:50%;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.pf-social a:hover svg{background:#b98a3e;border-color:#b98a3e;color:#fff}
+</style>
+            <footer class="pf-footer">
+                <div class="pf-inner">
+                    <div><a class="pf-brand" runat="server" href="~/"><img runat="server" src="~/avuna-logo.png" alt="Avuna Collective" /><span>Avuna Collective</span></a></div>
+                    <div><h4>Visit us</h4><p>127 Victoria Embankment<br />Astron Garage<br />Durban</p></div>
+                    <div><h4>Explore</h4><p><a runat="server" href="~/About">About</a> &middot; <a runat="server" href="~/HowToOrder">How To Order</a> &middot; <a runat="server" href="~/OurWork">Our Work</a> &middot; <a runat="server" href="~/ClientReviews">Reviews</a> &middot; <a runat="server" href="~/Contact">Contact</a></p></div>
+                    <div><h4>Follow us</h4>
+                        <ul class="pf-social">
+                            <li><a href="https://www.instagram.com/avunacollective" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><svg viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r=".9" fill="currentColor" stroke="none"/></svg><span>@avunacollective</span></a></li>
+                            <li><a href="https://www.facebook.com/avunacollective" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><svg viewBox="0 0 24 24"><path d="M14 8.5h2.5V5h-3c-2.4 0-3.8 1.5-3.8 3.9V11H7.5v3.4h2.2V21h3.5v-6.6h2.5l.5-3.4h-3v-1.6c0-.6.3-.9.8-.9z"/></svg><span>Avuna Collective</span></a></li>
+                            <li><a href="https://www.tiktok.com/@avunacollective" target="_blank" rel="noopener noreferrer" aria-label="TikTok"><svg viewBox="0 0 24 24"><path d="M14.5 3.5v10.2a3.6 3.6 0 1 1-3.6-3.6"/><path d="M14.5 3.5c.4 2.3 1.9 3.8 4.2 4"/></svg><span>@avunacollective</span></a></li>
+                            <li><a href="https://wa.me/27714860091" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp"><svg viewBox="0 0 24 24"><path d="M21 11.5a8.4 8.4 0 0 1-12.4 7.4L3 20.5l1.7-5.4A8.5 8.5 0 1 1 21 11.5z"/><path d="M9 8.5c.3 2.6 2.6 5.1 5.5 6l1.4-1.5-2-1-.8.8c-.9-.4-1.7-1.2-2.1-2.1l.8-.8-1-2z"/></svg><span>+27 71 486 0091</span></a></li>
+                        </ul></div>
+                </div>
+                <div class="pf-copy">&copy; <%: DateTime.Now.Year %> Avuna Collective. Custom apparel, made properly.</div>
             </footer>
         </div>
 
@@ -740,3 +762,4 @@
 </script>
 </body>
 </html>
+

@@ -9,14 +9,14 @@ AVUNA ORDERS PAGE — shared page shell (same as Dashboard)
 background: #f4f7f5;
 min-height: 100vh;
 padding-bottom: 60px;
-font-family: Arial, Helvetica, sans-serif;
+font-family: var(--av-sans);
 color: #243333;
 }
 /* HERO */
 .avuna-manager-hero {
 position: relative;
 overflow: hidden;
-background: linear-gradient(120deg, #0d2b2c, #174243);
+background: linear-gradient(120deg, #0d2b2c, #173c2c);
 color: white;
 padding: 55px 7%;
 min-height: 380px;
@@ -49,7 +49,7 @@ bottom: -150px;
 
 .avuna-eyebrow {
 display: block;
-color: #d9a52c;
+color: #c49a45;
 font-size: 11px;
 font-weight: bold;
 letter-spacing: 2px;
@@ -73,14 +73,14 @@ font-weight: bold;
 text-decoration: none;
 transition: .25s ease;
 }
-.avuna-button-orange { background: #d9711f; color: white; }
-.avuna-button-orange:hover { background: #b85c18; color: white; transform: translateY(-3px); }
+.avuna-button-orange { background: #0f2a1f; color: white; }
+.avuna-button-orange:hover { background: #0f2a1f; color: white; transform: translateY(-3px); }
 .avuna-button-outline {
 border: 1px solid rgba(255,255,255,.35);
 color: white;
 background: rgba(255,255,255,.05);
 }
-.avuna-button-outline:hover { background: white; color: #113334; }
+.avuna-button-outline:hover { background: #fbf8f2; color: #173c2c; }
 /* MANAGER BADGE */
 .avuna-manager-badge {
 position: relative;
@@ -98,8 +98,8 @@ justify-content: center;
 width: 145px;
 height: 145px;
 border-radius: 50%;
-background: #d9a52c;
-color: #113334;
+background: #c49a45;
+color: #173c2c;
 display: flex;
 flex-direction: column;
 justify-content: center;
@@ -113,7 +113,7 @@ box-shadow: 0 15px 35px rgba(0,0,0,.20);
 .avuna-manager-body { width: 92%; max-width: 1450px; margin: -40px auto 0; position: relative; z-index: 5; }
 /* WELCOME */
 .avuna-welcome {
-background: white;
+background: #fbf8f2;
 border: 1px solid #e1e7e3;
 border-radius: 18px;
 padding: 20px 25px;
@@ -123,7 +123,7 @@ align-items: center;
 box-shadow: 0 12px 35px rgba(17,51,52,.10);
 margin-bottom: 25px;
 }
-.avuna-welcome strong { color: #113334; font-size: 16px; }
+.avuna-welcome strong { color: #173c2c; font-size: 16px; }
 .avuna-welcome span { color: #78827f; font-size: 13px; }
 .avuna-business-status {
 background: #e8f4ec;
@@ -136,7 +136,7 @@ font-weight: bold;
 /* STATISTICS (reused for order-focused stats) */
 .avuna-stat-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 20px; margin-bottom: 25px; }
 .avuna-stat-card {
-background: white;
+background: #fbf8f2;
 border: 1px solid #e1e7e3;
 border-radius: 20px;
 padding: 25px;
@@ -152,49 +152,49 @@ width: 48px; height: 48px; border-radius: 14px;
 display: flex; align-items: center; justify-content: center;
 font-weight: bold; font-size: 18px;
 }
-.avuna-green-icon { background: #e8f1ef; color: #113334; }
-.avuna-orange-icon { background: #fff0e5; color: #d9711f; }
-.avuna-gold-icon { background: #fff5d8; color: #9c7814; }
+.avuna-green-icon { background: #e8f1ef; color: #173c2c; }
+.avuna-orange-icon { background: #f2e2c9; color: #8a6a35; }
+.avuna-gold-icon { background: #f2e2c9; color: #6e5133; }
 
 .avuna-red-icon { background: #fdeaea; color: #c84b4b; }
 .avuna-stat-label { font-size: 10px; font-weight: bold; letter-spacing: 1px; color: #78827f; }
-.avuna-stat-card h2 { color: #113334; font-size: 31px; margin: 0 0 5px; }
+.avuna-stat-card h2 { color: #173c2c; font-size: 31px; margin: 0 0 5px; }
 .avuna-stat-description { color: #78827f; font-size: 11px; }
 /* ALERT */
 .avuna-alert {
-display: flex; align-items: center; gap: 18px; background: #fff8ed;
-border: 1px solid #f1d7b5; border-radius: 20px; padding: 20px 25px; margin-bottom: 25px;
+display: flex; align-items: center; gap: 18px; background: #f2e2c9;
+border: 1px solid #e3d0ae; border-radius: 20px; padding: 20px 25px; margin-bottom: 25px;
 }
 .avuna-alert-icon {
-width: 52px; height: 52px; min-width: 52px; border-radius: 15px; background: #d9711f;
+width: 52px; height: 52px; min-width: 52px; border-radius: 15px; background: #0f2a1f;
 color: white; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 20px;
 }
 .avuna-alert-content { flex: 1; }
-.avuna-alert-content strong { display: block; font-size: 16px; margin-bottom: 5px; color: #113334; }
+.avuna-alert-content strong { display: block; font-size: 16px; margin-bottom: 5px; color: #173c2c; }
 .avuna-alert-content span { color: #78827f; font-size: 12px; }
 /* CARD + ORDERS TABLE */
-.avuna-card { background: white; border: 1px solid #e1e7e3; border-radius: 22px; box-shadow: 0 12px 35px rgba(17,51,52,.10); overflow: hidden; margin-bottom: 25px; }
+.avuna-card { background: #fbf8f2; border: 1px solid #e1e7e3; border-radius: 22px; box-shadow: 0 12px 35px rgba(17,51,52,.10); overflow: hidden; margin-bottom: 25px; }
 .avuna-orders-header { padding: 25px 28px; display: flex; justify-content: space-between; align-items: center; }
-.avuna-orders-header h2 { color: #113334; margin: 5px 0; }
+.avuna-orders-header h2 { color: #173c2c; margin: 5px 0; }
 .avuna-orders-header p { color: #78827f; font-size: 12px; }
-.avuna-eyebrow-inline { color: #d9a52c; font-size: 11px; font-weight: bold; letter-spacing: 2px; }
-.avuna-view-all { color: #d9711f; font-size: 12px; font-weight: bold; text-decoration: none; }
+.avuna-eyebrow-inline { color: #c49a45; font-size: 11px; font-weight: bold; letter-spacing: 2px; }
+.avuna-view-all { color: #8a6a35; font-size: 12px; font-weight: bold; text-decoration: none; }
 .avuna-table-wrap { overflow-x: auto; }
 .avuna-table { width: 100%; border-collapse: collapse; }
 .avuna-table th { background: #f7f9f7; color: #737d79; padding: 14px 20px; text-align: left; font-size: 9px; letter-spacing: 1px; }
 .avuna-table td { padding: 17px 20px; border-top: 1px solid #edf0ed; font-size: 12px; }
 .avuna-table tbody tr:hover { background: #fafcfb; }
-.avuna-order-number { color: #113334; font-weight: bold; }
+.avuna-order-number { color: #173c2c; font-weight: bold; }
 .avuna-status { display: inline-block; padding: 6px 10px; border-radius: 50px; font-size: 9px; font-weight: bold; }
 .avuna-completed { background: #e7f4eb; color: #277446; }
-.avuna-production { background: #fff0e5; color: #bb5c17; }
-.avuna-pending { background: #fff5d8; color: #927017; }
+.avuna-production { background: #f2e2c9; color: #6e5133; }
+.avuna-pending { background: #f2e2c9; color: #6e5133; }
 .avuna-db-notice { background: #fdeaea; border: 1px solid #f0c4c4; color: #8a2f2f; border-radius: 14px; padding: 12px 18px; font-size: 12px; margin-bottom: 20px; line-height: 1.6; }
 /* SHORTCUT CARD */
 .avuna-action-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 20px; margin-top: 25px; }
 .avuna-action-card {
 position: relative; overflow: hidden; min-height: 180px; border-radius: 20px; padding: 28px;
-background: #113334; color: white; transition: .25s ease; text-decoration: none;
+background: #173c2c; color: white; transition: .25s ease; text-decoration: none;
 }
 .avuna-action-card:hover { transform: translateY(-6px); box-shadow: 0 20px 35px rgba(17,51,52,.18); }
 .avuna-action-card small { font-weight: bold; letter-spacing: 2px; opacity: .7; }
@@ -217,10 +217,10 @@ background: #113334; color: white; transition: .25s ease; text-decoration: none;
 .avuna-orders-header { flex-direction: column; align-items: flex-start; gap: 12px; }
 }
 
-.av-logo-tile{position:relative;z-index:2;width:190px;height:190px;min-width:190px;flex:none;background:#fff;border:2px solid #d9a52c;border-radius:50%;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.av-logo-tile{position:relative;z-index:2;width:190px;height:190px;min-width:190px;flex:none;background:#fbf8f2;border:2px solid #c49a45;border-radius:50%;display:flex;align-items:center;justify-content:center;overflow:hidden}
 .av-logo-tile img{width:100%;height:100%;object-fit:contain;display:block}
 .avuna-manager-hero:before,.avuna-manager-hero:after,.customer-hero:before,.customer-hero:after,.rp-hero:before,.rp-hero:after,.rp-kpi:after,.customer-stat:after,.action-card:after,.avuna-modal-head:after,.edit-modal-head:before,.avuna-order .hero:before{display:none !important}
-.avuna-modal-avatar,.edit-avatar,.customer-avatar{border-radius:50% !important;background:#fff url("avuna-logo.png") center/contain no-repeat !important;color:transparent !important;font-size:0 !important;border:1px solid #d9a52c}
+.avuna-modal-avatar,.edit-avatar,.customer-avatar{border-radius:50% !important;background:#fff url("avuna-logo.png") center/contain no-repeat !important;color:transparent !important;font-size:0 !important;border:1px solid #c49a45}
 .avuna-modal-close,.edit-close,.design-viewer-close,.av-nav-btn{border-radius:50% !important}
 @media (max-width:700px){.av-logo-tile{width:130px;height:130px;min-width:130px}}
 </style>
@@ -228,10 +228,10 @@ background: #113334; color: white; transition: .25s ease; text-decoration: none;
 /* =========================================================
 MANAGER PAGES — photo hero, larger type, warm palette
 ========================================================= */
-.avuna-manager-page { background: #f7f3ec; color: #3a3028; font-family: "Segoe UI", Arial, Helvetica, sans-serif; }
+.avuna-manager-page { background: #f5efe6; color: #3a3028; font-family: "Segoe UI", Arial, Helvetica, sans-serif; }
 .avuna-manager-hero {
 box-sizing: border-box;
-background-color: #3a2c1e;
+background-color: #1b2a22;
 background-image:
 linear-gradient(90deg, rgba(34,24,16,0.93) 0%, rgba(34,24,16,0.82) 40%, rgba(34,24,16,0.4) 72%, rgba(34,24,16,0.1) 100%),
 url("<%= ResolveUrl("~/images/golf tshirt.jpg") %>");
@@ -248,28 +248,28 @@ min-height: 470px;
 .avuna-manager-copy p { max-width: 640px; color: rgba(255,255,255,.92); text-shadow: 0 1px 8px rgba(0,0,0,.45); font-size: 22px; line-height: 1.55; margin-bottom: 34px; }
 .avuna-button { padding: 17px 30px; font-size: 17px; }
 .avuna-button-outline { background: rgba(255,255,255,.12); }
-.avuna-button-outline:hover { color: #2a2118; }
+.avuna-button-outline:hover { color: #1b2a22; }
 .avuna-manager-badge { width: 230px; height: 230px; background: rgba(34,24,16,.35); }
-.avuna-manager-badge-inner { width: 165px; height: 165px; color: #2a2118; }
+.avuna-manager-badge-inner { width: 165px; height: 165px; color: #1b2a22; }
 .avuna-manager-badge-inner strong { font-size: 30px; }
 .avuna-manager-badge-inner span { font-size: 12px; }
-.avuna-welcome { border-color: #ece4d6; box-shadow: 0 12px 35px rgba(42,33,24,.10); }
-.avuna-welcome strong { color: #2a2118; font-size: 22px; }
-.avuna-welcome span { color: #8a7f72; font-size: 16px; }
-.avuna-stat-card, .avuna-card { border-color: #ece4d6; box-shadow: 0 12px 35px rgba(42,33,24,.10); }
+.avuna-welcome { border-color: #e5dccd; box-shadow: 0 12px 35px rgba(42,33,24,.10); }
+.avuna-welcome strong { color: #1b2a22; font-size: 22px; }
+.avuna-welcome span { color: #6c736d; font-size: 16px; }
+.avuna-stat-card, .avuna-card { border-color: #e5dccd; box-shadow: 0 12px 35px rgba(42,33,24,.10); }
 .avuna-stat-icon svg { display: block; }
-.avuna-green-icon { background: #f3ece0; color: #2a2118; }
-.avuna-stat-label { font-size: 13px; color: #8a7f72; }
-.avuna-stat-card h2 { color: #2a2118; font-size: 42px; font-weight: 700; }
-.avuna-stat-description { color: #8a7f72; font-size: 14px; }
-.avuna-card-header { border-bottom-color: #efe7da; }
-.avuna-card-header h2, .avuna-orders-header h2 { color: #2a2118; font-size: 28px; }
-.avuna-card-header p, .avuna-orders-header p { color: #8a7f72; font-size: 15px; }
+.avuna-green-icon { background: #f3ece0; color: #1b2a22; }
+.avuna-stat-label { font-size: 13px; color: #6c736d; }
+.avuna-stat-card h2 { color: #1b2a22; font-size: 42px; font-weight: 700; }
+.avuna-stat-description { color: #6c736d; font-size: 14px; }
+.avuna-card-header { border-bottom-color: #e5dccd; }
+.avuna-card-header h2, .avuna-orders-header h2 { color: #1b2a22; font-size: 28px; }
+.avuna-card-header p, .avuna-orders-header p { color: #6c736d; font-size: 15px; }
 .avuna-view-all { font-size: 15px; }
-.avuna-table th { background: #f7f3ec; color: #8a7f72; font-size: 12px; padding: 16px 20px; }
-.avuna-table td { border-top-color: #efe7da; font-size: 15px; }
-.avuna-table tbody tr:hover { background: #faf6ee; }
-.avuna-order-number { color: #2a2118; }
+.avuna-table th { background: #f5efe6; color: #6c736d; font-size: 12px; padding: 16px 20px; }
+.avuna-table td { border-top-color: #e5dccd; font-size: 15px; }
+.avuna-table tbody tr:hover { background: #f5efe6; }
+.avuna-order-number { color: #1b2a22; }
 .avuna-status { font-size: 12px; padding: 7px 12px; }
 @media(max-width:700px) { .avuna-manager-copy h1 { font-size: 46px; } .avuna-manager-hero { padding: 45px 25px; } }
 .avuna-orders-header { }
@@ -277,7 +277,7 @@ min-height: 470px;
 </style>
 <div class="avuna-manager-page">
 <!-- ===================================================== HERO ===================================================== -->
-<section class="avuna-manager-hero">
+<section class="avuna-manager-hero" style="--hero-img:url('images/GG-0653_PinksInks_29_lg.jpg');--hero-size:cover;--hero-pos:center">
 <div class="avuna-manager-copy">
 <span class="avuna-eyebrow">MANAGER PORTAL</span>
 <h1 style="color: white;">Orders</h1>
@@ -365,3 +365,4 @@ min-height: 470px;
 </main>
 </div>
 </asp:Content>
+

@@ -6,7 +6,7 @@
 .logout-page {
 width: 100%;
 min-height: 100vh;
-background: linear-gradient(135deg, #f7f3ec 0%, #f3ece0 60%, #ece4d6 100%);
+background: linear-gradient(135deg, #f5efe6 0%, #f3ece0 60%, #e5dccd 100%);
 display: flex;
 align-items: center;
 justify-content: center;
@@ -14,17 +14,17 @@ padding: 40px 20px;
 box-sizing: border-box;
 }
 .logout-card {
-background: white;
+background: #fbf8f2;
 border-radius: 20px;
 padding: 50px 40px;
 max-width: 420px;
 width: 100%;
 text-align: center;
-box-shadow: 0 20px 50px rgba(42,33,24,.14); border: 1px solid #ece4d6;
+box-shadow: 0 20px 50px rgba(42,33,24,.14); border: 1px solid #e5dccd;
 }
 .logout-badge {
 width: 70px; height: 70px; border-radius: 50%;
-background: #fff0e4; color: #f47b20;
+background: #f2e2c9; color: #8a6a35;
 display: flex; align-items: center; justify-content: center;
 font-size: 30px; font-weight: 900; margin: 0 auto 22px;
 }
@@ -34,11 +34,11 @@ font-size: 30px; font-weight: 900; margin: 0 auto 22px;
 display: inline-flex; align-items: center; justify-content: center;
 padding: 13px 26px; border-radius: 10px;
 text-decoration: none !important; font-weight: 700;
-background: #f47b20; color: white !important;
-box-shadow: 0 8px 20px rgba(244,123,32,.25);
+background: #0f2a1f; color: white !important;
+box-shadow: 0 8px 20px rgba(196,154,69,.25);
 transition: all .25s ease;
 }
-.customer-btn:hover { background: #ff8b32; transform: translateY(-3px); }
+.customer-btn:hover { background: #173c2c; transform: translateY(-3px); }
 </style>
 <div class="logout-page">
 <div class="logout-card">

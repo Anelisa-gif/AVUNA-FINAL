@@ -6,7 +6,7 @@
 AVUNA MANAGER DASHBOARD — shared page shell
 ========================================================= */
 .avuna-manager-page {
-background: #f7f3ec;
+background: #f5efe6;
 min-height: 100vh;
 padding-bottom: 60px;
 font-family: "Segoe UI", Arial, Helvetica, sans-serif;
@@ -17,7 +17,7 @@ color: #3a3028;
 box-sizing: border-box;
 position: relative;
 overflow: hidden;
-background-color: #3a2c1e;
+background-color: #1b2a22;
 background-image:
 linear-gradient(90deg, rgba(34,24,16,.82) 0%, rgba(34,24,16,.62) 38%, rgba(34,24,16,.18) 70%, rgba(34,24,16,.04) 100%),
 url("<%= ResolveUrl("~/images/avuna_collective_background.jpg") %>");
@@ -35,7 +35,7 @@ border-radius: 0 0 35px 35px;
 .avuna-manager-copy { position: relative; z-index: 2; max-width: 900px; }
 .avuna-eyebrow {
 display: block;
-color: #d9a52c;
+color: #c49a45;
 font-size: 15px;
 font-weight: bold;
 letter-spacing: 3px;
@@ -60,14 +60,14 @@ font-weight: bold;
 text-decoration: none;
 transition: .25s ease;
 }
-.avuna-button-orange { background: #d9711f; color: white; }
-.avuna-button-orange:hover { background: #b85c18; color: white; transform: translateY(-3px); }
+.avuna-button-orange { background: #0f2a1f; color: white; }
+.avuna-button-orange:hover { background: #0f2a1f; color: white; transform: translateY(-3px); }
 .avuna-button-outline {
 border: 1px solid rgba(255,255,255,.35);
 color: white;
 background: rgba(255,255,255,.12);
 }
-.avuna-button-outline:hover { background: white; color: #2a2118; }
+.avuna-button-outline:hover { background: #fbf8f2; color: #1b2a22; }
 .avuna-button-main { padding: 17px 32px; font-size: 17px; box-shadow: 0 10px 24px rgba(217,113,31,.35); }
 .avuna-button-main:hover { box-shadow: 0 14px 28px rgba(217,113,31,.45); }
 
@@ -88,8 +88,8 @@ justify-content: center;
 width: 165px;
 height: 165px;
 border-radius: 50%;
-background: #d9a52c;
-color: #2a2118;
+background: #c49a45;
+color: #1b2a22;
 display: flex;
 flex-direction: column;
 justify-content: center;
@@ -103,8 +103,8 @@ box-shadow: 0 15px 35px rgba(0,0,0,.20);
 .avuna-manager-body { width: 92%; max-width: 1450px; margin: -40px auto 0; position: relative; z-index: 5; }
 /* WELCOME */
 .avuna-welcome {
-background: white;
-border: 1px solid #ece4d6;
+background: #fbf8f2;
+border: 1px solid #e5dccd;
 border-radius: 18px;
 padding: 20px 25px;
 display: flex;
@@ -113,8 +113,8 @@ align-items: center;
 box-shadow: 0 12px 35px rgba(42,33,24,.10);
 margin-bottom: 25px;
 }
-.avuna-welcome strong { color: #2a2118; font-size: 22px; }
-.avuna-welcome span { color: #8a7f72; font-size: 16px; }
+.avuna-welcome strong { color: #1b2a22; font-size: 22px; }
+.avuna-welcome span { color: #6c736d; font-size: 16px; }
 .avuna-db-notice { background: #fdeaea; border: 1px solid #f0c4c4; color: #8a2f2f; border-radius: 14px; padding: 12px 18px; font-size: 12px; margin-bottom: 20px; line-height: 1.6; }
 .avuna-business-status {
 background: #e8f4ec;
@@ -129,8 +129,8 @@ font-weight: bold;
 /* STATISTICS */
 .avuna-stat-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 20px; margin-bottom: 25px; }
 .avuna-stat-card {
-background: white;
-border: 1px solid #ece4d6;
+background: #fbf8f2;
+border: 1px solid #e5dccd;
 border-radius: 20px;
 padding: 25px;
 box-shadow: 0 12px 35px rgba(42,33,24,.10);
@@ -145,23 +145,23 @@ width: 48px; height: 48px; border-radius: 14px;
 display: flex; align-items: center; justify-content: center;
 font-weight: bold; font-size: 18px;
 }
-.avuna-green-icon { background: #f3ece0; color: #2a2118; }
-.avuna-orange-icon { background: #fff0e5; color: #d9711f; }
-.avuna-gold-icon { background: #fff5d8; color: #9c7814; }
+.avuna-green-icon { background: #f3ece0; color: #1b2a22; }
+.avuna-orange-icon { background: #f2e2c9; color: #8a6a35; }
+.avuna-gold-icon { background: #f2e2c9; color: #6e5133; }
 .avuna-red-icon { background: #fdeaea; color: #c84b4b; }
-.avuna-stat-label { font-size: 13px; font-weight: bold; letter-spacing: 1px; color: #8a7f72; }
-.avuna-stat-card h2 { color: #2a2118; font-size: 42px; font-weight: 700; margin: 0 0 5px; }
-.avuna-stat-description { color: #8a7f72; font-size: 14px; }
+.avuna-stat-label { font-size: 13px; font-weight: bold; letter-spacing: 1px; color: #6c736d; }
+.avuna-stat-card h2 { color: #1b2a22; font-size: 42px; font-weight: 700; margin: 0 0 5px; }
+.avuna-stat-description { color: #6c736d; font-size: 14px; }
 /* MAIN GRID */
 .avuna-manager-grid { display: grid; grid-template-columns: 1.7fr 1fr; gap: 25px; margin-bottom: 25px; }
-.avuna-card { background: white; border: 1px solid #ece4d6; border-radius: 22px; box-shadow: 0 12px 35px rgba(42,33,24,.10); overflow: hidden; }
-.avuna-card-header { padding: 25px 28px; border-bottom: 1px solid #efe7da; }
-.avuna-card-header h2 { color: #2a2118; font-size: 28px; margin: 5px 0; }
-.avuna-card-header p { color: #8a7f72; font-size: 15px; margin: 0; }
+.avuna-card { background: #fbf8f2; border: 1px solid #e5dccd; border-radius: 22px; box-shadow: 0 12px 35px rgba(42,33,24,.10); overflow: hidden; }
+.avuna-card-header { padding: 25px 28px; border-bottom: 1px solid #e5dccd; }
+.avuna-card-header h2 { color: #1b2a22; font-size: 28px; margin: 5px 0; }
+.avuna-card-header p { color: #6c736d; font-size: 15px; margin: 0; }
 .avuna-sample {
 float: right;
 background: #f7f3ea;
-color: #8b6b1a;
+color: #6e5133;
 border-radius: 50px;
 padding: 7px 10px;
 font-size: 9px;
@@ -169,59 +169,59 @@ font-weight: bold;
 }
 /* SALES CHART */
 .avuna-chart { padding: 30px; height: 320px; display: flex; gap: 15px; }
-.avuna-chart-y { height: 230px; display: flex; flex-direction: column; justify-content: space-between; color: #8a7f72; font-size: 12px; }
+.avuna-chart-y { height: 230px; display: flex; flex-direction: column; justify-content: space-between; color: #6c736d; font-size: 12px; }
 .avuna-bars {
 flex: 1; height: 260px; display: flex; align-items: flex-end; justify-content: space-around;
 gap: 15px; border-left: 1px solid #e8dfd0; border-bottom: 1px solid #e8dfd0; padding: 10px 15px 0;
 }
 .avuna-bar-column { height: 100%; flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; position: relative; }
-.avuna-bar { width: 100%; max-width: 48px; background: linear-gradient(180deg, #d9711f, #d9a52c); border-radius: 8px 8px 2px 2px; transition: .3s ease; }
+.avuna-bar { width: 100%; max-width: 48px; background: linear-gradient(180deg, #0f2a1f, #c49a45); border-radius: 8px 8px 2px 2px; transition: .3s ease; }
 .avuna-bar-column:hover .avuna-bar { transform: scaleX(1.1); }
 .avuna-bar-value {
-position: absolute; top: -5px; background: #2a2118; color: white;
+position: absolute; top: -5px; background: #1b2a22; color: white;
 padding: 5px 7px; border-radius: 5px; font-size: 9px; opacity: 0; transition: .2s;
 
 }
 .avuna-bar-column:hover .avuna-bar-value { opacity: 1; top: -28px; }
-.avuna-month { margin-top: 10px; color: #8a7f72; font-size: 13px; }
+.avuna-month { margin-top: 10px; color: #6c736d; font-size: 13px; }
 /* REPORTS */
 .avuna-reports { padding: 12px; }
 .avuna-report {
 display: flex; align-items: center; gap: 14px; padding: 15px; border-radius: 13px;
-text-decoration: none; color: #2a2118; transition: .2s;
+text-decoration: none; color: #1b2a22; transition: .2s;
 }
 .avuna-report:hover { background: #f7f3ea; transform: translateX(5px); }
 .avuna-report-icon {
 width: 47px; height: 47px; min-width: 47px; border-radius: 13px;
-background: #2a2118; color: white; display: flex; align-items: center; justify-content: center; font-weight: bold;
+background: #1b2a22; color: white; display: flex; align-items: center; justify-content: center; font-weight: bold;
 }
-.avuna-report:nth-child(2) .avuna-report-icon { background: #d9711f; }
-.avuna-report:nth-child(3) .avuna-report-icon { background: #d9a52c; color: #2a2118; }
+.avuna-report:nth-child(2) .avuna-report-icon { background: #0f2a1f; }
+.avuna-report:nth-child(3) .avuna-report-icon { background: #c49a45; color: #1b2a22; }
 .avuna-report:nth-child(4) .avuna-report-icon { background: #8a7a66; }
 .avuna-report-info { flex: 1; }
 .avuna-report-info strong { display: block; font-size: 17px; margin-bottom: 4px; }
-.avuna-report-info small { color: #8a7f72; font-size: 13px; }
-.avuna-report-arrow { color: #d9711f; font-size: 20px; }
+.avuna-report-info small { color: #6c736d; font-size: 13px; }
+.avuna-report-arrow { color: #8a6a35; font-size: 20px; }
 /* ALERT */
 .avuna-alert {
-display: flex; align-items: center; gap: 18px; background: #fff8ed;
-border: 1px solid #f1d7b5; border-radius: 20px; padding: 20px 25px; margin-bottom: 25px;
+display: flex; align-items: center; gap: 18px; background: #f2e2c9;
+border: 1px solid #e3d0ae; border-radius: 20px; padding: 20px 25px; margin-bottom: 25px;
 }
 .avuna-alert-icon {
-width: 52px; height: 52px; min-width: 52px; border-radius: 15px; background: #d9711f;
+width: 52px; height: 52px; min-width: 52px; border-radius: 15px; background: #0f2a1f;
 color: white; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 20px;
 }
 .avuna-alert-content { flex: 1; }
-.avuna-alert-content strong { display: block; font-size: 20px; margin-bottom: 5px; color: #2a2118; }
-.avuna-alert-content span { color: #8a7f72; font-size: 15px; }
+.avuna-alert-content strong { display: block; font-size: 20px; margin-bottom: 5px; color: #1b2a22; }
+.avuna-alert-content span { color: #6c736d; font-size: 15px; }
 /* BOTTOM SHORTCUT CARDS */
 .avuna-action-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 20px; margin-top: 25px; }
 .avuna-action-card {
 position: relative; overflow: hidden; min-height: 180px; border-radius: 20px; padding: 28px;
-background: #2a2118; color: white; transition: .25s ease; text-decoration: none;
+background: #1b2a22; color: white; transition: .25s ease; text-decoration: none;
 }
-.avuna-action-card:nth-child(2) { background: #d9711f; }
-.avuna-action-card:nth-child(3) { background: #d9a52c; color: #2a2118; }
+.avuna-action-card:nth-child(2) { background: #0f2a1f; }
+.avuna-action-card:nth-child(3) { background: #c49a45; color: #1b2a22; }
 .avuna-action-card:hover { transform: translateY(-6px); box-shadow: 0 20px 35px rgba(42,33,24,.18); }
 .avuna-action-card small { font-weight: bold; letter-spacing: 2px; opacity: .7; }
 .avuna-action-card h3 { margin-top: 22px; font-size: 21px; }
@@ -243,10 +243,10 @@ background: #2a2118; color: white; transition: .25s ease; text-decoration: none;
 .avuna-alert { flex-direction: column; align-items: flex-start; }
 }
 
-.av-logo-tile{position:relative;z-index:2;width:190px;height:190px;min-width:190px;flex:none;background:#fff;border:2px solid #d9a52c;border-radius:50%;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.av-logo-tile{position:relative;z-index:2;width:190px;height:190px;min-width:190px;flex:none;background:#fbf8f2;border:2px solid #c49a45;border-radius:50%;display:flex;align-items:center;justify-content:center;overflow:hidden}
 .av-logo-tile img{width:100%;height:100%;object-fit:contain;display:block}
 .avuna-manager-hero:before,.avuna-manager-hero:after,.customer-hero:before,.customer-hero:after,.rp-hero:before,.rp-hero:after,.rp-kpi:after,.customer-stat:after,.action-card:after,.avuna-modal-head:after,.edit-modal-head:before,.avuna-order .hero:before{display:none !important}
-.avuna-modal-avatar,.edit-avatar,.customer-avatar{border-radius:50% !important;background:#fff url("avuna-logo.png") center/contain no-repeat !important;color:transparent !important;font-size:0 !important;border:1px solid #d9a52c}
+.avuna-modal-avatar,.edit-avatar,.customer-avatar{border-radius:50% !important;background:#fff url("avuna-logo.png") center/contain no-repeat !important;color:transparent !important;font-size:0 !important;border:1px solid #c49a45}
 .avuna-modal-close,.edit-close,.design-viewer-close,.av-nav-btn{border-radius:50% !important}
 @media (max-width:700px){.av-logo-tile{width:130px;height:130px;min-width:130px}}
 </style>
@@ -374,3 +374,4 @@ background: #2a2118; color: white; transition: .25s ease; text-decoration: none;
 
 
 </asp:Content>
+

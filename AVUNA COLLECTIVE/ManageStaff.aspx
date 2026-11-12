@@ -9,14 +9,14 @@ AVUNA STAFF PAGE — shared page shell (same as Dashboard)
 background: #f4f7f5;
 min-height: 100vh;
 padding-bottom: 60px;
-font-family: Arial, Helvetica, sans-serif;
+font-family: var(--av-sans);
 color: #243333;
 }
 /* HERO */
 .avuna-manager-hero {
 position: relative;
 overflow: hidden;
-background: linear-gradient(120deg, #0d2b2c, #174243);
+background: linear-gradient(120deg, #0d2b2c, #173c2c);
 color: white;
 padding: 55px 7%;
 min-height: 380px;
@@ -48,7 +48,7 @@ bottom: -150px;
 .avuna-manager-copy { position: relative; z-index: 2; max-width: 700px; }
 .avuna-eyebrow {
 display: block;
-color: #d9a52c;
+color: #c49a45;
 font-size: 11px;
 font-weight: bold;
 letter-spacing: 2px;
@@ -73,18 +73,18 @@ font-weight: bold;
 text-decoration: none;
 transition: .25s ease;
 }
-.avuna-button-orange { background: #d9711f; color: white; }
-.avuna-button-orange:hover { background: #b85c18; color: white; transform: translateY(-3px); }
+.avuna-button-orange { background: #0f2a1f; color: white; }
+.avuna-button-orange:hover { background: #0f2a1f; color: white; transform: translateY(-3px); }
 .avuna-button-outline {
 border: 1px solid rgba(255,255,255,.35);
 color: white;
 background: rgba(255,255,255,.05);
 }
-.avuna-button-outline:hover { background: white; color: #113334; }
-.avuna-archive-btn { background: #fff; border: 1px solid #d9711f; color: #d9711f; border-radius: 8px; padding: 6px 14px; font-size: 11px; font-weight: bold; cursor: pointer; font-family: inherit; transition: .2s; }
-.avuna-archive-btn:hover { background: #d9711f; color: #fff; }
+.avuna-button-outline:hover { background: #fbf8f2; color: #173c2c; }
+.avuna-archive-btn { background: #fbf8f2; border: 1px solid #c49a45; color: #8a6a35; border-radius: 8px; padding: 6px 14px; font-size: 11px; font-weight: bold; cursor: pointer; font-family: inherit; transition: .2s; }
+.avuna-archive-btn:hover { background: #0f2a1f; color: #fff; }
 .avuna-actions { display: flex; gap: 8px; align-items: center; }
-.avuna-edit-btn { background: #113334; border: 1px solid #113334; color: #fff; border-radius: 8px; padding: 6px 14px; font-size: 11px; font-weight: bold; cursor: pointer; font-family: inherit; transition: .2s; }
+.avuna-edit-btn { background: #173c2c; border: 1px solid #173c2c; color: #fff; border-radius: 8px; padding: 6px 14px; font-size: 11px; font-weight: bold; cursor: pointer; font-family: inherit; transition: .2s; }
 .avuna-edit-btn:hover { background: #1d5456; border-color: #1d5456; transform: translateY(-1px); }
 
 /* ---------- EDIT POP-UP ---------- */
@@ -92,39 +92,39 @@ background: rgba(255,255,255,.05);
     display: none; align-items: center; justify-content: center; padding: 20px; z-index: 5000; opacity: 0; transition: opacity .25s ease; }
 .avuna-modal-back.avuna-open { display: flex; }
 .avuna-modal-back.avuna-show { opacity: 1; }
-.avuna-modal { width: 100%; max-width: 680px; max-height: 94vh; overflow: auto; background: #fff; border-radius: 26px; box-shadow: 0 35px 90px rgba(0,0,0,.40);
-    transform: translateY(28px) scale(.97); transition: transform .3s cubic-bezier(.2,.8,.2,1); font-family: Arial, Helvetica, sans-serif; color: #243333; }
+.avuna-modal { width: 100%; max-width: 680px; max-height: 94vh; overflow: auto; background: #fbf8f2; border-radius: 26px; box-shadow: 0 35px 90px rgba(0,0,0,.40);
+    transform: translateY(28px) scale(.97); transition: transform .3s cubic-bezier(.2,.8,.2,1); font-family: var(--av-sans); color: #243333; }
 .avuna-modal-back.avuna-show .avuna-modal { transform: none; }
 .avuna-modal, .avuna-modal * { box-sizing: border-box; }
 .avuna-modal-head { position: relative; overflow: hidden; color: #fff; padding: 28px 32px; display: flex; align-items: center; gap: 18px;
-    background: linear-gradient(120deg, #0d2b2c, #174243 70%, #1d5456); }
+    background: linear-gradient(120deg, #0d2b2c, #173c2c 70%, #1d5456); }
 .avuna-modal-head:after { content: ""; position: absolute; right: -70px; top: -90px; width: 230px; height: 230px; border-radius: 50%; border: 36px solid rgba(217,165,44,.10); }
-.avuna-modal-avatar { position: relative; z-index: 1; width: 62px; height: 62px; min-width: 62px; border-radius: 50%; background: #d9a52c; color: #113334;
+.avuna-modal-avatar { position: relative; z-index: 1; width: 62px; height: 62px; min-width: 62px; border-radius: 50%; background: #c49a45; color: #173c2c;
     display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: bold; box-shadow: 0 8px 20px rgba(0,0,0,.25); }
 .avuna-modal-title { position: relative; z-index: 1; min-width: 0; }
-.avuna-modal-title small { display: block; color: #d9a52c; font-size: 10px; font-weight: bold; letter-spacing: 2px; margin-bottom: 5px; }
+.avuna-modal-title small { display: block; color: #c49a45; font-size: 10px; font-weight: bold; letter-spacing: 2px; margin-bottom: 5px; }
 .avuna-modal-title h3 { margin: 0; color: #fff; font-size: 24px; line-height: 1.15; }
 .avuna-modal-title span { display: inline-block; margin-top: 8px; background: rgba(255,255,255,.14); border-radius: 50px; padding: 4px 12px; font-size: 10px; font-weight: bold; letter-spacing: 1px; }
 .avuna-modal-close { position: absolute; z-index: 2; right: 18px; top: 16px; width: 34px; height: 34px; border-radius: 50%; border: 0; cursor: pointer;
     background: rgba(255,255,255,.12); color: #fff; font-size: 20px; line-height: 1; transition: .2s; }
-.avuna-modal-close:hover { background: #fff; color: #113334; }
+.avuna-modal-close:hover { background: #fbf8f2; color: #173c2c; }
 .avuna-modal-body { padding: 28px 32px 8px; }
 .avuna-modal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px 20px; }
 .avuna-field { display: flex; flex-direction: column; gap: 7px; }
 .avuna-field-wide { grid-column: span 2; }
 .avuna-field label { font-size: 10px; font-weight: bold; letter-spacing: 1px; color: #78827f; }
-.avuna-field input, .avuna-field select { width: 100%; padding: 13px 15px; border: 1.5px solid #dfe6e2; border-radius: 12px; background: #f9fbfa; color: #113334;
+.avuna-field input, .avuna-field select { width: 100%; padding: 13px 15px; border: 1.5px solid #dfe6e2; border-radius: 12px; background: #f9fbfa; color: #173c2c;
     font-size: 14px; font-family: inherit; transition: .2s; outline: none; }
-.avuna-field input:focus, .avuna-field select:focus { border-color: #d9711f; background: #fff; box-shadow: 0 0 0 4px rgba(217,113,31,.14); }
+.avuna-field input:focus, .avuna-field select:focus { border-color: #c49a45; background: #fbf8f2; box-shadow: 0 0 0 4px rgba(217,113,31,.14); }
 .avuna-field input[readonly], .avuna-field select:disabled { background: #eef2ef; color: #78827f; cursor: not-allowed; }
 .avuna-field small { color: #8a948f; font-size: 11px; line-height: 1.5; }
 .avuna-modal-error { background: #fdeaea; border: 1px solid #f0c4c4; color: #8a2f2f; border-radius: 12px; padding: 11px 15px; font-size: 13px; margin-bottom: 18px; line-height: 1.5; }
 .avuna-modal-foot { display: flex; justify-content: flex-end; gap: 12px; padding: 22px 32px 28px; }
-.avuna-modal-cancel { background: #fff; border: 1.5px solid #dfe6e2; color: #113334; border-radius: 12px; padding: 13px 24px; font-size: 13px; font-weight: bold; cursor: pointer; font-family: inherit; transition: .2s; }
-.avuna-modal-cancel:hover { border-color: #113334; }
-.avuna-modal-save { background: #d9711f; border: 0; color: #fff; border-radius: 12px; padding: 13px 30px; font-size: 13px; font-weight: bold; cursor: pointer; font-family: inherit;
+.avuna-modal-cancel { background: #fbf8f2; border: 1.5px solid #dfe6e2; color: #173c2c; border-radius: 12px; padding: 13px 24px; font-size: 13px; font-weight: bold; cursor: pointer; font-family: inherit; transition: .2s; }
+.avuna-modal-cancel:hover { border-color: #173c2c; }
+.avuna-modal-save { background: #0f2a1f; border: 0; color: #fff; border-radius: 12px; padding: 13px 30px; font-size: 13px; font-weight: bold; cursor: pointer; font-family: inherit;
     box-shadow: 0 10px 24px rgba(217,113,31,.32); transition: .2s; }
-.avuna-modal-save:hover { background: #b85c18; transform: translateY(-2px); }
+.avuna-modal-save:hover { background: #0f2a1f; transform: translateY(-2px); }
 @media (max-width: 640px) {
     .avuna-modal-grid { grid-template-columns: 1fr; }
     .avuna-field-wide { grid-column: span 1; }
@@ -135,22 +135,22 @@ background: rgba(255,255,255,.05);
 .avuna-type-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; padding: 28px 32px 10px; }
 .avuna-type-card { text-align: left; background: #f9fbfa; border: 1.5px solid #dfe6e2; border-radius: 20px; padding: 24px 22px; cursor: pointer; font-family: inherit;
     transition: .25s ease; display: flex; flex-direction: column; gap: 10px; position: relative; overflow: hidden; }
-.avuna-type-card:hover { border-color: #d9711f; background: #fff; transform: translateY(-5px); box-shadow: 0 18px 38px rgba(17,51,52,.14); }
+.avuna-type-card:hover { border-color: #c49a45; background: #fbf8f2; transform: translateY(-5px); box-shadow: 0 18px 38px rgba(17,51,52,.14); }
 .avuna-type-icon { width: 54px; height: 54px; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: bold; color: #fff; }
-.avuna-type-admin .avuna-type-icon { background: #113334; }
-.avuna-type-production .avuna-type-icon { background: #d9711f; }
-.avuna-type-card strong { color: #113334; font-size: 17px; }
+.avuna-type-admin .avuna-type-icon { background: #173c2c; }
+.avuna-type-production .avuna-type-icon { background: #0f2a1f; }
+.avuna-type-card strong { color: #173c2c; font-size: 17px; }
 .avuna-type-card span { color: #78827f; font-size: 12px; line-height: 1.6; }
-.avuna-type-card em { margin-top: 4px; color: #d9711f; font-size: 12px; font-style: normal; font-weight: bold; }
-.avuna-idbox { display: flex; align-items: center; justify-content: space-between; gap: 14px; background: #fff8ed; border: 1px dashed #e9c58f; border-radius: 14px; padding: 12px 16px; margin-bottom: 18px; }
-.avuna-idbox small { color: #8a5a17; font-size: 10px; font-weight: bold; letter-spacing: 1px; }
-.avuna-idbox strong { color: #113334; font-size: 18px; letter-spacing: 1px; }
+.avuna-type-card em { margin-top: 4px; color: #8a6a35; font-size: 12px; font-style: normal; font-weight: bold; }
+.avuna-idbox { display: flex; align-items: center; justify-content: space-between; gap: 14px; background: #f2e2c9; border: 1px dashed #e3d0ae; border-radius: 14px; padding: 12px 16px; margin-bottom: 18px; }
+.avuna-idbox small { color: #6e5133; font-size: 10px; font-weight: bold; letter-spacing: 1px; }
+.avuna-idbox strong { color: #173c2c; font-size: 18px; letter-spacing: 1px; }
 .avuna-pw-row { display: flex; gap: 10px; }
 .avuna-pw-row input { flex: 1; min-width: 0; }
-.avuna-gen-btn { background: #fff; border: 1.5px solid #dfe6e2; color: #113334; border-radius: 12px; padding: 0 16px; font-size: 12px; font-weight: bold; cursor: pointer; font-family: inherit; white-space: nowrap; transition: .2s; }
-.avuna-gen-btn:hover { border-color: #d9711f; color: #d9711f; }
+.avuna-gen-btn { background: #fbf8f2; border: 1.5px solid #dfe6e2; color: #173c2c; border-radius: 12px; padding: 0 16px; font-size: 12px; font-weight: bold; cursor: pointer; font-family: inherit; white-space: nowrap; transition: .2s; }
+.avuna-gen-btn:hover { border-color: #c49a45; color: #8a6a35; }
 .avuna-modal-back-link { margin-right: auto; background: none; border: 0; color: #78827f; font-size: 13px; font-weight: bold; cursor: pointer; font-family: inherit; padding: 13px 4px; }
-.avuna-modal-back-link:hover { color: #113334; }
+.avuna-modal-back-link:hover { color: #173c2c; }
 @media (max-width: 640px) { .avuna-type-grid { grid-template-columns: 1fr; padding-left: 22px; padding-right: 22px; } .avuna-modal-back-link { margin-right: 0; text-align: center; } }
 /* MANAGER BADGE */
 .avuna-manager-badge {
@@ -169,8 +169,8 @@ justify-content: center;
 width: 145px;
 height: 145px;
 border-radius: 50%;
-background: #d9a52c;
-color: #113334;
+background: #c49a45;
+color: #173c2c;
 display: flex;
 flex-direction: column;
 justify-content: center;
@@ -184,7 +184,7 @@ box-shadow: 0 15px 35px rgba(0,0,0,.20);
 .avuna-manager-body { width: 92%; max-width: 1450px; margin: -40px auto 0; position: relative; z-index: 5; }
 /* WELCOME */
 .avuna-welcome {
-background: white;
+background: #fbf8f2;
 border: 1px solid #e1e7e3;
 border-radius: 18px;
 padding: 20px 25px;
@@ -194,7 +194,7 @@ align-items: center;
 box-shadow: 0 12px 35px rgba(17,51,52,.10);
 margin-bottom: 25px;
 }
-.avuna-welcome strong { color: #113334; font-size: 16px; }
+.avuna-welcome strong { color: #173c2c; font-size: 16px; }
 .avuna-welcome span { color: #78827f; font-size: 13px; }
 .avuna-business-status {
 background: #e8f4ec;
@@ -207,7 +207,7 @@ font-weight: bold;
 /* STATISTICS (reused for staff headcount stats) */
 .avuna-stat-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 20px; margin-bottom: 25px; }
 .avuna-stat-card {
-background: white;
+background: #fbf8f2;
 border: 1px solid #e1e7e3;
 border-radius: 20px;
 padding: 25px;
@@ -223,32 +223,32 @@ width: 48px; height: 48px; border-radius: 14px;
 display: flex; align-items: center; justify-content: center;
 font-weight: bold; font-size: 18px;
 }
-.avuna-green-icon { background: #e8f1ef; color: #113334; }
-.avuna-orange-icon { background: #fff0e5; color: #d9711f; }
-.avuna-gold-icon { background: #fff5d8; color: #9c7814; }
+.avuna-green-icon { background: #e8f1ef; color: #173c2c; }
+.avuna-orange-icon { background: #f2e2c9; color: #8a6a35; }
+.avuna-gold-icon { background: #f2e2c9; color: #6e5133; }
 .avuna-red-icon { background: #fdeaea; color: #c84b4b; }
 .avuna-stat-label { font-size: 10px; font-weight: bold; letter-spacing: 1px; color: #78827f; }
-.avuna-stat-card h2 { color: #113334; font-size: 31px; margin: 0 0 5px; }
+.avuna-stat-card h2 { color: #173c2c; font-size: 31px; margin: 0 0 5px; }
 .avuna-stat-description { color: #78827f; font-size: 11px; }
 /* CARD (used to hold the staff table) */
-.avuna-card { background: white; border: 1px solid #e1e7e3; border-radius: 22px; box-shadow: 0 12px 35px rgba(17,51,52,.10); overflow: hidden; margin-bottom: 25px; }
+.avuna-card { background: #fbf8f2; border: 1px solid #e1e7e3; border-radius: 22px; box-shadow: 0 12px 35px rgba(17,51,52,.10); overflow: hidden; margin-bottom: 25px; }
 .avuna-card-header { padding: 25px 28px; border-bottom: 1px solid #e6ebe8; display: flex; justify-content: space-between; align-items: center; }
-.avuna-card-header h2 { color: #113334; font-size: 22px; margin: 5px 0; }
+.avuna-card-header h2 { color: #173c2c; font-size: 22px; margin: 5px 0; }
 .avuna-card-header p { color: #78827f; font-size: 12px; margin: 0; }
-.avuna-view-all { color: #d9711f; font-size: 12px; font-weight: bold; text-decoration: none; }
+.avuna-view-all { color: #8a6a35; font-size: 12px; font-weight: bold; text-decoration: none; }
 /* STAFF TABLE (same structure/classes as the Orders table) */
 .avuna-table-wrap { overflow-x: auto; }
 .avuna-table { width: 100%; border-collapse: collapse; }
 .avuna-table th { background: #f7f9f7; color: #737d79; padding: 14px 20px; text-align: left; font-size: 9px; letter-spacing: 1px; }
 .avuna-table td { padding: 17px 20px; border-top: 1px solid #edf0ed; font-size: 12px; }
 .avuna-table tbody tr:hover { background: #fafcfb; }
-.avuna-order-number { color: #113334; font-weight: bold; }
+.avuna-order-number { color: #173c2c; font-weight: bold; }
 
 /* STAFF STATUS PILLS (same visual language as order status pills) */
 .avuna-status { display: inline-block; padding: 6px 10px; border-radius: 50px; font-size: 9px; font-weight: bold; }
 .avuna-completed { background: #e7f4eb; color: #277446; } /* used here for "Active" */
-.avuna-production { background: #fff0e5; color: #bb5c17; } /* used here for "On Shift" */
-.avuna-pending { background: #fff5d8; color: #927017; } /* used here for "On Leave" */
+.avuna-production { background: #f2e2c9; color: #6e5133; } /* used here for "On Shift" */
+.avuna-pending { background: #f2e2c9; color: #6e5133; } /* used here for "On Leave" */
 /* RESPONSIVE */
 @media(max-width:1100px) {
 .avuna-stat-grid { grid-template-columns: repeat(2,1fr); }
@@ -263,10 +263,10 @@ font-weight: bold; font-size: 18px;
 .avuna-card-header { flex-direction: column; align-items: flex-start; gap: 12px; }
 }
 
-.av-logo-tile{position:relative;z-index:2;width:190px;height:190px;min-width:190px;flex:none;background:#fff;border:2px solid #d9a52c;border-radius:50%;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.av-logo-tile{position:relative;z-index:2;width:190px;height:190px;min-width:190px;flex:none;background:#fbf8f2;border:2px solid #c49a45;border-radius:50%;display:flex;align-items:center;justify-content:center;overflow:hidden}
 .av-logo-tile img{width:100%;height:100%;object-fit:contain;display:block}
 .avuna-manager-hero:before,.avuna-manager-hero:after,.customer-hero:before,.customer-hero:after,.rp-hero:before,.rp-hero:after,.rp-kpi:after,.customer-stat:after,.action-card:after,.avuna-modal-head:after,.edit-modal-head:before,.avuna-order .hero:before{display:none !important}
-.avuna-modal-avatar,.edit-avatar,.customer-avatar{border-radius:50% !important;background:#fff url("avuna-logo.png") center/contain no-repeat !important;color:transparent !important;font-size:0 !important;border:1px solid #d9a52c}
+.avuna-modal-avatar,.edit-avatar,.customer-avatar{border-radius:50% !important;background:#fff url("avuna-logo.png") center/contain no-repeat !important;color:transparent !important;font-size:0 !important;border:1px solid #c49a45}
 .avuna-modal-close,.edit-close,.design-viewer-close,.av-nav-btn{border-radius:50% !important}
 @media (max-width:700px){.av-logo-tile{width:130px;height:130px;min-width:130px}}
 </style>
@@ -274,10 +274,10 @@ font-weight: bold; font-size: 18px;
 /* =========================================================
 MANAGER PAGES — photo hero, larger type, warm palette
 ========================================================= */
-.avuna-manager-page { background: #f7f3ec; color: #3a3028; font-family: "Segoe UI", Arial, Helvetica, sans-serif; }
+.avuna-manager-page { background: #f5efe6; color: #3a3028; font-family: "Segoe UI", Arial, Helvetica, sans-serif; }
 .avuna-manager-hero {
 box-sizing: border-box;
-background-color: #3a2c1e;
+background-color: #1b2a22;
 background-image:
 linear-gradient(90deg, rgba(34,24,16,0.88) 0%, rgba(34,24,16,0.7) 40%, rgba(34,24,16,0.28) 72%, rgba(34,24,16,0.06) 100%),
 url("<%= ResolveUrl("~/images/GG-0653_PinksInks_29_lg.jpg") %>");
@@ -294,37 +294,37 @@ min-height: 470px;
 .avuna-manager-copy p { max-width: 640px; color: rgba(255,255,255,.92); text-shadow: 0 1px 8px rgba(0,0,0,.45); font-size: 22px; line-height: 1.55; margin-bottom: 34px; }
 .avuna-button { padding: 17px 30px; font-size: 17px; }
 .avuna-button-outline { background: rgba(255,255,255,.12); }
-.avuna-button-outline:hover { color: #2a2118; }
+.avuna-button-outline:hover { color: #1b2a22; }
 .avuna-manager-badge { width: 230px; height: 230px; background: rgba(34,24,16,.35); }
-.avuna-manager-badge-inner { width: 165px; height: 165px; color: #2a2118; }
+.avuna-manager-badge-inner { width: 165px; height: 165px; color: #1b2a22; }
 .avuna-manager-badge-inner strong { font-size: 30px; }
 .avuna-manager-badge-inner span { font-size: 12px; }
-.avuna-welcome { border-color: #ece4d6; box-shadow: 0 12px 35px rgba(42,33,24,.10); }
-.avuna-welcome strong { color: #2a2118; font-size: 22px; }
-.avuna-welcome span { color: #8a7f72; font-size: 16px; }
-.avuna-stat-card, .avuna-card { border-color: #ece4d6; box-shadow: 0 12px 35px rgba(42,33,24,.10); }
+.avuna-welcome { border-color: #e5dccd; box-shadow: 0 12px 35px rgba(42,33,24,.10); }
+.avuna-welcome strong { color: #1b2a22; font-size: 22px; }
+.avuna-welcome span { color: #6c736d; font-size: 16px; }
+.avuna-stat-card, .avuna-card { border-color: #e5dccd; box-shadow: 0 12px 35px rgba(42,33,24,.10); }
 .avuna-stat-icon svg { display: block; }
-.avuna-green-icon { background: #f3ece0; color: #2a2118; }
-.avuna-stat-label { font-size: 13px; color: #8a7f72; }
-.avuna-stat-card h2 { color: #2a2118; font-size: 42px; font-weight: 700; }
-.avuna-stat-description { color: #8a7f72; font-size: 14px; }
-.avuna-card-header { border-bottom-color: #efe7da; }
-.avuna-card-header h2, .avuna-orders-header h2 { color: #2a2118; font-size: 28px; }
-.avuna-card-header p, .avuna-orders-header p { color: #8a7f72; font-size: 15px; }
+.avuna-green-icon { background: #f3ece0; color: #1b2a22; }
+.avuna-stat-label { font-size: 13px; color: #6c736d; }
+.avuna-stat-card h2 { color: #1b2a22; font-size: 42px; font-weight: 700; }
+.avuna-stat-description { color: #6c736d; font-size: 14px; }
+.avuna-card-header { border-bottom-color: #e5dccd; }
+.avuna-card-header h2, .avuna-orders-header h2 { color: #1b2a22; font-size: 28px; }
+.avuna-card-header p, .avuna-orders-header p { color: #6c736d; font-size: 15px; }
 .avuna-view-all { font-size: 15px; }
-.avuna-table th { background: #f7f3ec; color: #8a7f72; font-size: 12px; padding: 16px 20px; }
-.avuna-table td { border-top-color: #efe7da; font-size: 15px; }
-.avuna-table tbody tr:hover { background: #faf6ee; }
-.avuna-order-number { color: #2a2118; }
+.avuna-table th { background: #f5efe6; color: #6c736d; font-size: 12px; padding: 16px 20px; }
+.avuna-table td { border-top-color: #e5dccd; font-size: 15px; }
+.avuna-table tbody tr:hover { background: #f5efe6; }
+.avuna-order-number { color: #1b2a22; }
 .avuna-status { font-size: 12px; padding: 7px 12px; }
 @media(max-width:700px) { .avuna-manager-copy h1 { font-size: 46px; } .avuna-manager-hero { padding: 45px 25px; } }
-.avuna-edit-btn { background: #2a2118; border-color: #2a2118; font-size: 13px; }
+.avuna-edit-btn { background: #1b2a22; border-color: #1b2a22; font-size: 13px; }
 .avuna-edit-btn:hover { background: #4a3a2a; border-color: #4a3a2a; }
 .avuna-archive-btn { font-size: 13px; }
-.avuna-modal-head { background: linear-gradient(120deg, #2a2118, #3a2c1e 70%, #4a3a2a); }
-.avuna-modal-avatar, .avuna-modal-close:hover { color: #2a2118; }
-.avuna-type-admin .avuna-type-icon { background: #2a2118; }
-.avuna-idbox strong, .avuna-type-card strong, .avuna-modal-cancel, .avuna-gen-btn { color: #2a2118; }
+.avuna-modal-head { background: linear-gradient(120deg, #1b2a22, #1b2a22 70%, #4a3a2a); }
+.avuna-modal-avatar, .avuna-modal-close:hover { color: #1b2a22; }
+.avuna-type-admin .avuna-type-icon { background: #1b2a22; }
+.avuna-idbox strong, .avuna-type-card strong, .avuna-modal-cancel, .avuna-gen-btn { color: #1b2a22; }
 </style>
 <div class="avuna-manager-page">
 <!-- ===================================================== HERO ===================================================== -->
@@ -744,4 +744,3 @@ min-height: 470px;
 </div>
 
 </asp:Content>
-
