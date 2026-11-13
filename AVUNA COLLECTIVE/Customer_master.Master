@@ -1,4 +1,74 @@
 ﻿<%@ Master Language="C#" AutoEventWireup="true" CodeBehind="Customer_master.Master.cs" Inherits="AVUNA_COLLECTIVE.Customer_master" %>
+<%@ Import Namespace="System.Collections.Generic" %>
+<%@ Import Namespace="System.Configuration" %>
+<%@ Import Namespace="System.Data.SqlClient" %>
+<%@ Import Namespace="System.Globalization" %>
+<%@ Import Namespace="System.Text" %>
+<script runat="server">
+    // Gives the Avuna Assistance chatbot the signed-in customer's OWN orders, so it can answer
+    // "how much do I owe?" and "where is ORD003?" accurately. Balance rules match the dashboard.
+    protected string AvaOrdersJson()
+    {
+        try
+        {
+            object cid = HttpContext.Current.Session["customer_ID"];
+            int id;
+            if (cid == null || !Int32.TryParse(Convert.ToString(cid), out id) || id < 1) return "{\"ok\":false,\"orders\":[]}";
+
+            var ids = new List<string>(); var dates = new List<string>(); var states = new List<string>(); var totals = new List<decimal>();
+            var paid = new Dictionary<string, decimal>(StringComparer.OrdinalIgnoreCase);
+            using (var conn = new SqlConnection(ConfigurationManager.ConnectionStrings["GroupWst2"].ConnectionString))
+            {
+                conn.Open();
+                using (var cmd = new SqlCommand("SELECT order_ID, order_Date, order_Status, order_TotalCost FROM [Order] WHERE customer_ID = @id ORDER BY order_Date DESC, order_ID DESC", conn))
+                {
+                    cmd.Parameters.AddWithValue("@id", id);
+                    using (var r = cmd.ExecuteReader())
+                        while (r.Read())
+                        {
+                            ids.Add(Convert.ToString(r.GetValue(0)).Trim());
+                            dates.Add(r.IsDBNull(1) ? "-" : Convert.ToDateTime(r.GetValue(1), CultureInfo.InvariantCulture).ToString("d MMM yyyy", CultureInfo.InvariantCulture));
+                            states.Add(r.IsDBNull(2) ? "" : Convert.ToString(r.GetValue(2)).Trim());
+                            totals.Add(r.IsDBNull(3) ? 0m : Convert.ToDecimal(r.GetValue(3), CultureInfo.InvariantCulture));
+                        }
+                }
+                using (var cmd = new SqlCommand("SELECT p.order_ID, p.payment_Amount, p.payment_Status FROM Payment p INNER JOIN [Order] o ON o.order_ID = p.order_ID WHERE o.customer_ID = @id", conn))
+                {
+                    cmd.Parameters.AddWithValue("@id", id);
+                    using (var r = cmd.ExecuteReader())
+                        while (r.Read())
+                        {
+                            string ps = r.IsDBNull(2) ? "" : Convert.ToString(r.GetValue(2)).ToLowerInvariant();
+                            bool ok = !(ps.Contains("unpaid") || ps.Contains("not paid") || ps.Contains("pend") || ps.Contains("fail") || ps.Contains("declin") || ps.Contains("cancel") || ps.Contains("refund") || ps.Contains("overdue") || ps.Contains("await") || ps.Contains("partial"))
+                                      && (ps.Contains("paid") || ps.Contains("complet") || ps.Contains("success") || ps.Contains("receiv") || ps.Contains("approved"));
+                            if (!ok) continue;
+                            string key = Convert.ToString(r.GetValue(0)).Trim();
+                            decimal amt = r.IsDBNull(1) ? 0m : Convert.ToDecimal(r.GetValue(1), CultureInfo.InvariantCulture);
+                            decimal cur; paid.TryGetValue(key, out cur); paid[key] = cur + amt;
+                        }
+                }
+            }
+
+            var sb = new StringBuilder("{\"ok\":true,\"orders\":[");
+            for (int i = 0; i < ids.Count; i++)
+            {
+                decimal p; paid.TryGetValue(ids[i], out p);
+                bool cancelled = states[i].ToLowerInvariant().Contains("cancel");
+                decimal bal = cancelled ? 0m : Math.Max(0m, totals[i] - p);
+                if (i > 0) sb.Append(",");
+                sb.Append("{\"id\":\"").Append(HttpUtility.JavaScriptStringEncode(ids[i])).Append("\",\"date\":\"").Append(HttpUtility.JavaScriptStringEncode(dates[i]))
+                  .Append("\",\"status\":\"").Append(HttpUtility.JavaScriptStringEncode(states[i])).Append("\",\"total\":").Append(totals[i].ToString("0.00", CultureInfo.InvariantCulture))
+                  .Append(",\"paid\":").Append(p.ToString("0.00", CultureInfo.InvariantCulture)).Append(",\"balance\":").Append(bal.ToString("0.00", CultureInfo.InvariantCulture))
+                  .Append(",\"cancelled\":").Append(cancelled ? "true" : "false").Append("}");
+            }
+            return sb.Append("]}").ToString();
+        }
+        catch (Exception)
+        {
+            return "{\"ok\":false,\"orders\":[]}";
+        }
+    }
+</script>
 <!DOCTYPE html>
 <html lang="en">
 <head runat="server">
@@ -13,156 +83,7 @@
     <style>
         html, body { overflow-x: hidden; }
 
-        /* Hide the chatbot while a popup is open so it doesn't sit above the dark overlay */
-        body.modal-open #chatbot { display: none; }
-
-        /* Floating chatbot */
-        #chatbot {
-            position: fixed;
-            bottom: 90px;   /* raise or lower this number to move the chatbot up or down */
-            right: 20px;
-            z-index: 9999;
-            font-family: var(--av-sans);
-            text-align: right;
-        }
-
-        #chatToggle {
-            width: 64px;
-            height: 64px;
-            padding: 0;
-            border: 2px solid #c49a45;
-            border-radius: 50%;
-            background: #fbf8f2;
-            cursor: pointer;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-            overflow: hidden;
-        }
-        #chatToggle img { width: 100%; height: 100%; object-fit: contain; display: block; }
-
-        .chat-window {
-            width: 340px;
-            max-width: calc(100vw - 40px);
-            height: 430px;
-            background: #fbf8f2;
-            border-radius: 14px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
-            overflow: hidden;
-            margin-bottom: 12px;
-            text-align: left;
-            position: relative;
-        }
-
-        .chat-header {
-            background: #0f2a1f;
-            color: white;
-            padding: 16px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-            .chat-header strong {
-                color: white;
-            }
-
-            .chat-header button {
-                background: transparent;
-                border: none;
-                color: white;
-                font-size: 24px;
-                cursor: pointer;
-            }
-
-        .chat-messages {
-            height: 310px;
-            overflow-y: auto;
-            padding: 12px;
-            background: #fbf8f2;
-        }
-
-        .bot-message, .user-message {
-            padding: 10px 12px;
-            border-radius: 12px;
-            margin-bottom: 10px;
-            max-width: 85%;
-            overflow-wrap: anywhere;
-        }
-
-        .bot-message {
-            background: #e4ece5;
-            color: #222;
-        }
-
-        .user-message {
-            background: #0f2a1f;
-            color: white;
-            margin-left: auto;
-        }
-
-        .chat-input-area {
-            display: flex;
-            padding: 10px;
-            gap: 6px;
-        }
-
-            .chat-input-area input {
-                flex: 1;
-                min-width: 0;
-                padding: 10px;
-                border: 1px solid #ccc;
-                border-radius: 6px;
-            }
-
-            .chat-input-area button {
-                background: #0f2a1f;
-                color: white;
-                border: none;
-                border-radius: 6px;
-                padding: 10px;
-                cursor: pointer;
-            }
-
-        /* Suggestion bubble above the chat input */
-        .chat-suggestions {
-            position: absolute;
-            left: 56px;
-            right: 12px;
-            bottom: 68px;
-            background: #fbf8f2;
-            border-radius: 18px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
-            padding: 8px 0;
-            z-index: 5;
-        }
-
-            .chat-suggestions::after {
-                content: "";
-                position: absolute;
-                left: 22px;
-                bottom: -8px;
-                width: 16px;
-                height: 16px;
-                background: #fbf8f2;
-                transform: rotate(45deg);
-            }
-
-            .chat-suggestions button {
-                display: block;
-                width: 100%;
-                text-align: left;
-                background: none;
-                border: none;
-                padding: 14px 22px;
-                font-size: 15px;
-                color: #222;
-                cursor: pointer;
-            }
-
-                .chat-suggestions button:hover {
-                    background: #f2f2ee;
-                }
-        /* WhatsApp consultant button - shows on every customer page */
-        .avuna-whatsapp {
+                .avuna-whatsapp {
             position: fixed;
             right: 20px;
             bottom: 20px;
@@ -356,7 +277,7 @@ hr{display:none}
                     <div><h4>Explore</h4><p>Dashboard &middot; My Orders &middot; Create Order &middot; Profile</p></div>
                     <div><h4>Follow us</h4>
                         <ul class="av-social">
-                            <li><a href="https://www.instagram.com/avunacollective" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><svg viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r=".9" fill="currentColor" stroke="none"/></svg><span>@avunacollective</span></a></li>
+                            <li><a href="https://www.instagram.com/avunacollected" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><svg viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r=".9" fill="currentColor" stroke="none"/></svg><span>@avunacollective</span></a></li>
                             <li><a href="https://www.facebook.com/avunacollective" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><svg viewBox="0 0 24 24"><path d="M14 8.5h2.5V5h-3c-2.4 0-3.8 1.5-3.8 3.9V11H7.5v3.4h2.2V21h3.5v-6.6h2.5l.5-3.4h-3v-1.6c0-.6.3-.9.8-.9z"/></svg><span>Avuna Collective</span></a></li>
                             <li><a href="https://www.tiktok.com/@avunacollective" target="_blank" rel="noopener noreferrer" aria-label="TikTok"><svg viewBox="0 0 24 24"><path d="M14.5 3.5v10.2a3.6 3.6 0 1 1-3.6-3.6"/><path d="M14.5 3.5c.4 2.3 1.9 3.8 4.2 4"/></svg><span>@avunacollective</span></a></li>
                             <li><a href="https://wa.me/27714860091" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp"><svg viewBox="0 0 24 24"><path d="M21 11.5a8.4 8.4 0 0 1-12.4 7.4L3 20.5l1.7-5.4A8.5 8.5 0 1 1 21 11.5z"/><path d="M9 8.5c.3 2.6 2.6 5.1 5.5 6l1.4-1.5-2-1-.8.8c-.9-.4-1.7-1.2-2.1-2.1l.8-.8-1-2z"/></svg><span>+27 71 486 0091</span></a></li>
@@ -366,324 +287,450 @@ hr{display:none}
             </footer>
         </div>
 
-        <!-- Avuna Collective Chatbot -->
-        <div id="chatbot">
-            <div id="chatWindow" class="chat-window" style="display:none;">
-                <div class="chat-header">
-                    <strong>Avuna Assistant</strong>
-                    <button type="button" onclick="toggleChat()">×</button>
-                </div>
+                                        <!-- ===================== AVUNA ASSISTANCE (chatbot) ===================== -->
+        <style>
+            body.modal-open #avaBot { display: none; }
+            #avaBot { position: fixed; bottom: 90px; right: 20px; z-index: 9999; font-family: 'Work Sans', Arial, sans-serif; text-align: right; }
+            #avaBot * { box-sizing: border-box; }
 
-                <div id="chatMessages" class="chat-messages">
-                    <div class="bot-message">
-                        Hi! Welcome to Avuna Collective. How can I help you today?
+            /* Label above the chat button */
+            .ava-label { display: inline-flex; align-items: center; gap: 8px; margin: 0 2px 8px 0; padding: 8px 15px; background: #263e35; color: #fff; border: 1px solid #d9a52c; border-radius: 999px; font-size: 13px; font-weight: 600; letter-spacing: .2px; cursor: pointer; box-shadow: 0 4px 14px rgba(0,0,0,.22); }
+            .ava-label:hover { background: #1d3129; }
+            .ava-dot { width: 9px; height: 9px; border-radius: 50%; background: #4cd27a; box-shadow: 0 0 0 0 rgba(76,210,122,.6); animation: avaPulse 2s infinite; flex: none; }
+            @keyframes avaPulse { 70% { box-shadow: 0 0 0 7px rgba(76,210,122,0); } 100% { box-shadow: 0 0 0 0 rgba(76,210,122,0); } }
+
+            #avaToggle { display: block; margin-left: auto; width: 64px; height: 64px; padding: 0; border: 2px solid #d9a52c; border-radius: 50%; background: #fff; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,.25); overflow: hidden; }
+            #avaToggle img { width: 100%; height: 100%; object-fit: contain; display: block; }
+
+            .ava-window { display: none; width: 360px; max-width: calc(100vw - 40px); height: 500px; max-height: calc(100vh - 140px); background: #fff; border-radius: 16px; box-shadow: 0 8px 30px rgba(0,0,0,.28); overflow: hidden; margin-bottom: 12px; text-align: left; flex-direction: column; }
+            .ava-window.open { display: flex; }
+            .ava-head { background: #263e35; color: #fff; padding: 13px 16px; display: flex; align-items: center; gap: 12px; border-bottom: 3px solid #d9a52c; flex: none; }
+            .ava-head img { width: 38px; height: 38px; border-radius: 50%; background: #fff; object-fit: contain; flex: none; }
+            .ava-head .ava-title { flex: 1; min-width: 0; line-height: 1.25; }
+            .ava-head strong { display: block; color: #fff; font-size: 16px; }
+            .ava-head small { display: flex; align-items: center; gap: 6px; color: #cfe0d4; font-size: 12px; }
+            .ava-head small .ava-dot { width: 7px; height: 7px; animation: none; }
+            .ava-head button { background: transparent; border: none; color: #fff; font-size: 26px; line-height: 1; cursor: pointer; padding: 0 2px; }
+
+            .ava-msgs { flex: 1; overflow-y: auto; padding: 14px 12px 6px; background: #f7f5ef; }
+            .ava-bot, .ava-user { padding: 10px 13px; border-radius: 14px; margin-bottom: 9px; max-width: 88%; overflow-wrap: anywhere; font-size: 14px; line-height: 1.45; }
+            .ava-bot { background: #e4ece5; color: #222; border-bottom-left-radius: 4px; }
+            .ava-user { background: #263e35; color: #fff; margin-left: auto; border-bottom-right-radius: 4px; }
+            .ava-bot p { margin: 0 0 6px; }
+            .ava-bot p:last-child { margin-bottom: 0; }
+            .ava-row { display: flex; flex-wrap: wrap; gap: 6px; margin: 2px 0 12px; }
+            .ava-chip { background: #fff; color: #263e35; border: 1px solid #263e35; border-radius: 999px; padding: 6px 12px; font-size: 13px; cursor: pointer; text-align: left; }
+            .ava-chip:hover { background: #263e35; color: #fff; }
+            .ava-link { display: inline-block; background: #d9a52c; color: #fff !important; border-radius: 999px; padding: 6px 13px; font-size: 13px; font-weight: 600; text-decoration: none !important; }
+            .ava-link:hover { background: #b98616; }
+            .ava-typing { display: inline-flex; gap: 4px; padding: 13px 14px; }
+            .ava-typing i { width: 7px; height: 7px; border-radius: 50%; background: #7a8f82; animation: avaBlink 1.2s infinite; }
+            .ava-typing i:nth-child(2) { animation-delay: .2s; }
+            .ava-typing i:nth-child(3) { animation-delay: .4s; }
+            @keyframes avaBlink { 0%, 80%, 100% { opacity: .25; } 40% { opacity: 1; } }
+
+            .ava-input { display: flex; gap: 6px; padding: 10px; border-top: 1px solid #e5e1d6; background: #fff; flex: none; }
+            .ava-input input { flex: 1; min-width: 0; padding: 10px 12px; border: 1px solid #ccc; border-radius: 999px; font-size: 14px; }
+            .ava-input input:focus { outline: none; border-color: #263e35; }
+            .ava-input button { background: #263e35; color: #fff; border: none; border-radius: 999px; padding: 10px 16px; cursor: pointer; font-weight: 600; }
+            .ava-note { text-align: center; font-size: 11px; color: #8a8a80; padding: 0 10px 8px; background: #fff; flex: none; }
+        </style>
+
+        <div id="avaBot">
+            <div id="avaWindow" class="ava-window" role="dialog" aria-label="Avuna Assistance">
+                <div class="ava-head">
+                    <img runat="server" src="~/avuna-logo.png" alt="" />
+                    <div class="ava-title">
+                        <strong>Avuna Assistance</strong>
+                        <small><span class="ava-dot"></span> Online &middot; ask me anything about Avuna</small>
                     </div>
+                    <button type="button" id="avaClose" aria-label="Close chat">&times;</button>
                 </div>
-
-                <div class="chat-suggestions" id="chatSuggestions">
-                    <button type="button" onclick="askSuggestion(this)">Do I need an account to place an order?</button>
-                    <button type="button" onclick="askSuggestion(this)">Can I upload my own design?</button>
+                <div id="avaMsgs" class="ava-msgs" aria-live="polite"></div>
+                <div class="ava-input">
+                    <input type="text" id="avaInput" placeholder="Type your question..." autocomplete="off" maxlength="200" />
+                    <button type="button" id="avaSend">Send</button>
                 </div>
-
-                <div class="chat-input-area">
-                    <input type="text" id="chatInput" placeholder="Type your question..."
-                           autocomplete="off"
-                           onkeydown="return chatKey(event)"
-                           oninput="updateSuggestions()" />
-                    <button type="button" onclick="sendMessage()">Send</button>
-                </div>
+                <div class="ava-note">Automated assistant &middot; for account-specific help contact our team</div>
             </div>
 
-            <button type="button" id="chatToggle" onclick="toggleChat()" aria-label="Open Avuna Assistant"><img runat="server" src="~/avuna-logo.png" alt="" /></button>
+            <div id="avaLabel" class="ava-label" role="button" tabindex="0"><span class="ava-dot"></span> Avuna Assistance</div>
+            <button type="button" id="avaToggle" aria-label="Open Avuna Assistance"><img runat="server" src="~/avuna-logo.png" alt="" /></button>
         </div>
 
         <script>
-            function toggleChat() {
-                var chat = document.getElementById("chatWindow");
-                chat.style.display = chat.style.display === "none" ? "block" : "none";
+            (function () {
+                var MODE = 'customer';                       // 'public' (visitors) or 'customer' (logged-in customers)
+                var CUSTOMER = (MODE === 'customer');
+                var BASE = '<%= ResolveUrl("~/") %>';
+            var ACCT = <%= AvaOrdersJson() %>;                         // signed-in customer's own orders (customer pages only)
+            var STORE = 'avaChat_' + MODE;
+
+            var $ = function (id) { return document.getElementById(id); };
+            var win = $('avaWindow'), msgs = $('avaMsgs'), input = $('avaInput'), label = $('avaLabel'), toggle = $('avaToggle');
+
+            /* ---------------- business facts (edit here if anything changes) ---------------- */
+            var PHONE = '067 173 6313';
+            var EMAIL = 'avunacollected@gmail.com';
+            var ADDRESS = '127 Victoria Embankment, Astron Garage, Durban, KwaZulu-Natal';
+
+            /* ---------------- helpers for building answers ---------------- */
+            function L(label, page) { return [label, BASE + page]; }
+            var LINK = {
+                order:   CUSTOMER ? L('Create Order', 'CreateOrder')        : L('Create an account', 'Register'),
+                howto:   L('How to Order', 'HowToOrder'),
+                work:    L('Our Work', 'OurWork'),
+                reviews: L('Client Reviews', 'ClientReviews'),
+                about:   L('About Us', 'About'),
+                contact: L('Contact page', 'Contact'),
+                login:   L('Log in', 'Login'),
+                forgot:  L('Reset password', 'ForgotPassword'),
+                biz:     L('Business account', 'RegisterBusiness'),
+                orders:  L('My Orders', 'MyOrders'),
+                pay:     L('Payment', 'Payment'),
+                profile: L('My Profile', 'Profile'),
+                dash:    L('Dashboard', 'CustomerDashboard')
+            };
+            // pick text depending on who is asking
+            function M(pub, cust) { return CUSTOMER ? cust : pub; }
+            var CONTACT_TXT = 'You can reach our team on ' + PHONE + ' or ' + EMAIL + '.';
+
+
+            /* ---------------- live account data (customer pages) ---------------- */
+            function money(n) { var s = (Math.round(n * 100) / 100).toFixed(2).replace(/\.00$/, ''); return 'R' + s.replace(/\B(?=(\d{3})+(?!\d))/g, ','); }
+            function orderLine(o) {
+                if (o.cancelled) return o.id + ': cancelled';
+                return o.id + ': ' + (o.status || 'Pending') + ', ' + (o.balance > 0 ? money(o.balance) + ' still to pay' : 'fully paid');
+            }
+            function owingAnswer() {
+                if (!CUSTOMER) return { t: ['To see how much you owe, please log in to your Avuna account. Your balance for each order is shown on your dashboard and on My Orders.'], l: [LINK.login], c: ['How do I pay?'] };
+                if (!ACCT || !ACCT.ok) return { t: ['I can\u2019t load your account details right now. Please open My Orders to see what you owe on each order.'], l: [LINK.orders, LINK.pay] };
+                var open = ACCT.orders.filter(function (o) { return !o.cancelled && o.balance > 0; });
+                if (!ACCT.orders.length) return { t: ['You haven\u2019t placed any orders yet, so you don\u2019t owe anything.'], l: [LINK.order], c: ['How do I create an order?'] };
+                if (!open.length) return { t: ['Good news: you don\u2019t owe anything. All your orders are paid or cancelled.'], l: [LINK.orders] };
+                var total = 0; open.forEach(function (o) { total += o.balance; });
+                var lines = open.slice(0, 6).map(function (o) { return '\u2022 ' + o.id + ': ' + money(o.balance) + ' (' + (o.status || 'Pending') + ')'; }).join('\n');
+                return { t: ['You currently owe ' + money(total) + ' across ' + open.length + (open.length === 1 ? ' order:' : ' orders:'), lines + (open.length > 6 ? '\n\u2022 and ' + (open.length - 6) + ' more' : ''), 'Figures are as at the time this page loaded. Refresh the page for the latest.'], l: [LINK.pay, LINK.orders], c: ['How do I pay?', 'Where is my order?'] };
+            }
+            function orderLookup(text) {
+                // "where is ORD003", "status of order ord-12" ...
+                var m = text.replace(/-/g, '').match(/\b([a-z]{2,4}\d{1,6})\b/);
+                if (!m) return null;
+                var want = m[1].toUpperCase();
+                if (!/^ORD/.test(want) && !(ACCT && ACCT.orders && ACCT.orders.some(function (o) { return o.id.toUpperCase().replace(/-/g, '') === want; }))) return null;
+                if (!CUSTOMER) return { t: ['To check an order, please log in to your account and open My Orders. I can only look up orders for the customer who is logged in.'], l: [LINK.login] };
+                if (!ACCT || !ACCT.ok) return { t: ['I can\u2019t load your orders right now. Please open My Orders.'], l: [LINK.orders] };
+                var hit = ACCT.orders.filter(function (o) { return o.id.toUpperCase().replace(/-/g, '') === want; })[0];
+                if (!hit) return { t: ['I can\u2019t find order ' + want + ' on your account. Please check the number on My Orders.'], l: [LINK.orders] };
+                return { t: ['Order ' + hit.id + ' (placed ' + hit.date + '):', '\u2022 Status: ' + (hit.status || 'Pending') + '\n\u2022 Total: ' + money(hit.total) + '\n\u2022 Paid: ' + money(hit.paid) + '\n\u2022 ' + (hit.cancelled ? 'Cancelled' : (hit.balance > 0 ? 'Still to pay: ' + money(hit.balance) : 'Fully paid'))], l: [LINK.orders, LINK.pay] };
+            }
+            function myOrdersAnswer() {
+                if (!CUSTOMER || !ACCT || !ACCT.ok) return null;
+                if (!ACCT.orders.length) return { t: ['You haven\u2019t placed an order yet. Open Create Order to start your first one.'], l: [LINK.order] };
+                var lines = ACCT.orders.slice(0, 5).map(function (o) { return '\u2022 ' + orderLine(o); }).join('\n');
+                return { t: ['Here are your latest orders:', lines, 'Open My Orders for full details and to track each stage.'], l: [LINK.orders], c: ['How much do I owe?', 'How long does it take?'] };
             }
 
-            // Shows the suggestion bubble only while the box is empty and nothing has been asked yet
-            function updateSuggestions() {
-                var box = document.getElementById("chatSuggestions");
-                var input = document.getElementById("chatInput");
-                var messages = document.getElementById("chatMessages");
-                box.style.display = (input.value.trim() === "" && messages.children.length <= 1) ? "block" : "none";
+            var NOT_SOLD = ['car', 'cars', 'vehicle', 'vehicles', 'bike', 'bikes', 'bicycle', 'motorbike', 'motorcycle', 'bakkie', 'truck', 'smartphone', 'cellphone', 'iphone', 'laptop', 'laptops', 'computer', 'computers', 'tv', 'television', 'fridge', 'furniture', 'couch', 'house', 'houses', 'property', 'land', 'food', 'groceries', 'drinks', 'alcohol', 'beer', 'wine', 'medicine', 'makeup', 'cosmetics', 'perfume', 'jewellery', 'jewelry', 'electronics', 'appliances', 'tyres', 'tires', 'airtime', 'toys', 'games', 'books', 'pets', 'tools'];
+            var APPAREL = ['tshirt', 'shirt', 'hoodie', 'sweater', 'jacket', 'cap', 'hat', 'jersey', 'golf', 'uniform', 'clothes', 'clothing', 'apparel', 'garment', 'headwear', 'pants', 'shorts', 'polo', 'beanie', 'overall', 'overalls', 'tracksuit', 'scarf', 'apron', 'dress', 'skirt', 'vest', 'socks', 'workwear', 'kit', 'wear', 'merch', 'merchandise', 'embroidery', 'print', 'printing', 'branding'];
+            function hasWord(tokens, list) { for (var i = 0; i < tokens.length; i++) if (list.indexOf(tokens[i]) > -1) return true; return false; }
+            var NOT_SOLD_ANSWER = function () {
+                return { t: ['No, we don\u2019t sell that. Avuna Collective is a custom clothing and branded apparel business, so we focus on garments like T-shirts, hoodies, jackets, caps and jerseys, with your own design, logo or text applied.', 'Is there anything clothing-related I can help you with?'], c: ['What do you make?', 'How do I place an order?'] };
+            };
+
+            /* ---------------- knowledge base ----------------
+               p = phrases / keywords (strong match, typos tolerated for single words)
+               w = weaker hint words
+               a = answer function -> { t: [paragraphs], l: [links], c: [follow-up chips] } */
+            var KB = [
+                { id: 'greet', p: ['hello', 'hi', 'hey', 'hiya', 'howzit', 'good morning', 'good afternoon', 'good evening', 'sawubona', 'molo'], w: [],
+                  a: function () { return { t: [greeting() + ' I\u2019m Avuna Assistance. I can help with ' + M('how to order, quotes, our products, accounts and contacting us.', 'your orders, quotes, payments, your profile and anything about Avuna.') + ' What would you like to know?'], c: M(['How do I place an order?', 'What do you make?', 'How do quotes work?'], ['How much do I owe?', 'Where is my order?', 'How do I pay?']) }; } },
+
+                { id: 'howru', p: ['how are you', 'how are you doing', 'how is it going', 'whats up', 'what is up'], w: [],
+                  a: function () { return { t: ['I\u2019m doing well, thank you for asking! How can I help you with Avuna Collective today?'], c: ['How do I place an order?', 'What do you make?'] }; } },
+
+                { id: 'who', p: ['who are you', 'what are you', 'are you a bot', 'are you human', 'are you real', 'your name', 'avuna assistance', 'avuna assistant', 'robot', 'bot', 'chatbot', 'ai', 'machine'], w: [],
+                  a: function () { return { t: ['I\u2019m Avuna Assistance, the virtual helper for Avuna Collective. I can answer questions about our products, ordering, quotes, payments and more. For anything I can\u2019t answer, our team is happy to help.'], c: ['Talk to a person', 'How do I place an order?'] }; } },
+
+                { id: 'about', p: ['what is avuna', 'about avuna', 'about you', 'about us', 'tell me about', 'who is avuna', 'avuna collective', 'your story', 'your business', 'your company', 'what do you do'], w: ['about', 'company', 'business', 'brand'],
+                  a: function () { return { t: ['Avuna Collective is a clothing brand and customisation business based in Durban. We turn your design, logo or idea into finished wearable pieces, for individuals as well as companies and teams, and everything is handled through one organised system instead of scattered messages.'], l: M([LINK.about, LINK.work], []), c: ['What do you make?', 'How do I place an order?'] }; } },
+
+                { id: 'products', p: ['what do you make', 'what do you sell', 'what products', 'what can i order', 'what can you make', 'what do you offer', 'what we offer', 'your products', 'your services', 'services', 'products', 'catalogue', 'range', 'offer', 'hoodie', 'sweater', 'jacket', 'cap', 'tshirt', 'shirt', 'jersey', 'golf', 'clothes', 'clothing', 'apparel', 'garment', 'headwear', 'hat', 'pants', 'shorts', 'polo', 'beanie'], w: [],
+                  a: function () { return { t: ['We create custom apparel, including:', '\u2022 Signature sweaters and hoodies\n\u2022 Jackets\n\u2022 Embroidered caps (headwear)\n\u2022 Everyday T-shirts\n\u2022 Branded golf T-shirts\n\u2022 Personalised jerseys\n\u2022 Branded uniforms and corporate wear', 'If you have something else in mind, just ask our team whether we can make it.'], l: M([LINK.work], []), c: ['Can I use my own design?', 'How do quotes work?', 'Do you do bulk or corporate orders?'] }; } },
+
+                { id: 'custom', p: ['custom design', 'own design', 'my own design', 'own artwork', 'my artwork', 'my own logo', 'my logo', 'upload design', 'upload my design', 'upload artwork', 'send my design', 'submit design', 'submit my design', 'submit artwork', 'upload', 'artwork', 'logo', 'design'], w: ['submit', 'sketch', 'drawing', 'image', 'picture', 'photo', 'file'],
+                  a: function () { return { t: ['Yes, you can bring your own artwork or logo, or describe what you need and we\u2019ll help develop it, with fit, fabric and finish chosen to match your vision.', M('To submit a design, create an account, log in and use the order form. You can upload artwork or describe your idea there.', 'To submit a design, open Create Order. You can upload your artwork or describe what you need, and add your requirements such as colours and quantity.')], l: [LINK.order, LINK.howto], c: ['I don\u2019t have a design yet', 'How do quotes work?'] }; } },
+
+                { id: 'nodesign', p: ['no design', 'dont have a design', 'do not have a design', 'i dont have a design', 'help with a design', 'design help', 'design ideas', 'need ideas', 'help me design', 'design for me', 'create a design', 'design service', 'dont have a logo'], w: ['idea', 'ideas', 'concept'],
+                  a: function () { return { t: ['No problem! You can describe what you\u2019re picturing and our team will work with you to develop it into a design. ' + CONTACT_TXT] , l: M([LINK.contact, LINK.work], [LINK.work]), c: ['What do you make?', 'How do quotes work?'] }; } },
+
+                { id: 'print', p: ['embroidery', 'embroider', 'embroidered', 'screen print', 'screen printing', 'heat transfer', 'printing', 'print', 'personalise', 'personalisation', 'personalize', 'personalization', 'customise', 'customisation', 'monogram', 'stitch', 'stitching', 'vinyl'], w: ['text', 'name', 'names', 'number', 'numbers'],
+                  a: function () { return { t: ['We apply embroidery, screen print and heat transfer, on single pieces or full production runs. The best method depends on your design, garment and quantity, and our team will advise when reviewing your order.'], c: ['What do you make?', 'How do quotes work?', 'Can I use my own design?'] }; } },
+
+                { id: 'business', p: ['business', 'business account', 'corporate', 'corporate wear', 'company', 'workwear', 'uniform', 'uniforms', 'team', 'team kit', 'staff', 'bulk', 'bulk order', 'wholesale', 'school', 'event', 'club', 'organisation', 'organization', 'many items', 'large order', 'big order', 'minimum order', 'minimum quantity', 'moq'], w: ['employees', 'workers', 'members', 'group'],
+                  a: function () { return { t: ['Yes! We do branded uniforms, team kits and corporate wear, produced to a consistent standard across every size and every order.', M('Companies can register a business account so everything is managed in one place.', 'Include the quantity in your order requirements so we can quote accurately. For very large runs or a minimum order quantity, please check with our team: ' + PHONE + '.')], l: M([LINK.biz], []), c: ['How do quotes work?', 'How do I place an order?'] }; } },
+
+                { id: 'howto', p: ['how to order', 'how do i order', 'how do i place an order', 'how can i order', 'place an order', 'place order', 'make an order', 'create an order', 'create order', 'start an order', 'new order', 'order process', 'ordering process', 'how does it work', 'how does avuna work', 'how does the process work', 'process', 'steps', 'order'], w: ['buy', 'purchase', 'get', 'start'],
+                  a: function () { return { t: ['Ordering takes five simple steps:', '1. Submit your design: upload artwork or describe what you need.\n2. Get a clear quote: pricing calculated against your specification.\n3. Make a payment: once you have your quote, payment starts production.\n4. We produce it: your order moves through our production floor, tracked at every stage.\n5. Track and receive: check your status any time and get notified when it\u2019s ready.'], l: M([LINK.order, LINK.howto], [LINK.order, LINK.orders]), c: ['How do quotes work?', 'How do I pay?', 'How long does it take?'] }; } },
+
+                { id: 'account', p: ['register', 'sign up', 'signup', 'create an account', 'create account', 'need an account', 'do i need an account', 'new account', 'open an account', 'join', 'account'], w: ['registration', 'profile'],
+                  a: function () { return CUSTOMER
+                      ? { t: ['You\u2019re already logged in. You can update your details on your Profile page.'], l: [LINK.profile], c: ['How do I update my profile?', 'How do I place an order?'] }
+                      : { t: ['Yes, you\u2019ll need a free Avuna account to place an order, because your order, quote, payment and tracking all live in your profile. Individuals can use Register, and companies can use the business account option.'], l: [LINK.order, LINK.biz, LINK.login], c: ['I forgot my password', 'How do I place an order?'] }; } },
+
+                { id: 'login', p: ['log in', 'login', 'sign in', 'signin', 'cant log in', 'cannot log in', 'cant login', 'unable to log in', 'login problem', 'login error', 'wrong password', 'logout', 'log out', 'sign out'], w: ['username', 'locked'],
+                  a: function () { return CUSTOMER
+                      ? { t: ['You\u2019re logged in right now. To leave your account, use Log Out in the menu. If you ever can\u2019t get in, use the password reset option on the login page.'], c: ['I forgot my password'] }
+                      : { t: ['Open the Login page and enter your registered email and password. If it isn\u2019t working, double-check your details, or reset your password.'], l: [LINK.login, LINK.forgot], c: ['I forgot my password', 'Do I need an account?'] }; } },
+
+                { id: 'forgot', p: ['forgot password', 'forgot my password', 'forgotten password', 'reset password', 'reset my password', 'change password', 'change my password', 'new password', 'lost password', 'password'], w: ['reset', 'recover', 'recovery'],
+                  a: function () { return { t: ['To reset your password, use the Forgot Password page and enter your registered email address. A reset code is emailed to you.', 'If the email doesn\u2019t arrive, check your spam folder, then contact our team.'], l: M([LINK.forgot], [LINK.profile]), c: ['Talk to a person'] }; } },
+
+                { id: 'profile', p: ['update my profile', 'update profile', 'edit profile', 'edit my profile', 'change my details', 'change my address', 'change my email', 'change my phone', 'update my details', 'account details', 'my details', 'my profile'], w: ['profile', 'details', 'address'],
+                  a: function () { return CUSTOMER
+                      ? { t: ['Open your Profile page to view and update your details, then save. You\u2019ll be asked to confirm before changes are applied.'], l: [LINK.profile] }
+                      : { t: ['After you log in, you can view and update your details on your Profile page.'], l: [LINK.login] }; } },
+
+                { id: 'quote', p: ['quote', 'quotation', 'get a quote', 'request a quote', 'how do quotes work', 'estimate', 'quoted'], w: ['quotes'],
+                  a: function () { return { t: ['After you submit your design and requirements (such as product, colours and quantity), we calculate a clear quote against your specification. No manual back-and-forth is needed.', M('You\u2019ll find your quote in your Avuna profile once you\u2019ve submitted an order.', 'Your quote appears on your My Orders page once it\u2019s ready. You can then make payment to start production.')], l: M([LINK.howto], [LINK.orders, LINK.pay]), c: ['How do I pay?', 'How much does it cost?'] }; } },
+
+                { id: 'price', p: ['price', 'prices', 'pricing', 'cost', 'costs', 'how much', 'how much is', 'how much does', 'cheap', 'cheaper', 'expensive', 'rates', 'rate', 'afford', 'budget', 'discount', 'per item', 'per shirt'], w: ['rand', 'zar', 'fee', 'fees', 'charge', 'charges'],
+                  a: function () { return { t: ['Our pricing is calculated for each order, because it depends on the garment, the design and decoration method, and the quantity. I can\u2019t give an exact price in chat, but you\u2019ll get a clear quote once you submit your requirements.'], l: M([LINK.order], [LINK.order]), c: ['How do quotes work?', 'Do you do bulk or corporate orders?'] }; } },
+
+                { id: 'owing', p: ['how much do i owe', 'how much am i owing', 'how much i owe', 'how much do i still owe', 'what do i owe', 'what am i owing', 'what is my balance', 'my balance', 'balance', 'outstanding', 'outstanding balance', 'amount due', 'amount owing', 'amount outstanding', 'owing', 'owe', 'owed', 'still to pay', 'how much must i pay', 'how much should i pay', 'how much do i have to pay', 'what must i pay', 'unpaid', 'my account balance', 'am i in debt', 'what do i still need to pay', 'how much have i paid', 'total due', 'due'], w: ['debt'],
+                  a: function () { return owingAnswer(); } },
+
+                { id: 'pay', p: ['pay', 'payment', 'payments', 'how do i pay', 'make a payment', 'pay for my order', 'paying', 'deposit', 'invoice', 'receipt', 'eft', 'card', 'cash', 'bank', 'proof of payment', 'payment methods', 'pay later'], w: ['paid', 'checkout'],
+                  a: function () { return { t: ['Once you receive your quote, you make a payment to start production of your order.', M('You can do this from your account after logging in.', 'Open your order and use the Payment page; you\u2019ll be asked to confirm before it\u2019s processed.'), 'For questions about payment options or a payment that isn\u2019t showing, please contact our team on ' + PHONE + '.'], l: M([LINK.login], [LINK.orders, LINK.pay]), c: ['How do quotes work?', 'Where is my order?'] }; } },
+
+                { id: 'time', p: ['how long', 'turnaround', 'turn around', 'how many days', 'how soon', 'how fast', 'when will', 'lead time', 'delivery time', 'production time', 'how quickly', 'urgent', 'rush', 'deadline', 'in time', 'by friday', 'asap'], w: ['long', 'days', 'weeks', 'time', 'quick', 'fast', 'soon'],
+                  a: function () { return { t: ['Production time depends on your order, including the design, decoration method, quantity and how busy our production floor is, so I can\u2019t promise a fixed time in chat.', 'If you have a deadline, tell us when you order, or contact our team for an estimated completion date: ' + PHONE + '.'], c: ['How do I place an order?', 'Where is my order?'] }; } },
+
+                { id: 'production', p: ['production', 'produce', 'being made', 'how is it made', 'how are they made', 'manufacturing', 'quality', 'quality check', 'queue', 'production floor', 'fabric', 'material', 'materials', 'stitching quality'], w: ['made', 'make', 'making'],
+                  a: function () { return { t: ['Once payment is made, your order is queued, produced and quality-checked. Its status is updated as it moves through our production floor, so you can follow progress.'], l: M([LINK.howto], [LINK.orders]), c: ['How long does it take?', 'Where is my order?'] }; } },
+
+                { id: 'track', p: ['where is my order', 'track', 'tracking', 'track my order', 'order status', 'status', 'check my order', 'order update', 'my order', 'my orders', 'is my order ready', 'order ready', 'progress', 'update on my order'], w: ['ready', 'notified', 'notification', 'whereabouts'],
+                  a: function () { var live = myOrdersAnswer(); if (live) return live; return CUSTOMER
+                      ? { t: ['You can follow every order on My Orders. Each order shows its current status as it moves through production, so you can check any time. I can\u2019t see live order details in chat, but our team can help if something looks wrong.'], l: [LINK.orders], c: ['How long does it take?', 'Talk to a person'] }
+                      : { t: ['Log in to your Avuna account and open My Orders to see the live status of your order. You\u2019ll also be notified when it\u2019s ready. I can\u2019t see individual order details in chat.'], l: [LINK.login], c: ['I forgot my password', 'Talk to a person'] }; } },
+
+                { id: 'delivery', p: ['delivery', 'deliver', 'delivered', 'collection', 'collect', 'collect my order', 'courier', 'shipping', 'ship', 'send to', 'pick up', 'pickup', 'postage', 'nationwide', 'outside durban', 'do you deliver'], w: ['receive'],
+                  a: function () { return { t: ['Delivery or collection is arranged when your order is ready. For delivery options and costs to your area, or to collect from us in Durban, please confirm with our team: ' + PHONE + '.'], l: [], c: ['Where are you located?', 'Talk to a person'] }; } },
+
+                { id: 'change', p: ['change my order', 'change my design', 'edit my order', 'modify my order', 'change order', 'amend', 'wrong size', 'wrong colour', 'wrong color', 'add more', 'mistake in my order', 'update my order'], w: ['change', 'modify', 'edit'],
+                  a: function () { return { t: ['Changes are easiest before production starts, and they may affect the quote or timing. Please contact our team as soon as possible with your order details: ' + PHONE + ' or ' + EMAIL + '.'], c: ['Can I cancel my order?', 'Talk to a person'] }; } },
+
+                { id: 'cancel', p: ['cancel', 'cancel my order', 'cancellation', 'cancelled', 'refund', 'money back', 'return', 'returns', 'exchange', 'return policy', 'refund policy'], w: ['undo'],
+                  a: function () { return CUSTOMER
+                      ? { t: ['If your order hasn\u2019t progressed too far, you can cancel it from My Orders (you\u2019ll be asked to confirm first). Once production has started, cancellation depends on the order status and our terms, so please contact our team.', 'For refunds or returns, please speak to our team: ' + PHONE + '.'], l: [LINK.orders], c: ['Talk to a person'] }
+                      : { t: ['Orders can be cancelled from your account while they haven\u2019t progressed too far. Once production has started, it depends on the order status and our terms. For refunds or returns, please speak to our team: ' + PHONE + '.'], c: ['Talk to a person'] }; } },
+
+                { id: 'review', p: ['review', 'reviews', 'rate', 'rating', 'ratings', 'feedback', 'give review', 'leave a review', 'testimonial', 'testimonials', 'stars', 'response from manager', 'manager response', 'manager reply'], w: ['reply', 'responded'],
+                  a: function () { return CUSTOMER
+                      ? { t: ['Once an order is delivered, a Give Review button appears on My Orders. Rate it from 1 to 5 stars and add a comment. If our manager replies, a gold Response button appears next to your order number, and clicking it shows the reply.'], l: [LINK.orders] }
+                      : { t: ['You can read what other clients say on our Client Reviews page. After your own order is delivered, you can leave a rating and review from your account.'], l: [LINK.reviews] }; } },
+
+                { id: 'work', p: ['our work', 'your work', 'portfolio', 'examples', 'samples', 'previous work', 'gallery', 'photos', 'pictures of', 'show me', 'past orders', 'past work', 'completed work', 'what have you made'], w: ['inspiration', 'inspire'],
+                  a: function () { return { t: ['You can see work we\u2019ve completed for clients on the Our Work page, from custom pieces for individuals to branded workwear for teams.'], l: M([LINK.work, LINK.reviews], []), c: ['What do you make?', 'How do I place an order?'] }; } },
+
+                { id: 'location', p: ['where are you', 'where are you located', 'location', 'located', 'address', 'directions', 'where is avuna', 'find you', 'visit', 'visit you', 'walk in', 'showroom', 'shop', 'store', 'office', 'workshop', 'map', 'durban'], w: ['near', 'area', 'town'],
+                  a: function () { return { t: ['We\u2019re based in Durban at ' + ADDRESS + '. Please contact us before visiting so we can make sure someone is available to help you.'], l: M([LINK.contact], []), c: ['What are your contact details?', 'Do you deliver?'] }; } },
+
+                { id: 'hours', p: ['opening hours', 'open hours', 'business hours', 'trading hours', 'what time do you open', 'when are you open', 'are you open', 'closing time', 'working hours', 'open on saturday', 'open on sunday', 'hours', 'open'], w: ['closed', 'weekend', 'saturday', 'sunday', 'public holiday'],
+                  a: function () { return { t: ['I don\u2019t have our exact opening hours in chat. Please call us on ' + PHONE + ' or email ' + EMAIL + ' and the team will confirm when they\u2019re available.'], c: ['Where are you located?'] }; } },
+
+                { id: 'contact', p: ['contact', 'contact you', 'contact us', 'contact details', 'phone', 'phone number', 'call you', 'call', 'telephone', 'cell number', 'whatsapp', 'email', 'email address', 'e-mail', 'speak to someone', 'speak to a person', 'talk to someone', 'talk to a person', 'talk to a human', 'human', 'real person', 'agent', 'customer service', 'support', 'help me', 'manager', 'complaint', 'complain', 'problem with', 'issue with', 'not happy', 'unhappy', 'escalate'], w: ['help', 'assist', 'speak', 'talk'],
+                  a: function () { return { t: ['Our team is happy to help:', '\u2022 Phone: ' + PHONE + '\n\u2022 Email: ' + EMAIL + '\n\u2022 Address: ' + ADDRESS, 'If you have a complaint or a problem with an order, please include your order number so we can sort it out quickly.'], l: M([LINK.contact], []), c: M(['Where are you located?', 'How do I place an order?'], ['Where is my order?', 'Where are you located?']) }; } },
+
+                { id: 'social', p: ['instagram', 'facebook', 'tiktok', 'twitter', 'social media', 'social', 'follow you', 'follow avuna'], w: [],
+                  a: function () { return { t: ['You can find us on Instagram: @avunacollected (instagram.com/avunacollected). All our social links are also in the footer at the bottom of every page. For anything urgent, calling or emailing our team is quickest: ' + PHONE + '.'] }; } },
+
+                { id: 'sizes', p: ['size', 'sizes', 'sizing', 'size chart', 'colour', 'colours', 'color', 'colors', 'fit', 'what sizes', 'plus size', 'kids', 'children', 'ladies', 'mens', 'unisex'], w: ['small', 'medium', 'large', 'xl', 'xxl'],
+                  a: function () { return { t: ['Garment sizes and colours depend on the product you choose. Add your preferred sizes, colours and quantities in your order requirements and we\u2019ll confirm what\u2019s available in your quote.'], l: [LINK.order], c: ['How do quotes work?', 'What do you make?'] }; } },
+
+                { id: 'thanks', p: ['thanks', 'thank you', 'thank', 'thx', 'cheers', 'appreciate', 'ngiyabonga', 'enkosi', 'awesome', 'great', 'perfect', 'cool', 'nice', 'okay thanks'], w: [],
+                  a: function () { return { t: ['You\u2019re welcome! Is there anything else I can help you with?'], c: ['What do you make?', 'Talk to a person'] }; } },
+
+                { id: 'bye', p: ['bye', 'goodbye', 'see you', 'see ya', 'later', 'that is all', 'thats all', 'no thanks', 'nothing else'], w: [],
+                  a: function () { return { t: ['Thank you for visiting Avuna Collective. We look forward to bringing your design to life!'] }; } }
+            ];
+
+            /* ---------------- text processing ---------------- */
+            function greeting() { var h = new Date().getHours(); return h < 12 ? 'Good morning!' : (h < 18 ? 'Good afternoon!' : 'Good evening!'); }
+
+            var SYN = [[/t[\s-]?shirts?|tees?\b/g, 'tshirt'], [/\bpls\b|\bplz\b/g, 'please'], [/\bthx\b|\bty\b/g, 'thanks'], [/\bu\b/g, 'you'], [/\bur\b/g, 'your'], [/\bwat\b/g, 'what'], [/\bwhats\b/g, 'what is'], [/\bhow much is\b/g, 'how much'], [/\bdont\b/g, 'do not'], [/\bcant\b/g, 'cannot'], [/\bhoodies\b/g, 'hoodie']];
+            function norm(s) {
+                s = (' ' + s.toLowerCase() + ' ').replace(/['\u2019]/g, '');
+                for (var i = 0; i < SYN.length; i++) s = s.replace(SYN[i][0], SYN[i][1]);
+                return s.replace(/[^a-z0-9\s]/g, ' ').replace(/\s+/g, ' ').trim();
+            }
+            function stem(w) { return w.length > 4 ? w.replace(/(ing|ed|es|s)$/, '') : w; }
+            function lev(a, b) {
+                if (Math.abs(a.length - b.length) > 2) return 9;
+                var prev = [], cur, i, j;
+                for (j = 0; j <= b.length; j++) prev[j] = j;
+                for (i = 1; i <= a.length; i++) {
+                    cur = [i];
+                    for (j = 1; j <= b.length; j++) cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+                    prev = cur;
+                }
+                return prev[b.length];
             }
 
-            function askSuggestion(btn) {
-                document.getElementById("chatInput").value = btn.textContent;
-                sendMessage();
+            // pre-process knowledge base once
+            KB.forEach(function (k) {
+                k.pn = k.p.map(norm).filter(function (x, i, arr) { return arr.indexOf(x) === i; });   // drop duplicates after normalising
+                
+                k.ws = k.w.map(function (x) { return stem(norm(x)); });
+            });
+
+            function scoreIntent(k, text, tokens, stems) {
+                var s = 0, i, j, ph, padded = ' ' + text + ' ';
+                for (i = 0; i < k.pn.length; i++) {
+                    ph = k.pn[i];
+                    if (padded.indexOf(' ' + ph + ' ') > -1) {
+                        s += ph.indexOf(' ') > -1 ? 4 + ph.split(' ').length : 3;      // longer phrases outrank single words
+                    } else if (ph.length >= 5 && ph.indexOf(' ') === -1) {
+                        for (j = 0; j < tokens.length; j++) {                          // typo tolerance on single words
+                            if (tokens[j].length >= 5 && lev(tokens[j], ph) <= (ph.length >= 8 ? 2 : 1)) { s += 3; break; }
+                        }
+                    }
+                }
+                for (i = 0; i < k.ws.length; i++) if (stems.indexOf(k.ws[i]) > -1) s += 1;
+                return s;
             }
 
-            // Stops Enter from submitting the ASP.NET form (which reloads the page)
-            function chatKey(e) {
-                if (e.key === "Enter") {
-                    e.preventDefault();
-                    sendMessage();
-                    return false;
+            var lastId = null;
+
+            function answer(q) {
+                var text = norm(q);
+                if (!text) return null;
+                var tokens = text.split(' '), stems = tokens.map(stem);
+
+                // a specific order number, e.g. "where is ORD003"
+                var ol = orderLookup(text);
+                if (ol) { lastId = 'track'; return [ol]; }
+
+                // things we do not sell (cars, phones, food ...)
+                if (hasWord(tokens, NOT_SOLD) && !hasWord(tokens, APPAREL) && /\b(sell|buy|have|make|offer|get|order|stock|purchase|supply|do you do|available|price of|how much is)\b/.test(text)) {
+                    lastId = 'notsold';
+                    return [NOT_SOLD_ANSWER()];
                 }
-                return true;
+                var scored = [];
+                KB.forEach(function (k) {
+                    var s = scoreIntent(k, text, tokens, stems);
+                    if (k.id === lastId && s > 0) s += 1;                             // stay on topic for follow-ups
+                    if (s > 0) scored.push({ k: k, s: s });
+                });
+                scored.sort(function (a, b) { return b.s - a.s; });
+
+                // "more / explain" follow-up
+                if ((!scored.length || scored[0].s < 3) && lastId && /\b(more|details|explain|elaborate|what else|and then|tell me more)\b/.test(text)) {
+                    var lk = KB.filter(function (k) { return k.id === lastId; })[0];
+                    if (lk) { return [lk.a()]; }
+                }
+
+                if ((!scored.length || scored[0].s < 3) && /^(do|does|can|could|will) (you|avuna|u)( guys)? (sell|make|have|offer|stock|supply|do|sew|repair|fix|design)\b/.test(text) && !hasWord(tokens, APPAREL)) {
+                    return [{ t: ['I don\u2019t have that listed among what we make. Avuna Collective specialises in custom clothing and branded apparel. If you\u2019d like to check whether we can do something specific, our team can confirm: ' + PHONE + ' or ' + EMAIL + '.'], c: ['What do you make?', 'Talk to a person'] }];
+                }
+
+                if (!scored.length || scored[0].s < 3) {
+                    // not understood: offer closest topics
+                    var guess = scored.slice(0, 3).map(function (x) { return x.k; });
+                    var chips = guess.map(function (k) { return TOPIC[k.id]; }).filter(Boolean);
+                    if (chips.length < 3) chips = chips.concat(['How do I place an order?', 'What do you make?', 'Talk to a person']).slice(0, 4);
+                    return [{ t: ['I\u2019m not completely sure I understood that. ' + (guess.length ? 'Did you mean one of these?' : 'Here are some things I can help with:'), 'Or you can reach our team directly on ' + PHONE + ' or ' + EMAIL + '.'], c: chips, unknown: true }];
+                }
+
+                // answer the best match, plus a second one if it is nearly as strong (multi-part questions)
+                var out = [scored[0].k], top = scored[0].s;
+                if (scored[1] && scored[1].s >= 4 && scored[1].s >= top * 0.7 && scored[1].k.id !== 'thanks' && scored[0].k.id !== 'greet') out.push(scored[1].k);
+                lastId = out[0].id;
+                return out.map(function (k) { return k.a(); });
             }
 
-            function sendMessage() {
-                var input = document.getElementById("chatInput");
-                var messages = document.getElementById("chatMessages");
-                var question = input.value.trim();
+            // short question text used as a chip for each topic
+            var TOPIC = { owing: 'How much do I owe?', products: 'What do you make?', howto: 'How do I place an order?', quote: 'How do quotes work?', price: 'How much does it cost?', pay: 'How do I pay?', track: 'Where is my order?', delivery: 'Do you deliver?', contact: 'Talk to a person', location: 'Where are you located?', account: 'Do I need an account?', forgot: 'I forgot my password', cancel: 'Can I cancel my order?', time: 'How long does it take?', business: 'Do you do bulk or corporate orders?', custom: 'Can I use my own design?', review: 'How do reviews work?', work: 'Show me your work', hours: 'What are your opening hours?', change: 'Can I change my order?', print: 'What printing do you do?', login: 'How do I log in?', profile: 'How do I update my profile?' };
 
-                if (question === "") return;
+            /* ---------------- rendering ---------------- */
+            function save() { try { sessionStorage.setItem(STORE, msgs.innerHTML); } catch (e) { } }
+            function scroll() { msgs.scrollTop = msgs.scrollHeight; }
+            function clearChips() { var rows = msgs.querySelectorAll('.ava-row'); for (var i = 0; i < rows.length; i++) rows[i].parentNode.removeChild(rows[i]); }
 
-                var userMessage = document.createElement("div");
-                userMessage.className = "user-message";
-                userMessage.textContent = question;
-                messages.appendChild(userMessage);
-
-                var reply = getBotReply(question.toLowerCase());
-
-                var botMessage = document.createElement("div");
-                botMessage.className = "bot-message";
-                botMessage.textContent = reply;
-                messages.appendChild(botMessage);
-
-                input.value = "";
-                messages.scrollTop = messages.scrollHeight;
-                input.focus();
-                updateSuggestions();
+            function addUser(text) {
+                clearChips();
+                var d = document.createElement('div'); d.className = 'ava-user'; d.textContent = text; msgs.appendChild(d); scroll();
+            }
+            function fillText(el, s) {
+                var lines = String(s).split('\n');
+                for (var i = 0; i < lines.length; i++) { if (i) el.appendChild(document.createElement('br')); el.appendChild(document.createTextNode(lines[i])); }
+            }
+            function addBot(r) {
+                var d = document.createElement('div'); d.className = 'ava-bot';
+                (r.t || []).forEach(function (para) { var p = document.createElement('p'); fillText(p, para); d.appendChild(p); });
+                if (r.l && r.l.length) {
+                    var lp = document.createElement('p'); lp.style.marginTop = '8px';
+                    r.l.forEach(function (x) { var a = document.createElement('a'); a.className = 'ava-link'; a.href = x[1]; a.textContent = x[0] + ' \u2192'; a.style.marginRight = '6px'; a.style.marginBottom = '4px'; lp.appendChild(a); });
+                    d.appendChild(lp);
+                }
+                msgs.appendChild(d);
+            }
+            function addChips(list) {
+                if (!list || !list.length) return;
+                var row = document.createElement('div'); row.className = 'ava-row';
+                list.forEach(function (c) { var b = document.createElement('button'); b.type = 'button'; b.className = 'ava-chip'; b.setAttribute('data-q', c); b.textContent = c; row.appendChild(b); });
+                msgs.appendChild(row);
             }
 
-            function getBotReply(question) {
-                question = question.toLowerCase().trim();
-
-                // 1. Greetings (whole words only, so "this" or "which" don't trigger it)
-                if (/\b(hello|hi|hey)\b/.test(question)) {
-                    return "Hello! Welcome to Avuna Collective. You can ask me about our services, submitting designs, quotes, production, or tracking orders. How can I help you?";
-                }
-
-                // 2. About Avuna Collective
-                if (
-                    question.includes("what is avuna") ||
-                    question.includes("about avuna") ||
-                    question.includes("who are you")
-                ) {
-                    return "Avuna Collective is a custom clothing business that helps customers bring their T-shirt and clothing design ideas to life.";
-                }
-
-                if (
-                    question.includes("how does avuna work") ||
-                    question.includes("how do you operate") ||
-                    question.includes("how does the process work") ||
-                    question.includes("how does it work")
-                ) {
-                    return "Avuna Collective follows four main steps: 1. Submit your design. 2. Receive a clear quote. 3. Your items are produced. 4. Track and receive your order.";
-                }
-
-                if (
-                    question.includes("what do you sell") ||
-                    question.includes("what products") ||
-                    question.includes("what do you make") ||
-                    question.includes("your services")
-                ) {
-                    return "We focus on custom T-shirts and clothing. Please contact our team to confirm whether your specific item can be produced.";
-                }
-
-                if (
-                    question.includes("who can order") ||
-                    question.includes("who can place an order")
-                ) {
-                    return "Customers interested in custom clothing can submit their designs and requirements for our team to review.";
-                }
-
-                // 3. Design submissions
-                if (
-                    question.includes("submit") ||
-                    question.includes("upload") ||
-                    question.includes("send my design") ||
-                    question.includes("how do i design")
-                ) {
-                    return "You can submit your design through the appropriate design submission or order section of our website. Include your requirements so our team can review your request.";
-                }
-
-                if (
-                    question.includes("own design") ||
-                    question.includes("my own artwork") ||
-                    question.includes("my own logo") ||
-                    question.includes("business logo")
-                ) {
-                    return "You can submit your own artwork or logo for consideration. Our team will review your requirements and advise you on the next steps.";
-                }
-
-                if (
-                    question.includes("no design") ||
-                    question.includes("design ideas") ||
-                    question.includes("help with a design")
-                ) {
-                    return "If you do not have a design ready, contact our team to discuss your ideas and find out what options may be available.";
-                }
-
-                if (question.includes("colour") || question.includes("color")) {
-                    return "Include your preferred colours in your design requirements so our team can assess your request.";
-                }
-
-                if (
-                    question.includes("after i submit") ||
-                    question.includes("after submitting") ||
-                    question.includes("what happens next")
-                ) {
-                    return "After you submit your design and order requirements, our team reviews your request before providing a quote.";
-                }
-
-                // 4. Quotes and pricing
-                if (
-                    question.includes("quote") ||
-                    question.includes("price") ||
-                    question.includes("cost") ||
-                    question.includes("how much") ||
-                    question.includes("pricing")
-                ) {
-                    return "Pricing depends on your order requirements, including factors such as quantity, design and production needs. Submit your design and details so our team can provide a quote.";
-                }
-
-                if (
-                    question.includes("accept the quote") ||
-                    question.includes("after the quote") ||
-                    question.includes("quote approved")
-                ) {
-                    return "Once your order requirements and the necessary terms are confirmed, your order can proceed to the production stage.";
-                }
-
-                if (
-                    question.includes("change my order") ||
-                    question.includes("change my design") ||
-                    question.includes("modify my order")
-                ) {
-                    return "Please contact our team before production begins to discuss changes. Changes may affect the quoted price or production arrangements.";
-                }
-
-                // 5. Production and quantities
-                if (
-                    question.includes("production") ||
-                    question.includes("manufacturing") ||
-                    question.includes("making my order") ||
-                    question.includes("how are my t-shirts made")
-                ) {
-                    return "Your order moves through the production process according to the approved design and requirements once the necessary details and terms have been confirmed.";
-                }
-
-                if (
-                    question.includes("how long") &&
-                    (
-                        question.includes("production") ||
-                        question.includes("make") ||
-                        question.includes("ready") ||
-                        question.includes("take")
-                    )
-                ) {
-                    return "Production time depends on your order and current arrangements. Please contact our team for an estimated completion date.";
-                }
-
-                if (
-                    question.includes("quantity") ||
-                    question.includes("bulk order") ||
-                    question.includes("multiple t-shirts") ||
-                    question.includes("many t-shirts") ||
-                    question.includes("more than one")
-                ) {
-                    return "Include the quantity you require when submitting your order so our team can assess your request and provide a quote.";
-                }
-
-                if (question.includes("repeat order") || question.includes("order again")) {
-                    return "You can contact our team with the details of your previous order to enquire about placing it again.";
-                }
-
-                if (question.includes("cancel") || question.includes("cancellation")) {
-                    return "Please contact our team as soon as possible. Cancellation depends on your order status and the applicable business terms.";
-                }
-
-                // 6. Order tracking and delivery
-                if (
-                    question.includes("track") ||
-                    question.includes("order status") ||
-                    question.includes("where is my order") ||
-                    question.includes("check my order") ||
-                    question.includes("order update")
-                ) {
-                    return "Log in to your Avuna account and check your order status if tracking is available. I cannot access live order information through this chatbot.";
-                }
-
-                if (
-                    question.includes("delivery") ||
-                    question.includes("deliver") ||
-                    question.includes("collection") ||
-                    question.includes("receive my order")
-                ) {
-                    return "Delivery or collection arrangements should be confirmed with our team when your order is processed.";
-                }
-
-                if (
-                    question.includes("delayed") ||
-                    question.includes("late order") ||
-                    question.includes("order is late")
-                ) {
-                    return "Please contact our team with your order details so they can help you establish the status of your order.";
-                }
-
-                // 7. Account and login support
-                if (
-                    question.includes("forgot password") ||
-                    question.includes("reset password") ||
-                    question.includes("forgotten password")
-                ) {
-                    return "Use the password recovery option if it is available on the website. Otherwise, contact our team for assistance.";
-                }
-
-                if (
-                    question.includes("login") ||
-                    question.includes("log in") ||
-                    question.includes("sign in")
-                ) {
-                    return "Open the login page and enter your registered username and password.";
-                }
-
-                if (
-                    question.includes("account details") ||
-                    question.includes("update my profile")
-                ) {
-                    return "Log in to your account and check whether your profile details can be updated. Contact our team if you need help.";
-                }
-
-                if (
-                    question.includes("need an account") ||
-                    question.includes("create an account") ||
-                    question.includes("register")
-                ) {
-                    return "Please follow the registration and ordering instructions on our website. If registration is required, create an account before continuing.";
-                }
-
-                // 8. Contact and customer support
-                if (
-                    question.includes("contact") ||
-                    question.includes("speak to someone") ||
-                    question.includes("human") ||
-                    question.includes("customer service") ||
-                    question.includes("talk to someone") ||
-                    question.includes("help me")
-                ) {
-                    return "Please visit the Contact page on our website for the available contact details and support options.";
-                }
-
-                // 9. Thanks and goodbye
-                if (question.includes("thank") || question.includes("thanks")) {
-                    return "You're welcome! Thank you for choosing Avuna Collective.";
-                }
-
-                if (question.includes("bye") || question.includes("goodbye")) {
-                    return "Thank you for visiting Avuna Collective. We hope to help you bring your design ideas to life. Goodbye!";
-                }
-
-                // 10. Default response
-                return "I'm sorry, I don't have an answer for that yet. Please visit the Contact page on our website for assistance from the Avuna Collective team.";
+            function ask(q) {
+                q = (q || '').replace(/^\s+|\s+$/g, '');
+                if (!q) return;
+                addUser(q); input.value = '';
+                var typing = document.createElement('div'); typing.className = 'ava-bot ava-typing'; typing.innerHTML = '<i></i><i></i><i></i>';
+                msgs.appendChild(typing); scroll();
+                var res = answer(q);
+                setTimeout(function () {
+                    msgs.removeChild(typing);
+                    res.forEach(function (r) { addBot(r); });
+                    var last = res[res.length - 1];
+                    addChips(last.c);
+                    scroll(); save();
+                }, 450 + Math.min(700, q.length * 12));
             }
+
+            function open() {
+                win.className = 'ava-window open'; label.style.display = 'none'; toggle.style.display = 'none';
+                try { sessionStorage.setItem(STORE + '_open', '1'); } catch (e) { }
+                scroll(); setTimeout(function () { input.focus(); }, 50);
+            }
+            function close() {
+                win.className = 'ava-window'; label.style.display = ''; toggle.style.display = 'block';
+                try { sessionStorage.removeItem(STORE + '_open'); } catch (e) { }
+            }
+
+            /* ---------------- wiring ---------------- */
+            toggle.addEventListener('click', open);
+            label.addEventListener('click', open);
+            label.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); } });
+            $('avaClose').addEventListener('click', close);
+            $('avaSend').addEventListener('click', function () { ask(input.value); });
+            input.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); ask(input.value); } });
+            msgs.addEventListener('click', function (e) {
+                var b = e.target; if (b && b.className === 'ava-chip') ask(b.getAttribute('data-q'));
+            });
+
+            // restore the conversation when moving between pages, otherwise start with a welcome
+            var saved = null, wasOpen = false;
+            try { saved = sessionStorage.getItem(STORE); wasOpen = sessionStorage.getItem(STORE + '_open') === '1'; } catch (e) { }
+            if (saved) { msgs.innerHTML = saved; }
+            else {
+                addBot({ t: [greeting() + ' Welcome to Avuna Collective. I\u2019m Avuna Assistance, your virtual helper. Ask me about ' + M('our products, how to order, quotes, accounts and contacting us.', 'your orders, quotes, payments, your profile and more.')] });
+                addChips(M(['What do you make?', 'How do I place an order?', 'How do quotes work?', 'Do I need an account?'], ['How much do I owe?', 'Where is my order?', 'How do I create an order?', 'How do reviews work?']));
+            }
+            if (wasOpen) open();
+        })();
         </script>
+        <!-- =================== END AVUNA ASSISTANCE =================== -->
         <!-- WhatsApp: opens a chat with the AVUNA consultant -->
         <a class="avuna-whatsapp" href="https://wa.me/27714860091?text=Hello%20AVUNA%20COLLECTIVE%2C%20I%20would%20like%20to%20speak%20to%20a%20consultant." target="_blank" rel="noopener noreferrer" title="Chat with a consultant on WhatsApp" aria-label="Chat with a consultant on WhatsApp">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 0 1-12.4 7.4L3 20.5l1.7-5.4A8.5 8.5 0 1 1 21 11.5z"/><path d="M9 8.5c.3 2.6 2.6 5.1 5.5 6l1.4-1.5-2-1-.8.8c-.9-.4-1.7-1.2-2.1-2.1l.8-.8-1-2z"/></svg>
@@ -703,22 +750,94 @@ hr{display:none}
             })();
         </script>
     <script>
-        // Highlights the current page in the navigation bar
-        (function () {
-            var here = (location.pathname.split("/").pop() || "default").toLowerCase().replace(/\.aspx$/, "");
-            var links = document.querySelectorAll(".av-links .av-link");
-            for (var i = 0; i < links.length; i++) {
-                var h = (links[i].getAttribute("href") || "").split("?")[0].split("/").pop().toLowerCase().replace(/\.aspx$/, "");
-                if (h === "" && here === "default") h = "default";
-                if (h === here) links[i].className += " active";
-            }
-        })();
-    </script>
+    // Highlights the current page in the navigation bar
+    (function () {
+        var here = (location.pathname.split("/").pop() || "default").toLowerCase().replace(/\.aspx$/, "");
+        var links = document.querySelectorAll(".av-links .av-link");
+        for (var i = 0; i < links.length; i++) {
+            var h = (links[i].getAttribute("href") || "").split("?")[0].split("/").pop().toLowerCase().replace(/\.aspx$/, "");
+            if (h === "" && here === "default") h = "default";
+            if (h === here) links[i].className += " active";
+        }
+    })();
+</script>
+<style>
+.avc-back{position:fixed;inset:0;z-index:100000;display:none;align-items:center;justify-content:center;background:rgba(15,42,31,.55);padding:20px;font-family:"Inter","Segoe UI",Roboto,Arial,sans-serif}
+.avc-back.avc-open{display:flex}
+.avc-box{position:relative;background:#fbf8f2;border-radius:18px;max-width:440px;width:100%;padding:30px 30px 24px;box-shadow:0 24px 60px rgba(0,0,0,.3);overflow:hidden;animation:avcIn .18s ease-out}
+.avc-box:before{content:"";position:absolute;left:0;right:0;top:0;height:5px;background:#b98a3e}
+.avc-box.avc-danger:before{background:#b4443c}
+@keyframes avcIn{from{transform:translateY(10px) scale(.98);opacity:0}to{transform:none;opacity:1}}
+.avc-icon{width:46px;height:46px;border-radius:50%;background:#f2e8d6;color:#8a6a35;display:flex;align-items:center;justify-content:center;margin-bottom:14px}
+.avc-danger .avc-icon{background:#f7e1de;color:#b4443c}
+.avc-icon svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.avc-title{font-family:"Playfair Display",Georgia,serif;font-size:23px;font-weight:700;color:#0f2a1f;margin:0 0 8px}
+.avc-msg{font-size:14.5px;line-height:1.65;color:#4c564f;margin:0 0 20px}
+.avc-msg ul{margin:10px 0 0;padding-left:18px}.avc-msg li{margin:3px 0}
+.avc-actions{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap}
+.avc-btn{border-radius:10px;padding:11px 20px;font-size:14px;font-weight:600;cursor:pointer;border:1px solid transparent;font-family:inherit}
+.avc-cancel{background:#fff;border-color:#d9cfbd;color:#0f2a1f}.avc-cancel:hover{background:#f5efe6}
+.avc-ok{background:#0f2a1f;color:#f5efe6}.avc-ok:hover{background:#173c2c}
+.avc-danger .avc-ok{background:#b4443c;color:#fff}.avc-danger .avc-ok:hover{background:#963530}
+.av-lowstock{background:#fff7e6;border:1px solid #ecd49b;border-left:5px solid #c78a1a;border-radius:14px;padding:16px 20px;margin:0 0 22px;font-family:"Inter","Segoe UI",Roboto,Arial,sans-serif;color:#5b4310}
+.av-ls-head{display:flex;align-items:center;gap:12px;flex-wrap:wrap;font-size:14px}
+.av-ls-head strong{font-size:15px;color:#7a5200}.av-ls-head a{margin-left:auto;background:#0f2a1f;color:#f5efe6!important;text-decoration:none!important;border-radius:9px;padding:8px 16px;font-weight:600;font-size:13px}
+.av-lowstock ul{list-style:none;margin:12px 0 0;padding:0;display:flex;flex-wrap:wrap;gap:8px}
+.av-lowstock li{background:#fff;border:1px solid #ecd49b;border-radius:20px;padding:5px 12px;font-size:12.5px}
+.av-lowstock li.out{border-color:#e3b3ae;background:#fdeceb;color:#8f2f28}
+</style>
+<script>
+    (function () {
+        var ICON = {
+            q: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.6 2.2c-.7.4-1.1.9-1.1 1.8M12 17h.01"/></svg>',
+            m: '<svg viewBox="0 0 24 24"><rect x="3.5" y="5.5" width="17" height="13" rx="2"/><path d="m4 7 8 6 8-6"/></svg>',
+            w: '<svg viewBox="0 0 24 24"><path d="M12 3.5 21 19.5H3z"/><path d="M12 10v4.5M12 17.2h.01"/></svg>'
+        };
+        var back = null, onOk = null;
+        function ensure() {
+            if (back) return;
+            back = document.createElement('div');
+            back.className = 'avc-back';
+            back.innerHTML = '<div class="avc-box" role="dialog" aria-modal="true"><div class="avc-icon"></div><h3 class="avc-title"></h3><div class="avc-msg"></div><div class="avc-actions"><button type="button" class="avc-btn avc-cancel">Cancel</button><button type="button" class="avc-btn avc-ok">OK</button></div></div>';
+            document.body.appendChild(back);
+            back.addEventListener('click', function (e) { if (e.target === back) close(); });
+            back.querySelector('.avc-cancel').onclick = close;
+            back.querySelector('.avc-ok').onclick = function () { var f = onOk; close(); if (f) f(); };
+            document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && back.classList.contains('avc-open')) close(); });
+        }
+        function close() { if (back) back.classList.remove('avc-open'); onOk = null; }
+        function open(title, html, okText, cancelText, danger, icon, cb) {
+            ensure();
+            var box = back.querySelector('.avc-box');
+            box.className = 'avc-box' + (danger ? ' avc-danger' : '');
+            back.querySelector('.avc-icon').innerHTML = icon;
+            back.querySelector('.avc-title').textContent = title;
+            back.querySelector('.avc-msg').innerHTML = html;
+            back.querySelector('.avc-ok').textContent = okText;
+            var c = back.querySelector('.avc-cancel');
+            c.textContent = cancelText; c.style.display = cancelText ? '' : 'none';
+            onOk = cb;
+            back.classList.add('avc-open');
+            back.querySelector('.avc-ok').focus();
+        }
+        function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+        window.avConfirm = function (title, message, okText, onConfirm, danger) {
+            open(title, esc(message), okText || 'Yes, continue', 'Cancel', !!danger, danger ? ICON.w : ICON.q, onConfirm);
+        };
+        window.avNotice = function (title, html, okText, href) {
+            open(title, html, okText || 'OK', href ? 'Close' : '', false, href ? ICON.w : ICON.m, href ? function () { window.location.href = href; } : null);
+        };
+        window.avConfirmClick = function (el, title, message, okText, danger) {
+            if (el.__avOk) { el.__avOk = false; return true; }
+            avConfirm(title, message, okText, function () { el.__avOk = true; el.click(); }, danger);
+            return false;
+        };
+    })();
+</script>
     </form>
     <asp:PlaceHolder runat="server">
         <%: Scripts.Render("~/Scripts/bootstrap.js") %>
     </asp:PlaceHolder>
 </body>
 </html>
-
 

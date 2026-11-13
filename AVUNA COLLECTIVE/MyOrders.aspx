@@ -122,6 +122,19 @@
 .customer-stat-grid .stat-gold:before{background:#0f2a1f}
 .customer-stat-grid .stat-dark:before{background:#6b8f71}
 .customer-stat-grid .stat-orange:before{background:#6b8f71}
+.resp-chip{margin-left:8px;background:#f2e8d6;color:#6f5428;border:1px solid #c49a45;border-radius:999px;padding:3px 11px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;font-family:inherit}
+.resp-chip:hover{background:#0f2a1f;color:#f5efe6;border-color:#0f2a1f}
+.resp-q{background:#f5efe6;border-radius:10px;padding:10px 12px;margin:0 0 12px;font-size:13.5px;color:#4c564f}
+.resp-q b{color:#b98a3e;letter-spacing:2px}
+.resp-a{border-left:4px solid #b98a3e;padding:4px 0 4px 12px;color:#0f2a1f;font-size:15px;line-height:1.6;margin:0}
+.resp-d{font-size:12px;color:#8a6a35;margin:10px 0 0}
+.give-review-btn{padding:9px 14px;border:1px solid #0f2a1f;background:#0f2a1f;color:#f5efe6;border-radius:8px;font-size:11px;font-weight:800;cursor:pointer;white-space:nowrap}
+.give-review-btn:hover{background:#173c2c}
+.reviewed-tag{color:#8a6a35;font-size:12px;font-weight:700;white-space:nowrap}
+.rv-stars{display:flex;gap:6px;justify-content:center;margin:6px 0 16px}
+.rv-star{font-size:34px;line-height:1;background:none;border:0;cursor:pointer;color:#ddd3bf;padding:0}
+.rv-star.on{color:#b98a3e}
+.rv-text{width:100%;min-height:90px;border:1px solid #d9cfbd;border-radius:10px;padding:10px 12px;font:inherit;font-size:14px;box-sizing:border-box;resize:vertical}
 .status { display: inline-block; padding: 6px 10px; border-radius: 20px; font-size: 10px; font-weight: 800; }
 .status-processing { background: #fff0df; color: #c46715; }
 .status-completed { background: #e4f5ec; color: #287a52; }
@@ -177,22 +190,6 @@
 .avuna-cancel-keep{background:#f1f1f1;color:#333}
 .avuna-cancel-confirm{background:#c94b45;color:#fff}
 .avuna-notice-ok{background:#0f2a1f;color:#fff;min-width:130px}
-
-/* ORDER RATING */
-.rate-order-btn{display:inline-block;padding:9px 14px;border:1px solid #9a7536;background:#f2e2c9;color:#6f5428;border-radius:8px;font-size:11px;font-weight:800;letter-spacing:.5px;cursor:pointer;white-space:nowrap;transition:all .2s ease}
-.rate-order-btn:hover{background:#9a7536;color:#fff;transform:translateY(-2px);box-shadow:0 6px 14px rgba(196,154,69,.3)}
-.avuna-stars{display:flex;flex-direction:row-reverse;justify-content:center;gap:4px;margin:4px 0 18px}
-.avuna-stars input{position:absolute;opacity:0;width:0;height:0}
-.avuna-stars label{font-size:42px;line-height:1;color:#d9d3c5;cursor:pointer;transition:color .15s ease,transform .15s ease}
-.avuna-stars label:hover{transform:scale(1.12)}
-.avuna-stars input:checked ~ label,.avuna-stars label:hover,.avuna-stars label:hover ~ label{color:#c49a45}
-.avuna-stars input:focus-visible + label{outline:2px solid #9a7536;border-radius:6px}
-.avuna-rate-text{display:block;width:100%;box-sizing:border-box;padding:12px;border:1px solid #e5dccd;border-radius:10px;font:inherit;font-size:14px;resize:none;background:#fff;color:#222}
-.avuna-rate-text:focus{outline:2px solid #c49a45;border-color:#c49a45}
-.avuna-rate-count{text-align:right;font-size:12px;color:#888;margin:6px 0 0}
-.avuna-rate-submit{border:0;border-radius:9px;padding:12px 22px;font-weight:800;cursor:pointer;background:#9a7536;color:#fff}
-.avuna-rate-submit:hover{background:#173c2c}
-.avuna-rate-error{display:none;color:#c94b45;font-size:13px;font-weight:700;margin:10px 0 0}
 </style>
 <div class="customer-dashboard">
   <!-- ===================================================== HERO ===================================================== -->
@@ -252,7 +249,11 @@
         <asp:GridView ID="gvOrders" runat="server" AutoGenerateColumns="False" CssClass="orders-table" GridLines="None"
             EmptyDataText="You haven't placed any orders yet.">
           <Columns>
-            <asp:BoundField DataField="order_ID" HeaderText="Order No." />
+            <asp:TemplateField HeaderText="Order No.">
+              <ItemTemplate>
+                <%# RenderOrderId(Eval("order_ID"), Eval("ItemRowNumber")) %>
+              </ItemTemplate>
+            </asp:TemplateField>
             <asp:BoundField DataField="order_Date" HeaderText="Order Date" DataFormatString="{0:dd MMM yyyy}" />
             <asp:BoundField DataField="item" HeaderText="Item" />
             <asp:BoundField DataField="DesignPackage" HeaderText="Package" />
@@ -272,7 +273,7 @@
             <asp:BoundField DataField="orderItem_Subtotal" HeaderText="Subtotal" DataFormatString="R {0:N2}" />
             <asp:TemplateField HeaderText="Action">
               <ItemTemplate>
-                <%# RenderAction(Eval("order_Status"), Eval("order_ID"), Eval("ItemRowNumber"), Eval("RatingCount"), Eval("RatingScore")) %>
+                <%# RenderCancel(Eval("order_Status"), Eval("order_ID"), Eval("ItemRowNumber")) %>
               </ItemTemplate>
             </asp:TemplateField>
           </Columns>
@@ -348,103 +349,107 @@
   </div>
 </div>
 <script>
-    (function () {
-        var modal = document.getElementById('avunaCancelModal');
-        var keep = document.getElementById('avunaCancelKeep');
-        var hidden = document.getElementById('avunaCancelOrderId');
-        function closeCancel() { modal.classList.remove('open'); modal.setAttribute('aria-hidden', 'true'); hidden.value = ''; }
-        document.addEventListener('click', function (e) {
-            var button = e.target.closest ? e.target.closest('.cancel-order-btn') : null;
-            if (button) {
-                hidden.value = button.getAttribute('data-order');
-                document.getElementById('avunaCancelMessage').textContent = 'Are you sure you want to cancel order ' + hidden.value + '?';
-                modal.classList.add('open'); modal.setAttribute('aria-hidden', 'false'); keep.focus();
-            }
-            if (e.target === modal) closeCancel();
-        });
-        keep.addEventListener('click', closeCancel);
-        document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeCancel(); });
-    })();
-    window.avunaShowNotice = function (title, message, success) {
-        var modal = document.getElementById('avunaNoticeModal');
-        document.getElementById('avunaNoticeHeading').textContent = title;
-        document.getElementById('avunaNoticeMessage').textContent = message;
-        modal.classList.add('open'); modal.setAttribute('aria-hidden', 'false');
-        document.getElementById('avunaNoticeOkay').focus();
-    };
-    document.getElementById('avunaNoticeOkay').addEventListener('click', function () {
-        var modal = document.getElementById('avunaNoticeModal');
-        modal.classList.remove('open'); modal.setAttribute('aria-hidden', 'true');
-    });
+(function(){
+  var modal = document.getElementById('avunaCancelModal');
+  var keep = document.getElementById('avunaCancelKeep');
+  var hidden = document.getElementById('avunaCancelOrderId');
+  function closeCancel(){modal.classList.remove('open');modal.setAttribute('aria-hidden','true');hidden.value='';}
+  document.addEventListener('click',function(e){
+    var button = e.target.closest ? e.target.closest('.cancel-order-btn') : null;
+    if(button){
+      hidden.value=button.getAttribute('data-order');
+      document.getElementById('avunaCancelMessage').textContent='Are you sure you want to cancel order '+hidden.value+'?';
+      modal.classList.add('open');modal.setAttribute('aria-hidden','false');keep.focus();
+    }
+    if(e.target===modal) closeCancel();
+  });
+  keep.addEventListener('click',closeCancel);
+  document.addEventListener('keydown',function(e){if(e.key==='Escape')closeCancel();});
+})();
+window.avunaShowNotice=function(title,message,success){
+  var modal=document.getElementById('avunaNoticeModal');
+  document.getElementById('avunaNoticeHeading').textContent=title;
+  document.getElementById('avunaNoticeMessage').textContent=message;
+  modal.classList.add('open');modal.setAttribute('aria-hidden','false');
+  document.getElementById('avunaNoticeOkay').focus();
+};
+document.getElementById('avunaNoticeOkay').addEventListener('click',function(){
+  var modal=document.getElementById('avunaNoticeModal');
+  modal.classList.remove('open');modal.setAttribute('aria-hidden','true');
+});
 </script>
 
-<!-- RATE ORDER: the ASP.NET button saves the rating into dbo.Rating -->
-<input type="hidden" id="avunaRateOrderId" name="avunaRateOrderId" value="" />
-<div id="avunaRateModal" class="avuna-cancel-overlay" role="dialog" aria-modal="true" aria-labelledby="avunaRateHeading" aria-hidden="true">
+<script>
+document.addEventListener('click', function (e) {
+  var b = e.target.closest ? e.target.closest('.resp-chip') : null;
+  if (!b || !window.avNotice) return;
+  function esc(s) { return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+  var n = parseInt(b.getAttribute('data-score'), 10) || 0;
+  var html = '';
+  var review = b.getAttribute('data-review');
+  if (n || review) {
+    html += '<div class="resp-q"><b>' + '\u2605'.repeat(Math.max(0, Math.min(5, n))) + '</b>' + (review ? ' &ldquo;' + esc(review) + '&rdquo;' : '') + '</div>';
+  }
+  html += '<p class="resp-a">' + esc(b.getAttribute('data-text')) + '</p>';
+  var d = b.getAttribute('data-date');
+  if (d) html += '<p class="resp-d">Replied on ' + esc(d) + '</p>';
+  avNotice('Avuna Collective replied to your rating of order ' + b.getAttribute('data-order'), html, 'Close');
+});
+</script>
+<!-- GIVE REVIEW (posts plain fields; MyOrders.apsx.cs saves it) -->
+<input type="hidden" name="avunaReviewSave" id="avunaReviewSave" value="" />
+<input type="hidden" name="avunaReviewOrderId" id="avunaReviewOrderId" value="" />
+<input type="hidden" name="avunaReviewScore" id="avunaReviewScore" value="" />
+<div id="avunaReviewModal" class="avuna-cancel-overlay" role="dialog" aria-modal="true" aria-hidden="true">
   <div class="avuna-cancel-dialog">
-    <h2 id="avunaRateHeading">Rate your order</h2>
-    <p id="avunaRateMessage"></p>
-    <div class="avuna-stars" role="radiogroup" aria-label="Star rating">
-      <input type="radio" id="avStar5" name="avunaRatingScore" value="5" /><label for="avStar5" title="5 - Excellent">&#9733;</label>
-      <input type="radio" id="avStar4" name="avunaRatingScore" value="4" /><label for="avStar4" title="4 - Good">&#9733;</label>
-      <input type="radio" id="avStar3" name="avunaRatingScore" value="3" /><label for="avStar3" title="3 - Average">&#9733;</label>
-      <input type="radio" id="avStar2" name="avunaRatingScore" value="2" /><label for="avStar2" title="2 - Poor">&#9733;</label>
-      <input type="radio" id="avStar1" name="avunaRatingScore" value="1" /><label for="avStar1" title="1 - Terrible">&#9733;</label>
+    <h2>How was your order?</h2>
+    <p id="avunaReviewFor"></p>
+    <div class="rv-stars" id="avunaReviewStars">
+      <button type="button" class="rv-star" data-v="1" aria-label="1 star">&#9733;</button>
+      <button type="button" class="rv-star" data-v="2" aria-label="2 stars">&#9733;</button>
+      <button type="button" class="rv-star" data-v="3" aria-label="3 stars">&#9733;</button>
+      <button type="button" class="rv-star" data-v="4" aria-label="4 stars">&#9733;</button>
+      <button type="button" class="rv-star" data-v="5" aria-label="5 stars">&#9733;</button>
     </div>
-    <textarea id="avunaRatingReview" name="avunaRatingReview" class="avuna-rate-text" rows="3" maxlength="50"
-        placeholder="Tell us about your order (max 50 characters)"></textarea>
-    <div class="avuna-rate-count"><span id="avunaRateCount">0</span>/50</div>
-    <div id="avunaRateError" class="avuna-rate-error" role="alert"></div>
+    <textarea id="avunaReviewText" name="avunaReviewText" class="rv-text" maxlength="250" placeholder="Tell us about your order (optional)"></textarea>
     <div class="avuna-cancel-actions">
-      <button type="button" id="avunaRateCancel" class="avuna-cancel-keep">Cancel</button>
-      <asp:Button ID="btnSubmitRating" runat="server" Text="Submit Rating"
-          CssClass="avuna-rate-submit" CausesValidation="false"
-          OnClientClick="return avunaCheckRating();"
-          OnClick="btnSubmitRating_Click" />
+      <button type="button" id="avunaReviewCancel" class="avuna-cancel-keep">Cancel</button>
+      <button type="button" id="avunaReviewSubmit" class="avuna-notice-ok">Submit review</button>
     </div>
   </div>
 </div>
 <script>
-    (function () {
-        var modal = document.getElementById('avunaRateModal');
-        var hidden = document.getElementById('avunaRateOrderId');
-        var review = document.getElementById('avunaRatingReview');
-        var count = document.getElementById('avunaRateCount');
-        var error = document.getElementById('avunaRateError');
-
-        function closeRate() { modal.classList.remove('open'); modal.setAttribute('aria-hidden', 'true'); hidden.value = ''; }
-        function selectedScore() {
-            var checked = modal.querySelector('input[name="avunaRatingScore"]:checked');
-            return checked ? checked.value : '';
-        }
-
-        document.addEventListener('click', function (e) {
-            var button = e.target.closest ? e.target.closest('.rate-order-btn') : null;
-            if (button) {
-                hidden.value = button.getAttribute('data-order');
-                document.getElementById('avunaRateMessage').textContent = 'How was order ' + hidden.value + '?';
-                var radios = modal.querySelectorAll('input[name="avunaRatingScore"]');
-                for (var i = 0; i < radios.length; i++) radios[i].checked = false;
-                review.value = '';
-                count.textContent = '0';
-                error.style.display = 'none';
-                modal.classList.add('open'); modal.setAttribute('aria-hidden', 'false');
-                return;
-            }
-            if (e.target === modal || e.target.id === 'avunaRateCancel') closeRate();
-        });
-        document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeRate(); });
-        review.addEventListener('input', function () { count.textContent = review.value.length; });
-
-        // Runs before the postback; returning false stops the submit.
-        window.avunaCheckRating = function () {
-            var message = '';
-            if (!selectedScore()) message = 'Please choose a star rating.';
-            else if (!review.value.replace(/\s+/g, '')) message = 'Please write a short comment.';
-            if (message) { error.textContent = message; error.style.display = 'block'; return false; }
-            return true;
-        };
-    })();
+(function () {
+  var modal = document.getElementById('avunaReviewModal');
+  var stars = document.querySelectorAll('#avunaReviewStars .rv-star');
+  var scoreBox = document.getElementById('avunaReviewScore');
+  function paint(n) { for (var i = 0; i < stars.length; i++) stars[i].classList.toggle('on', i < n); }
+  function close() { modal.classList.remove('open'); modal.setAttribute('aria-hidden', 'true'); }
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest ? e.target.closest('.give-review-btn') : null;
+    if (b) {
+      var id = b.getAttribute('data-order');
+      document.getElementById('avunaReviewOrderId').value = id;
+      document.getElementById('avunaReviewFor').textContent = 'Order ' + id;
+      document.getElementById('avunaReviewText').value = '';
+      scoreBox.value = ''; paint(0);
+      modal.classList.add('open'); modal.setAttribute('aria-hidden', 'false');
+      return;
+    }
+    var s = e.target.closest ? e.target.closest('#avunaReviewStars .rv-star') : null;
+    if (s) { var v = parseInt(s.getAttribute('data-v'), 10); scoreBox.value = v; paint(v); return; }
+    if (e.target === modal) close();
+  });
+  document.getElementById('avunaReviewCancel').addEventListener('click', close);
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') close(); });
+  document.getElementById('avunaReviewSubmit').addEventListener('click', function () {
+    if (!scoreBox.value) { document.getElementById('avunaReviewFor').textContent = 'Please tap a star rating first.'; return; }
+    close();
+    avConfirm('Submit your review?', 'Your ' + scoreBox.value + '-star review of order ' + document.getElementById('avunaReviewOrderId').value + ' will be sent to Avuna Collective.', 'Yes, submit review', function () {
+      document.getElementById('avunaReviewSave').value = '1';
+      HTMLFormElement.prototype.submit.call(document.forms[0]);
+    });
+  });
+})();
 </script>
-
 </asp:Content>

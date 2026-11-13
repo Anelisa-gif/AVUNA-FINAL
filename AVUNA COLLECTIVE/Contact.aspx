@@ -183,7 +183,21 @@
         </div>
         <div>
           <h3>Email Address</h3>
-          <p><a href="mailto:siyandamlotshwa9@gmail.com">siyandamlotshwa9@gmail.com</a></p>
+          <p><a href="mailto:avunacollected@gmail.com">avunacollected@gmail.com</a></p>
+        </div>
+      </div>
+
+      <div class="avuna-info-card">
+        <div class="avuna-info-card__icon">
+          <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="18" height="18" rx="5"/>
+            <circle cx="12" cy="12" r="4"/>
+            <circle cx="17.5" cy="6.5" r="1"/>
+          </svg>
+        </div>
+        <div>
+          <h3>Instagram</h3>
+          <p><a href="https://www.instagram.com/avunacollected" target="_blank" rel="noopener noreferrer">@avunacollected</a></p>
         </div>
       </div>
 
@@ -214,3 +228,4 @@
 </div>
 
 </asp:Content>
+

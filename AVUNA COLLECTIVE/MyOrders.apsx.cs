@@ -11,252 +11,155 @@ using System.Web.UI;
 
 namespace AVUNA_COLLECTIVE
 {
-    public partial class MyOrders : System.Web.UI.Page
-    {
-        private readonly Dictionary<string, string> _designKeys =
-            new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+	public partial class MyOrders : System.Web.UI.Page
+	{
+		private readonly Dictionary<string, string> _designKeys =
+			new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+		// Manager responses to this customer's ratings, keyed by order ID: [response, response date, score, review]
+		private readonly Dictionary<string, string[]> _responses = new Dictionary<string, string[]>(StringComparer.OrdinalIgnoreCase);
 
-        // Existing ASPX page uses this to show design images.
-        protected string DesignStoreHtml = "";
+		// Orders this customer has already reviewed (so "Give Review" only shows once per order).
+		private readonly HashSet<string> _rated = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
-        // Bind the viewstate to this visitor's session to reduce forged postbacks.
-        protected override void OnInit(EventArgs e)
-        {
-            if (Session != null) ViewStateUserKey = Session.SessionID;
-            base.OnInit(e);
-        }
+		// Existing ASPX page uses this to show design images.
+		protected string DesignStoreHtml = "";
 
-        protected void Page_Load(object sender, EventArgs e)
-        {
-            int customerId = GetLoggedInCustomerId();
-            if (customerId <= 0)
-            {
-                Response.Redirect("~/Login.aspx", false);
-                Context.ApplicationInstance.CompleteRequest();
-                return;
-            }
+		// Bind the viewstate to this visitor's session to reduce forged postbacks.
+		protected override void OnInit(EventArgs e)
+		{
+			if (Session != null) ViewStateUserKey = Session.SessionID;
+			base.OnInit(e);
+		}
 
-            if (!IsPostBack)
-            {
-                LoadOrders(customerId);
+		protected void Page_Load(object sender, EventArgs e)
+		{
+			int customerId = GetLoggedInCustomerId();
+			if (customerId <= 0)
+			{
+				Response.Redirect("~/Login.aspx", false);
+				Context.ApplicationInstance.CompleteRequest();
+				return;
+			}
 
-                string cancelledId = Session["AvunaCancelledOrderId"] as string;
-                if (!String.IsNullOrEmpty(cancelledId))
-                {
-                    Session.Remove("AvunaCancelledOrderId");
-                    ShowPopup("Order Cancelled Successfully!",
-                        "Order " + cancelledId + " was moved to ArchivedOrder, and its reserved stock was returned to inventory.", true);
-                }
+			// "Give Review" pop-up posts here (plain form fields, no extra server control needed).
+			if (Request.HttpMethod == "POST" && Request.Form["avunaReviewSave"] == "1")
+			{
+				SaveReview(customerId);
+				Response.Redirect(Request.Path, false);   // redirect after POST so refreshing cannot send it twice
+				Context.ApplicationInstance.CompleteRequest();
+				return;
+			}
 
-                string ratedId = Session["AvunaRatedOrderId"] as string;
-                if (!String.IsNullOrEmpty(ratedId))
-                {
-                    Session.Remove("AvunaRatedOrderId");
-                    ShowPopup("Thank you for your feedback!",
-                        "Your rating for order " + ratedId + " has been saved.", true);
-                }
-            }
-        }
+			if (!IsPostBack)
+			{
+				LoadOrders(customerId);
 
-        // Called by the "Submit Rating" button in the rating modal.
-        protected void btnSubmitRating_Click(object sender, EventArgs e)
-        {
-            int customerId = GetLoggedInCustomerId();
-            if (customerId <= 0)
-            {
-                Response.Redirect("~/Login.aspx", false);
-                Context.ApplicationInstance.CompleteRequest();
-                return;
-            }
+				string reviewMsg = Session["AvunaReviewMsg"] as string;
+				if (!String.IsNullOrEmpty(reviewMsg))
+				{
+					bool reviewOk = (Session["AvunaReviewOk"] as string) == "1";
+					Session.Remove("AvunaReviewMsg");
+					Session.Remove("AvunaReviewOk");
+					ShowPopup(reviewOk ? "Thank you for your review!" : "Review not submitted", reviewMsg, reviewOk);
+				}
 
-            string orderId, scoreText, review;
-            try
-            {
-                orderId = (Request.Form["avunaRateOrderId"] ?? "").Trim();
-                scoreText = (Request.Form["avunaRatingScore"] ?? "").Trim();
-                review = (Request.Form["avunaRatingReview"] ?? "").Trim();
-            }
-            catch (HttpRequestValidationException)
-            {
-                // ASP.NET blocks text like <script> in form fields.
-                LoadOrders(customerId);
-                ShowPopup("Rating not saved", "Please remove special characters such as < or > from your comment and try again.", false);
-                return;
-            }
+				string cancelledId = Session["AvunaCancelledOrderId"] as string;
+				if (!String.IsNullOrEmpty(cancelledId))
+				{
+					Session.Remove("AvunaCancelledOrderId");
+					ShowPopup("Order Cancelled Successfully!",
+						"Order " + cancelledId + " was moved to ArchivedOrder, and its reserved stock was returned to inventory.", true);
+				}
+			}
+		}
 
-            int score;
-            if (orderId.Length == 0 || orderId.Length > 50)
-            {
-                LoadOrders(customerId);
-                ShowPopup("Rating not saved", "Please select a valid order.", false);
-                return;
-            }
-            if (!int.TryParse(scoreText, out score) || score < 1 || score > 5)
-            {
-                LoadOrders(customerId);
-                ShowPopup("Rating not saved", "Please choose a star rating between 1 and 5.", false);
-                return;
-            }
-            if (review.Length == 0)
-            {
-                LoadOrders(customerId);
-                ShowPopup("Rating not saved", "Please write a short comment.", false);
-                return;
-            }
-            if (review.Length > 50)   // dbo.Rating.rating_Review is VARCHAR(50)
-            {
-                LoadOrders(customerId);
-                ShowPopup("Rating not saved", "Your comment can be at most 50 characters.", false);
-                return;
-            }
+		// Called by the confirmation button in the centred modal.
+		protected void btnConfirmCancel_Click(object sender, EventArgs e)
+		{
+			int customerId = GetLoggedInCustomerId();
+			if (customerId <= 0)
+			{
+				Response.Redirect("~/Login.aspx", false);
+				Context.ApplicationInstance.CompleteRequest();
+				return;
+			}
 
-            try
-            {
-                SaveRating(customerId, orderId, score, review);
-                // Redirect after POST prevents refreshing the page from saving the rating twice.
-                Session["AvunaRatedOrderId"] = orderId;
-                Response.Redirect(Request.Path, false);
-                Context.ApplicationInstance.CompleteRequest();
-            }
-            catch (InvalidOperationException ex)
-            {
-                LoadOrders(customerId);
-                ShowPopup("Rating not saved", ex.Message, false);
-            }
-            catch (SqlException)
-            {
-                LoadOrders(customerId);
-                ShowPopup("Rating not saved", "The database could not save your rating. Please try again.", false);
-            }
-        }
+			string orderId = (Request.Form["avunaCancelOrderId"] ?? "").Trim();
+			if (orderId.Length == 0 || orderId.Length > 50)
+			{
+				LoadOrders(customerId);
+				ShowPopup("Cancellation not completed", "Please select a valid order.", false);
+				return;
+			}
 
-        // Saves one rating into dbo.Rating (RAT023, RAT024, ...).
-        // The insert only happens when the order belongs to this customer, is Completed/Delivered
-        // and has not been rated yet, so it cannot be abused from the browser.
-        private static void SaveRating(int customerId, string orderId, int score, string review)
-        {
-            const string sql = @"
-SET XACT_ABORT ON;
-BEGIN TRAN;
-DECLARE @next INT = ISNULL((SELECT MAX(TRY_CAST(SUBSTRING(rating_ID, 4, 10) AS INT))
-                            FROM dbo.Rating WITH (UPDLOCK, HOLDLOCK)), 0) + 1;
-INSERT INTO dbo.Rating (rating_ID, rating_Date, rating_Review, rating_Score, order_ID)
-SELECT 'RAT' + CASE WHEN @next < 1000
-                    THEN RIGHT('000' + CAST(@next AS VARCHAR(10)), 3)
-                    ELSE CAST(@next AS VARCHAR(10)) END,
-       CAST(GETDATE() AS DATE), @Review, @Score, o.order_ID
-FROM dbo.[Order] o
-WHERE o.order_ID = @OrderId
-  AND o.customer_ID = @CustomerId
-  AND LOWER(LTRIM(RTRIM(o.order_Status))) IN ('completed', 'delivered')
-  AND NOT EXISTS (SELECT 1 FROM dbo.Rating r WHERE r.order_ID = o.order_ID);
-DECLARE @rc INT = @@ROWCOUNT;
-COMMIT;
-SELECT @rc;";
+			try
+			{
+				CancelPendingOrder(customerId, orderId);
+				// Redirect after POST prevents refreshing the page from cancelling twice.
+				Session["AvunaCancelledOrderId"] = orderId;
+				Response.Redirect(Request.Path, false);
+				Context.ApplicationInstance.CompleteRequest();
+			}
+			catch (InvalidOperationException ex)
+			{
+				LoadOrders(customerId);
+				ShowPopup("Cancellation not completed", ex.Message, false);
+			}
+			catch (SqlException)
+			{
+				LoadOrders(customerId);
+				ShowPopup("Cancellation not completed", "The database could not cancel this order. Please try again.", false);
+			}
+		}
 
-            string cs = ConfigurationManager.ConnectionStrings["GroupWst2"].ConnectionString;
-            using (var con = new SqlConnection(cs))
-            using (var cmd = new SqlCommand(sql, con))
-            {
-                cmd.Parameters.Add("@Review", SqlDbType.VarChar, 50).Value = review;
-                cmd.Parameters.Add("@Score", SqlDbType.Int).Value = score;
-                cmd.Parameters.Add("@OrderId", SqlDbType.VarChar, 50).Value = orderId;
-                cmd.Parameters.Add("@CustomerId", SqlDbType.Int).Value = customerId;
-                con.Open();
-                int inserted = Convert.ToInt32(cmd.ExecuteScalar());
-                if (inserted == 0)
-                    throw new InvalidOperationException(
-                        "This order can't be rated. It must be your own order, completed, and not already rated.");
-            }
-        }
-
-        // Called by the confirmation button in the centred modal.
-        protected void btnConfirmCancel_Click(object sender, EventArgs e)
-        {
-            int customerId = GetLoggedInCustomerId();
-            if (customerId <= 0)
-            {
-                Response.Redirect("~/Login.aspx", false);
-                Context.ApplicationInstance.CompleteRequest();
-                return;
-            }
-
-            string orderId = (Request.Form["avunaCancelOrderId"] ?? "").Trim();
-            if (orderId.Length == 0 || orderId.Length > 50)
-            {
-                LoadOrders(customerId);
-                ShowPopup("Cancellation not completed", "Please select a valid order.", false);
-                return;
-            }
-
-            try
-            {
-                CancelPendingOrder(customerId, orderId);
-                // Redirect after POST prevents refreshing the page from cancelling twice.
-                Session["AvunaCancelledOrderId"] = orderId;
-                Response.Redirect(Request.Path, false);
-                Context.ApplicationInstance.CompleteRequest();
-            }
-            catch (InvalidOperationException ex)
-            {
-                LoadOrders(customerId);
-                ShowPopup("Cancellation not completed", ex.Message, false);
-            }
-            catch (SqlException)
-            {
-                LoadOrders(customerId);
-                ShowPopup("Cancellation not completed", "The database could not cancel this order. Please try again.", false);
-            }
-        }
-
-        // Uses the SAME transaction for status changes and both stock tables.
-        // Only Pending orders belonging to the current customer can be cancelled.
-        private static void CancelPendingOrder(int customerId, string orderId)
-        {
-            string cs = ConfigurationManager.ConnectionStrings["GroupWst2"].ConnectionString;
-            using (var con = new SqlConnection(cs))
-            {
-                con.Open();
-                using (var tx = con.BeginTransaction(IsolationLevel.Serializable))
-                {
-                    try
-                    {
-                        string status;
-                        using (var cmd = new SqlCommand(@"
+		// Uses the SAME transaction for status changes and both stock tables.
+		// Only Pending orders belonging to the current customer can be cancelled.
+		private static void CancelPendingOrder(int customerId, string orderId)
+		{
+			string cs = ConfigurationManager.ConnectionStrings["GroupWst2"].ConnectionString;
+			using (var con = new SqlConnection(cs))
+			{
+				con.Open();
+				using (var tx = con.BeginTransaction(IsolationLevel.Serializable))
+				{
+					try
+					{
+						string status;
+						using (var cmd = new SqlCommand(@"
                             SELECT order_Status
                             FROM dbo.[Order] WITH (UPDLOCK, HOLDLOCK)
                             WHERE order_ID = @OrderId AND customer_ID = @CustomerId", con, tx))
-                        {
-                            cmd.Parameters.Add("@OrderId", SqlDbType.VarChar, 50).Value = orderId;
-                            cmd.Parameters.Add("@CustomerId", SqlDbType.Int).Value = customerId;
-                            object result = cmd.ExecuteScalar();
-                            if (result == null || result == DBNull.Value)
-                                throw new InvalidOperationException("Order not found in your account.");
-                            status = Convert.ToString(result).Trim();
-                        }
+						{
+							cmd.Parameters.Add("@OrderId", SqlDbType.VarChar, 50).Value = orderId;
+							cmd.Parameters.Add("@CustomerId", SqlDbType.Int).Value = customerId;
+							object result = cmd.ExecuteScalar();
+							if (result == null || result == DBNull.Value)
+								throw new InvalidOperationException("Order not found in your account.");
+							status = Convert.ToString(result).Trim();
+						}
 
-                        if (!String.Equals(status, "Pending", StringComparison.OrdinalIgnoreCase))
-                            throw new InvalidOperationException(
-                                "Only Pending orders can be cancelled. In Progress, Completed and Cancelled orders cannot be cancelled.");
+						if (!String.Equals(status, "Pending", StringComparison.OrdinalIgnoreCase))
+							throw new InvalidOperationException(
+								"Only Pending orders can be cancelled. In Progress, Completed and Cancelled orders cannot be cancelled.");
 
-                        // Do not erase/"refund" a payment that has already been recorded as paid.
-                        // Pending requests (including Pay Now simulations not yet completed)
-                        // can be archived; paid or partial payments require staff handling.
-                        using (var cmd = new SqlCommand(@"
+						// Do not erase/"refund" a payment that has already been recorded as paid.
+						// Pending requests (including Pay Now simulations not yet completed)
+						// can be archived; paid or partial payments require staff handling.
+						using (var cmd = new SqlCommand(@"
                             SELECT COUNT(*) FROM dbo.Payment WITH (UPDLOCK, HOLDLOCK)
                             WHERE order_ID=@OrderId
                               AND (payment_Status IS NULL OR
                                    UPPER(LTRIM(RTRIM(payment_Status))) <> 'PENDING')", con, tx))
-                        {
-                            cmd.Parameters.Add("@OrderId", SqlDbType.VarChar, 50).Value = orderId;
-                            if (Convert.ToInt32(cmd.ExecuteScalar()) > 0)
-                                throw new InvalidOperationException(
-                                    "This order has a recorded payment. Contact staff for cancellation/refund.");
-                        }
+						{
+							cmd.Parameters.Add("@OrderId", SqlDbType.VarChar, 50).Value = orderId;
+							if (Convert.ToInt32(cmd.ExecuteScalar()) > 0)
+								throw new InvalidOperationException(
+									"This order has a recorded payment. Contact staff for cancellation/refund.");
+						}
 
-                        // The new CreateOrder flow deducts inventory when saving orders.
-                        // Existing/seeded orders with missing variants are rejected rather than inflating stock.
-                        const string restoreSql = @"
+						// The new CreateOrder flow deducts inventory when saving orders.
+						// Existing/seeded orders with missing variants are rejected rather than inflating stock.
+						const string restoreSql = @"
 SET NOCOUNT ON;
 IF NOT EXISTS (SELECT 1 FROM dbo.OrderItem WHERE order_ID = @OrderId)
     THROW 50011, 'Cannot restore stock: this order has no order items.', 1;
@@ -303,75 +206,75 @@ IF @@ROWCOUNT <> (SELECT COUNT(*) FROM #RestoreItem)
     THROW 50014, 'Could not restore inventory stock.', 1;
 
 ";
-                        using (var cmd = new SqlCommand(restoreSql, con, tx))
-                        {
-                            cmd.Parameters.Add("@OrderId", SqlDbType.VarChar, 50).Value = orderId;
-                            cmd.Parameters.Add("@CustomerId", SqlDbType.Int).Value = customerId;
-                            cmd.CommandTimeout = 30;
-                            cmd.ExecuteNonQuery();
-                        }
+						using (var cmd = new SqlCommand(restoreSql, con, tx))
+						{
+							cmd.Parameters.Add("@OrderId", SqlDbType.VarChar, 50).Value = orderId;
+							cmd.Parameters.Add("@CustomerId", SqlDbType.Int).Value = customerId;
+							cmd.CommandTimeout = 30;
+							cmd.ExecuteNonQuery();
+						}
 
-                        // Archive the parent order before the children, allowing archives
-                        // that enforce foreign keys from ArchivedOrderItem to ArchivedOrder.
-                        // All copies/deletes share the same SQL transaction.
-                        ArchiveRows(con, tx, "Order", "ArchivedOrder", orderId,
-                            "order_Status", "Cancelled", 1);
-                        ArchiveRows(con, tx, "OrderItem", "ArchivedOrderItem", orderId,
-                            "orderItem_Status", "Cancelled", -1);
-                        ArchiveRows(con, tx, "Payment", "ArchivedPayment", orderId,
-                            null, null, -1);
+						// Archive the parent order before the children, allowing archives
+						// that enforce foreign keys from ArchivedOrderItem to ArchivedOrder.
+						// All copies/deletes share the same SQL transaction.
+						ArchiveRows(con, tx, "Order", "ArchivedOrder", orderId,
+							"order_Status", "Cancelled", 1);
+						ArchiveRows(con, tx, "OrderItem", "ArchivedOrderItem", orderId,
+							"orderItem_Status", "Cancelled", -1);
+						ArchiveRows(con, tx, "Payment", "ArchivedPayment", orderId,
+							null, null, -1);
 
-                        // Paid/partially paid transactions cannot be silently cancelled:
-                        // they require a separate refund / staff review workflow.
-                        // This is checked before any archive or stock update below.
+						// Paid/partially paid transactions cannot be silently cancelled:
+						// they require a separate refund / staff review workflow.
+						// This is checked before any archive or stock update below.
 
-                        DeleteOrderRows(con, tx, "Payment", orderId);
-                        DeleteOrderRows(con, tx, "OrderItem", orderId);
+						DeleteOrderRows(con, tx, "Payment", orderId);
+						DeleteOrderRows(con, tx, "OrderItem", orderId);
 
-                        // A Customer may also hold a pointer to their latest order.
-                        using (var cmd = new SqlCommand(@"
+						// A Customer may also hold a pointer to their latest order.
+						using (var cmd = new SqlCommand(@"
                             UPDATE dbo.Customer SET order_ID = NULL
                             WHERE customer_ID=@CustomerId AND order_ID=@OrderId", con, tx))
-                        {
-                            cmd.Parameters.Add("@CustomerId", SqlDbType.Int).Value = customerId;
-                            cmd.Parameters.Add("@OrderId", SqlDbType.VarChar, 50).Value = orderId;
-                            cmd.ExecuteNonQuery();
-                        }
+						{
+							cmd.Parameters.Add("@CustomerId", SqlDbType.Int).Value = customerId;
+							cmd.Parameters.Add("@OrderId", SqlDbType.VarChar, 50).Value = orderId;
+							cmd.ExecuteNonQuery();
+						}
 
-                        using (var cmd = new SqlCommand(@"
+						using (var cmd = new SqlCommand(@"
                             DELETE FROM dbo.[Order]
                             WHERE order_ID=@OrderId AND customer_ID=@CustomerId
                               AND LTRIM(RTRIM(order_Status))='Pending'", con, tx))
-                        {
-                            cmd.Parameters.Add("@CustomerId", SqlDbType.Int).Value = customerId;
-                            cmd.Parameters.Add("@OrderId", SqlDbType.VarChar, 50).Value = orderId;
-                            if (cmd.ExecuteNonQuery() != 1)
-                                throw new InvalidOperationException("Order changed during cancellation.");
-                        }
+						{
+							cmd.Parameters.Add("@CustomerId", SqlDbType.Int).Value = customerId;
+							cmd.Parameters.Add("@OrderId", SqlDbType.VarChar, 50).Value = orderId;
+							if (cmd.ExecuteNonQuery() != 1)
+								throw new InvalidOperationException("Order changed during cancellation.");
+						}
 
-                        tx.Commit();
-                    }
-                    catch
-                    {
-                        try { tx.Rollback(); } catch { }
-                        throw;
-                    }
-                }
-            }
-        }
+						tx.Commit();
+					}
+					catch
+					{
+						try { tx.Rollback(); } catch { }
+						throw;
+					}
+				}
+			}
+		}
 
-        // Copy every non-computed source field to the matching archive field.
-        // Stop if an archive table is absent or incompatible instead of losing data.
-        private static void ArchiveRows(SqlConnection con, SqlTransaction tx,
-            string sourceTable, string archiveTable, string orderId,
-            string statusColumn, string archiveStatus, int expectedRows)
-        {
-            // Table names are fixed by server-side code, never supplied by the browser.
-            string sourceName = "dbo." + sourceTable;
-            string destName = "dbo." + archiveTable;
-            var sourceColumns = new List<string>();
-            var destColumns = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-            const string columnSql = @"
+		// Copy every non-computed source field to the matching archive field.
+		// Stop if an archive table is absent or incompatible instead of losing data.
+		private static void ArchiveRows(SqlConnection con, SqlTransaction tx,
+			string sourceTable, string archiveTable, string orderId,
+			string statusColumn, string archiveStatus, int expectedRows)
+		{
+			// Table names are fixed by server-side code, never supplied by the browser.
+			string sourceName = "dbo." + sourceTable;
+			string destName = "dbo." + archiveTable;
+			var sourceColumns = new List<string>();
+			var destColumns = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+			const string columnSql = @"
                 SELECT c.name
                 FROM sys.columns c
                 WHERE c.object_id=OBJECT_ID(@tableName)
@@ -379,112 +282,206 @@ IF @@ROWCOUNT <> (SELECT COUNT(*) FROM #RestoreItem)
                   AND c.system_type_id<>189
                   AND c.is_identity=0
                 ORDER BY c.column_id";
-            foreach (var table in new[] { sourceName, destName })
-            {
-                using (var cmd = new SqlCommand(columnSql, con, tx))
-                {
-                    cmd.Parameters.Add("@tableName", SqlDbType.NVarChar, 256).Value = table;
-                    using (var rd = cmd.ExecuteReader())
-                        while (rd.Read())
-                        {
-                            if (table == sourceName) sourceColumns.Add(rd.GetString(0));
-                            else destColumns.Add(rd.GetString(0));
-                        }
-                }
-            }
-            if (sourceColumns.Count == 0 || destColumns.Count == 0)
-                throw new InvalidOperationException("Missing archive table: " + destName + ".");
-            foreach (string column in sourceColumns)
-                if (!destColumns.Contains(column))
-                    throw new InvalidOperationException(
-                        destName + " does not have the required column " + column + ".");
+			foreach (var table in new[] { sourceName, destName })
+			{
+				using (var cmd = new SqlCommand(columnSql, con, tx))
+				{
+					cmd.Parameters.Add("@tableName", SqlDbType.NVarChar, 256).Value = table;
+					using (var rd = cmd.ExecuteReader())
+						while (rd.Read())
+						{
+							if (table == sourceName) sourceColumns.Add(rd.GetString(0));
+							else destColumns.Add(rd.GetString(0));
+						}
+				}
+			}
+			if (sourceColumns.Count == 0 || destColumns.Count == 0)
+				throw new InvalidOperationException("Missing archive table: " + destName + ".");
+			foreach (string column in sourceColumns)
+				if (!destColumns.Contains(column))
+					throw new InvalidOperationException(
+						destName + " does not have the required column " + column + ".");
 
-            var insertCols = new List<string>();
-            var selectCols = new List<string>();
-            foreach (string column in sourceColumns)
-            {
-                insertCols.Add(QuoteColumn(column));
-                selectCols.Add(String.Equals(column, statusColumn, StringComparison.OrdinalIgnoreCase)
-                    ? "@ArchiveStatus"
-                    : "s." + QuoteColumn(column));
-            }
-            string sql = "INSERT INTO dbo." + QuoteColumn(archiveTable) + " (" +
-                String.Join(",", insertCols) + ") SELECT " +
-                String.Join(",", selectCols) + " FROM dbo." + QuoteColumn(sourceTable) +
-                " s WHERE s.order_ID=@OrderId";
-            using (var cmd = new SqlCommand(sql, con, tx))
-            {
-                cmd.Parameters.Add("@OrderId", SqlDbType.VarChar, 50).Value = orderId;
-                if (statusColumn != null)
-                    cmd.Parameters.Add("@ArchiveStatus", SqlDbType.VarChar, 30).Value = archiveStatus;
-                int copied = cmd.ExecuteNonQuery();
-                if (expectedRows >= 0 && copied != expectedRows)
-                    throw new InvalidOperationException("Archive row count does not match for " + sourceTable + ".");
-            }
-        }
+			var insertCols = new List<string>();
+			var selectCols = new List<string>();
+			foreach (string column in sourceColumns)
+			{
+				insertCols.Add(QuoteColumn(column));
+				selectCols.Add(String.Equals(column, statusColumn, StringComparison.OrdinalIgnoreCase)
+					? "@ArchiveStatus"
+					: "s." + QuoteColumn(column));
+			}
+			string sql = "INSERT INTO dbo." + QuoteColumn(archiveTable) + " (" +
+				String.Join(",", insertCols) + ") SELECT " +
+				String.Join(",", selectCols) + " FROM dbo." + QuoteColumn(sourceTable) +
+				" s WHERE s.order_ID=@OrderId";
+			using (var cmd = new SqlCommand(sql, con, tx))
+			{
+				cmd.Parameters.Add("@OrderId", SqlDbType.VarChar, 50).Value = orderId;
+				if (statusColumn != null)
+					cmd.Parameters.Add("@ArchiveStatus", SqlDbType.VarChar, 30).Value = archiveStatus;
+				int copied = cmd.ExecuteNonQuery();
+				if (expectedRows >= 0 && copied != expectedRows)
+					throw new InvalidOperationException("Archive row count does not match for " + sourceTable + ".");
+			}
+		}
 
-        private static string QuoteColumn(string name)
-        {
-            return "[" + name.Replace("]", "]]") + "]";
-        }
+		private static string QuoteColumn(string name)
+		{
+			return "[" + name.Replace("]", "]]") + "]";
+		}
 
-        private static void DeleteOrderRows(SqlConnection con, SqlTransaction tx,
-            string table, string orderId)
-        {
-            // Only the two predefined child tables are permitted here.
-            if (table != "Payment" && table != "OrderItem")
-                throw new InvalidOperationException("Invalid deletion target.");
-            using (var cmd = new SqlCommand(
-                "DELETE FROM dbo.[" + table + "] WHERE order_ID=@OrderId", con, tx))
-            {
-                cmd.Parameters.Add("@OrderId", SqlDbType.VarChar, 50).Value = orderId;
-                cmd.ExecuteNonQuery();
-            }
-        }
+		private static void DeleteOrderRows(SqlConnection con, SqlTransaction tx,
+			string table, string orderId)
+		{
+			// Only the two predefined child tables are permitted here.
+			if (table != "Payment" && table != "OrderItem")
+				throw new InvalidOperationException("Invalid deletion target.");
+			using (var cmd = new SqlCommand(
+				"DELETE FROM dbo.[" + table + "] WHERE order_ID=@OrderId", con, tx))
+			{
+				cmd.Parameters.Add("@OrderId", SqlDbType.VarChar, 50).Value = orderId;
+				cmd.ExecuteNonQuery();
+			}
+		}
 
-        private void ShowPopup(string heading, string message, bool success)
-        {
-            string js = "window.addEventListener('load', function(){" +
-                        "avunaShowNotice('" + HttpUtility.JavaScriptStringEncode(heading) +
-                        "','" + HttpUtility.JavaScriptStringEncode(message) +
-                        "'," + (success ? "true" : "false") + ");});";
-            ClientScript.RegisterStartupScript(GetType(), "avunaCancelNotice", js, true);
-        }
+		private static bool IsReviewable(string status)
+		{
+			string s = (status ?? "").Trim();
+			return s.Equals("Completed", StringComparison.OrdinalIgnoreCase)
+				|| s.Equals("Delivered", StringComparison.OrdinalIgnoreCase)
+				|| s.Equals("Collected", StringComparison.OrdinalIgnoreCase);
+		}
 
-        // Login page stores the customer as Session["customer_ID"].
-        private int GetLoggedInCustomerId()
-        {
-            int id;
-            if (Session["customer_ID"] != null &&
-                int.TryParse(Session["customer_ID"].ToString(), out id)) return id;
-            return 0;
-        }
+		// Saves a customer's review (1-5 stars + optional comment) for one of their finished orders.
+		private void SaveReview(int customerId)
+		{
+			string orderId = (Request.Form["avunaReviewOrderId"] ?? "").Trim();
+			string text = (Request.Form["avunaReviewText"] ?? "").Trim();
+			int score;
+			if (!int.TryParse((Request.Form["avunaReviewScore"] ?? "").Trim(), out score)) score = 0;
+			if (text.Length > 250) text = text.Substring(0, 250);
 
-        private void LoadOrders(int customerId)
-        {
-            string cs = ConfigurationManager.ConnectionStrings["GroupWst2"].ConnectionString;
-            var orders = new DataTable();
-            var items = new DataTable();
+			string message;
+			bool ok = false;
+			if (orderId.Length == 0 || orderId.Length > 50 || score < 1 || score > 5)
+			{
+				message = "Please choose a star rating from 1 to 5.";
+			}
+			else
+			{
+				try
+				{
+					string cs = ConfigurationManager.ConnectionStrings["GroupWst2"].ConnectionString;
+					using (var con = new SqlConnection(cs))
+					{
+						con.Open();
+						using (var tx = con.BeginTransaction(IsolationLevel.Serializable))
+						{
+							try
+							{
+								object st;
+								using (var cmd = new SqlCommand("SELECT order_Status FROM dbo.[Order] WHERE order_ID = @OrderId AND customer_ID = @CustomerId", con, tx))
+								{
+									cmd.Parameters.Add("@OrderId", SqlDbType.VarChar, 50).Value = orderId;
+									cmd.Parameters.Add("@CustomerId", SqlDbType.Int).Value = customerId;
+									st = cmd.ExecuteScalar();
+								}
+								if (st == null || st == DBNull.Value)
+									throw new InvalidOperationException("Order not found in your account.");
+								if (!IsReviewable(Convert.ToString(st)))
+									throw new InvalidOperationException("You can review an order once it has been completed.");
 
-            const string ordersSql = @"
+								using (var cmd = new SqlCommand("SELECT COUNT(*) FROM dbo.Rating WITH (UPDLOCK, HOLDLOCK) WHERE order_ID = @OrderId", con, tx))
+								{
+									cmd.Parameters.Add("@OrderId", SqlDbType.VarChar, 50).Value = orderId;
+									if (Convert.ToInt32(cmd.ExecuteScalar()) > 0)
+										throw new InvalidOperationException("You have already reviewed this order.");
+								}
+
+								int next;
+								using (var cmd = new SqlCommand("SELECT ISNULL(MAX(TRY_CAST(SUBSTRING(rating_ID, 4, 20) AS INT)), 0) + 1 FROM dbo.Rating WITH (UPDLOCK, HOLDLOCK)", con, tx))
+								{
+									next = Convert.ToInt32(cmd.ExecuteScalar());
+								}
+
+								using (var cmd = new SqlCommand(
+									"INSERT INTO dbo.Rating (rating_ID, rating_Date, rating_Review, rating_Score, order_ID) " +
+									"VALUES (@Id, @Date, @Review, @Score, @OrderId)", con, tx))
+								{
+									cmd.Parameters.Add("@Id", SqlDbType.VarChar, 20).Value = "RAT" + next.ToString("D3", CultureInfo.InvariantCulture);
+									cmd.Parameters.Add("@Date", SqlDbType.Date).Value = DateTime.Today;
+									cmd.Parameters.Add("@Review", SqlDbType.NVarChar, 250).Value = text;
+									cmd.Parameters.Add("@Score", SqlDbType.Int).Value = score;
+									cmd.Parameters.Add("@OrderId", SqlDbType.VarChar, 50).Value = orderId;
+									cmd.ExecuteNonQuery();
+								}
+								tx.Commit();
+								ok = true;
+							}
+							catch
+							{
+								try { tx.Rollback(); } catch { }
+								throw;
+							}
+						}
+					}
+					message = "Your review of order " + orderId + " has been submitted.";
+				}
+				catch (InvalidOperationException ex)
+				{
+					message = ex.Message;
+				}
+				catch (SqlException)
+				{
+					message = "The database could not save your review. Please try again.";
+				}
+			}
+			Session["AvunaReviewMsg"] = message;
+			Session["AvunaReviewOk"] = ok ? "1" : "0";
+		}
+
+		private void ShowPopup(string heading, string message, bool success)
+		{
+			string js = "window.addEventListener('load', function(){" +
+						"avunaShowNotice('" + HttpUtility.JavaScriptStringEncode(heading) +
+						"','" + HttpUtility.JavaScriptStringEncode(message) +
+						"'," + (success ? "true" : "false") + ");});";
+			ClientScript.RegisterStartupScript(GetType(), "avunaCancelNotice", js, true);
+		}
+
+		// Login page stores the customer as Session["customer_ID"].
+		private int GetLoggedInCustomerId()
+		{
+			int id;
+			if (Session["customer_ID"] != null &&
+				int.TryParse(Session["customer_ID"].ToString(), out id)) return id;
+			return 0;
+		}
+
+		private void LoadOrders(int customerId)
+		{
+			string cs = ConfigurationManager.ConnectionStrings["GroupWst2"].ConnectionString;
+			var orders = new DataTable();
+			var items = new DataTable();
+
+			const string ordersSql = @"
                 SELECT order_ID, order_TotalCost, order_Status
                 FROM [dbo].[Order]
                 WHERE customer_ID = @CustomerId";
 
-            const string itemsSql = @"
+			const string itemsSql = @"
                 SELECT o.order_ID, o.order_Date, o.order_Status,
                        oi.item, oi.DesignPackage, oi.orderItem_Quantity,
                        oi.orderItem_Size, oi.orderItem_Colour, oi.orderItem_Subtotal,
                        oi.designFile_ID,
-                       ROW_NUMBER() OVER(PARTITION BY o.order_ID ORDER BY oi.orderItem_ID) AS ItemRowNumber,
-                       (SELECT COUNT(*) FROM [dbo].[Rating] r WHERE r.order_ID = o.order_ID) AS RatingCount,
-                       (SELECT TOP 1 r.rating_Score FROM [dbo].[Rating] r WHERE r.order_ID = o.order_ID) AS RatingScore
+                       ROW_NUMBER() OVER(PARTITION BY o.order_ID ORDER BY oi.orderItem_ID) AS ItemRowNumber
                 FROM [dbo].[Order] o
                 LEFT JOIN [dbo].[OrderItem] oi ON oi.order_ID = o.order_ID
                 WHERE o.customer_ID = @CustomerId
                 ORDER BY o.order_Date DESC, o.order_ID DESC, oi.orderItem_ID";
 
-            const string photosSql = @"
+			const string photosSql = @"
                 SELECT df.designFile_ID, df.design_Photo
                 FROM [dbo].[DesignFile] df
                 WHERE df.design_Photo IS NOT NULL
@@ -494,172 +491,225 @@ IF @@ROWCOUNT <> (SELECT COUNT(*) FROM #RestoreItem)
                         INNER JOIN [dbo].[Order] o ON o.order_ID = oi.order_ID
                         WHERE o.customer_ID = @CustomerId)";
 
-            _designKeys.Clear();
-            using (var con = new SqlConnection(cs))
-            {
-                con.Open();
-                using (var cmd = new SqlCommand(ordersSql, con))
-                {
-                    cmd.Parameters.Add("@CustomerId", SqlDbType.Int).Value = customerId;
-                    using (var da = new SqlDataAdapter(cmd)) { da.Fill(orders); }
-                }
-                using (var cmd = new SqlCommand(itemsSql, con))
-                {
-                    cmd.Parameters.Add("@CustomerId", SqlDbType.Int).Value = customerId;
-                    using (var da = new SqlDataAdapter(cmd)) { da.Fill(items); }
-                }
+			_designKeys.Clear();
+			using (var con = new SqlConnection(cs))
+			{
+				con.Open();
+				using (var cmd = new SqlCommand(ordersSql, con))
+				{
+					cmd.Parameters.Add("@CustomerId", SqlDbType.Int).Value = customerId;
+					using (var da = new SqlDataAdapter(cmd)) { da.Fill(orders); }
+				}
+				using (var cmd = new SqlCommand(itemsSql, con))
+				{
+					cmd.Parameters.Add("@CustomerId", SqlDbType.Int).Value = customerId;
+					using (var da = new SqlDataAdapter(cmd)) { da.Fill(items); }
+				}
 
-                var store = new StringBuilder();
-                int n = 0;
-                using (var cmd = new SqlCommand(photosSql, con))
-                {
-                    cmd.Parameters.Add("@CustomerId", SqlDbType.Int).Value = customerId;
-                    using (var rd = cmd.ExecuteReader())
-                    {
-                        while (rd.Read())
-                        {
-                            string id = rd[0].ToString();
-                            byte[] bytes = rd[1] == DBNull.Value ? null : (byte[])rd[1];
-                            string uri = ToDataUri(bytes);
-                            if (uri == null || _designKeys.ContainsKey(id)) continue;
-                            string key = "dfimg_" + n++;
-                            _designKeys[id] = key;
-                            store.Append("<img id='").Append(key).Append("' src='")
-                                 .Append(uri).Append("' alt='' />");
-                        }
-                    }
-                }
-                DesignStoreHtml = store.ToString();
-            }
+				var store = new StringBuilder();
+				int n = 0;
+				using (var cmd = new SqlCommand(photosSql, con))
+				{
+					cmd.Parameters.Add("@CustomerId", SqlDbType.Int).Value = customerId;
+					using (var rd = cmd.ExecuteReader())
+					{
+						while (rd.Read())
+						{
+							string id = rd[0].ToString();
+							byte[] bytes = rd[1] == DBNull.Value ? null : (byte[])rd[1];
+							string uri = ToDataUri(bytes);
+							if (uri == null || _designKeys.ContainsKey(id)) continue;
+							string key = "dfimg_" + n++;
+							_designKeys[id] = key;
+							store.Append("<img id='").Append(key).Append("' src='")
+								 .Append(uri).Append("' alt='' />");
+						}
+					}
+				}
+				DesignStoreHtml = store.ToString();
 
-            gvOrders.DataSource = items;
-            gvOrders.DataBind();
+				// Which of this customer's orders already have a review.
+				_rated.Clear();
+				try
+				{
+					using (var cmd = new SqlCommand(@"
+                        SELECT r.order_ID FROM [dbo].[Rating] r
+                        INNER JOIN [dbo].[Order] o ON o.order_ID = r.order_ID
+                        WHERE o.customer_ID = @CustomerId", con))
+					{
+						cmd.Parameters.Add("@CustomerId", SqlDbType.Int).Value = customerId;
+						using (var rd = cmd.ExecuteReader())
+							while (rd.Read()) _rated.Add(rd[0].ToString());
+					}
+				}
+				catch (SqlException)
+				{
+					_rated.Clear();
+				}
 
-            int total = 0, completed = 0, active = 0;
-            decimal outstanding = 0m;
-            foreach (DataRow r in orders.Rows)
-            {
-                string status = (r["order_Status"] == DBNull.Value ? "" : r["order_Status"].ToString()).Trim().ToLowerInvariant();
-                decimal cost = r["order_TotalCost"] == DBNull.Value ? 0m : Convert.ToDecimal(r["order_TotalCost"]);
-                total++;
-                if (status == "completed" || status == "delivered") completed++;
-                else if (status != "cancelled")
-                {
-                    active++;
-                    outstanding += cost;  // Preserved from your existing page.
-                }
-            }
-            litTotal.Text = total.ToString();
-            litCompleted.Text = completed.ToString();
-            litActive.Text = active.ToString();
-            litOutstanding.Text = "R" + outstanding.ToString("N2", CultureInfo.InvariantCulture);
-        }
+				// Manager responses to this customer's ratings (ignored quietly if the response columns are not in the database yet).
+				_responses.Clear();
+				try
+				{
+					const string respSql = @"
+                        SELECT r.order_ID, r.manager_Response, r.response_Date, r.rating_Score, r.rating_Review
+                        FROM [dbo].[Rating] r
+                        INNER JOIN [dbo].[Order] o ON o.order_ID = r.order_ID
+                        WHERE o.customer_ID = @CustomerId
+                          AND r.manager_Response IS NOT NULL AND LTRIM(RTRIM(r.manager_Response)) <> ''";
+					using (var cmd = new SqlCommand(respSql, con))
+					{
+						cmd.Parameters.Add("@CustomerId", SqlDbType.Int).Value = customerId;
+						using (var rd = cmd.ExecuteReader())
+						{
+							while (rd.Read())
+							{
+								string oid = rd[0].ToString();
+								string when = rd[2] == DBNull.Value ? "" : Convert.ToDateTime(rd[2]).ToString("d MMM yyyy", CultureInfo.InvariantCulture);
+								_responses[oid] = new[]
+								{
+									rd[1].ToString(), when,
+									rd[3] == DBNull.Value ? "" : rd[3].ToString(),
+									rd[4] == DBNull.Value ? "" : rd[4].ToString()
+								};
+							}
+						}
+					}
+				}
+				catch (SqlException)
+				{
+					_responses.Clear();
+				}
+			}
 
-        // Action column: Cancel for Pending orders, Rate Order (or the given score) for
-        // Completed/Delivered orders. Only the first row of each order shows a button.
-        protected string RenderAction(object status, object orderId, object rowNumber,
-            object ratingCount, object ratingScore)
-        {
-            string s = (status == null || status == DBNull.Value)
-                ? "" : Convert.ToString(status).Trim().ToLowerInvariant();
+			gvOrders.DataSource = items;
+			gvOrders.DataBind();
 
-            if (s == "completed" || s == "delivered")
-            {
-                if (orderId == null || orderId == DBNull.Value ||
-                    rowNumber == null || rowNumber == DBNull.Value ||
-                    Convert.ToInt32(rowNumber) != 1)
-                    return "<span class='no-design'>—</span>";
+			int total = 0, completed = 0, active = 0;
+			decimal outstanding = 0m;
+			foreach (DataRow r in orders.Rows)
+			{
+				string status = (r["order_Status"] == DBNull.Value ? "" : r["order_Status"].ToString()).Trim().ToLowerInvariant();
+				decimal cost = r["order_TotalCost"] == DBNull.Value ? 0m : Convert.ToDecimal(r["order_TotalCost"]);
+				total++;
+				if (status == "completed" || status == "delivered") completed++;
+				else if (status != "cancelled")
+				{
+					active++;
+					outstanding += cost;  // Preserved from your existing page.
+				}
+			}
+			litTotal.Text = total.ToString();
+			litCompleted.Text = completed.ToString();
+			litActive.Text = active.ToString();
+			litOutstanding.Text = "R" + outstanding.ToString("N2", CultureInfo.InvariantCulture);
+		}
 
-                int count = (ratingCount == null || ratingCount == DBNull.Value) ? 0 : Convert.ToInt32(ratingCount);
-                if (count > 0)
-                {
-                    string score = (ratingScore == null || ratingScore == DBNull.Value)
-                        ? "" : Convert.ToString(ratingScore);
-                    return "<span class='status status-completed'>&#9733; " +
-                           HttpUtility.HtmlEncode(score) + "/5</span>";
-                }
+		// Order number plus (on the first item row only) a "Response" button when the manager has replied to the rating.
+		protected string RenderOrderId(object orderId, object rowNumber)
+		{
+			string id = Convert.ToString(orderId);
+			string html = HttpUtility.HtmlEncode(id);
+			string[] resp;
+			if (rowNumber != null && rowNumber != DBNull.Value && Convert.ToInt32(rowNumber) == 1 && _responses.TryGetValue(id, out resp))
+			{
+				html += " <button type='button' class='resp-chip' data-order='" + HttpUtility.HtmlAttributeEncode(id)
+					 + "' data-text='" + HttpUtility.HtmlAttributeEncode(resp[0])
+					 + "' data-date='" + HttpUtility.HtmlAttributeEncode(resp[1])
+					 + "' data-score='" + HttpUtility.HtmlAttributeEncode(resp[2])
+					 + "' data-review='" + HttpUtility.HtmlAttributeEncode(resp[3])
+					 + "'>&#9993; Response</button>";
+			}
+			return html;
+		}
 
-                return "<button type='button' class='rate-order-btn' data-order='" +
-                       HttpUtility.HtmlAttributeEncode(Convert.ToString(orderId)) +
-                       "'>Rate Order</button>";
-            }
+		// Action column (first item row of each order only): Cancel for Pending orders,
+		// "Give Review" for finished orders that have not been reviewed yet.
+		protected string RenderCancel(object status, object orderId, object rowNumber)
+		{
+			if (status == null || orderId == null || rowNumber == null || Convert.ToInt32(rowNumber) != 1)
+				return "<span class='no-design'>—</span>";
 
-            return RenderCancel(status, orderId, rowNumber);
-        }
+			string s = Convert.ToString(status).Trim();
+			string id = Convert.ToString(orderId);
 
-        // Only show ONE Cancel button per pending order (even if it contains multiple items).
-        protected string RenderCancel(object status, object orderId, object rowNumber)
-        {
-            if (status == null || orderId == null || rowNumber == null ||
-                !String.Equals(Convert.ToString(status).Trim(), "Pending", StringComparison.OrdinalIgnoreCase) ||
-                Convert.ToInt32(rowNumber) != 1)
-                return "<span class='no-design'>—</span>";
+			if (String.Equals(s, "Pending", StringComparison.OrdinalIgnoreCase))
+			{
+				return "<button type='button' class='cancel-order-btn' data-order='" +
+					   HttpUtility.HtmlAttributeEncode(id) + "'>Cancel Order</button>";
+			}
 
-            return "<button type='button' class='cancel-order-btn' data-order='" +
-                   HttpUtility.HtmlAttributeEncode(Convert.ToString(orderId)) +
-                   "'>Cancel Order</button>";
-        }
+			if (IsReviewable(s))
+			{
+				if (_rated.Contains(id)) return "<span class='reviewed-tag'>&#9733; Reviewed</span>";
+				return "<button type='button' class='give-review-btn' data-order='" +
+					   HttpUtility.HtmlAttributeEncode(id) + "'>Give Review</button>";
+			}
 
-        protected string RenderDesign(object designFileId, object orderId, object item)
-        {
-            string key;
-            if (designFileId == null || designFileId == DBNull.Value
-                || !_designKeys.TryGetValue(designFileId.ToString(), out key))
-                return "<span class='no-design'>No design</span>";
+			return "<span class='no-design'>—</span>";
+		}
 
-            string title = "Order " + orderId + (item == null || item == DBNull.Value ? "" : " - " + item);
-            return "<button type='button' class='view-design-btn' data-img='" + key
-                 + "' data-title='" + HttpUtility.HtmlAttributeEncode(title) + "'>View Design</button>";
-        }
+		protected string RenderDesign(object designFileId, object orderId, object item)
+		{
+			string key;
+			if (designFileId == null || designFileId == DBNull.Value
+				|| !_designKeys.TryGetValue(designFileId.ToString(), out key))
+				return "<span class='no-design'>No design</span>";
 
-        private static string ToDataUri(byte[] bytes)
-        {
-            if (bytes == null || bytes.Length == 0) return null;
-            string mime = DetectMime(bytes);
-            if (mime == null)
-            {
-                try
-                {
-                    string t = Encoding.ASCII.GetString(bytes).Trim();
-                    int comma = t.IndexOf(',');
-                    if (t.StartsWith("data:", StringComparison.OrdinalIgnoreCase) && comma > 0)
-                        t = t.Substring(comma + 1);
-                    byte[] decoded = Convert.FromBase64String(t);
-                    mime = DetectMime(decoded);
-                    if (mime != null) bytes = decoded;
-                }
-                catch { return null; }
-            }
-            return mime == null ? null : "data:" + mime + ";base64," + Convert.ToBase64String(bytes);
-        }
+			string title = "Order " + orderId + (item == null || item == DBNull.Value ? "" : " - " + item);
+			return "<button type='button' class='view-design-btn' data-img='" + key
+				 + "' data-title='" + HttpUtility.HtmlAttributeEncode(title) + "'>View Design</button>";
+		}
 
-        private static string DetectMime(byte[] b)
-        {
-            if (b.Length > 3 && b[0] == 0x89 && b[1] == 0x50 && b[2] == 0x4E && b[3] == 0x47) return "image/png";
-            if (b.Length > 2 && b[0] == 0xFF && b[1] == 0xD8) return "image/jpeg";
-            if (b.Length > 3 && b[0] == 0x47 && b[1] == 0x49 && b[2] == 0x46) return "image/gif";
-            if (b.Length > 1 && b[0] == 0x42 && b[1] == 0x4D) return "image/bmp";
-            if (b.Length > 11 && b[0] == 0x52 && b[1] == 0x49 && b[8] == 0x57 && b[9] == 0x45) return "image/webp";
-            return null;
-        }
+		private static string ToDataUri(byte[] bytes)
+		{
+			if (bytes == null || bytes.Length == 0) return null;
+			string mime = DetectMime(bytes);
+			if (mime == null)
+			{
+				try
+				{
+					string t = Encoding.ASCII.GetString(bytes).Trim();
+					int comma = t.IndexOf(',');
+					if (t.StartsWith("data:", StringComparison.OrdinalIgnoreCase) && comma > 0)
+						t = t.Substring(comma + 1);
+					byte[] decoded = Convert.FromBase64String(t);
+					mime = DetectMime(decoded);
+					if (mime != null) bytes = decoded;
+				}
+				catch { return null; }
+			}
+			return mime == null ? null : "data:" + mime + ";base64," + Convert.ToBase64String(bytes);
+		}
 
-        protected string GetStatusClass(object status)
-        {
-            string s = status == null ? "" : status.ToString();
-            switch (s.Trim().ToLowerInvariant())
-            {
-                case "delivered":
-                case "completed": return "status-delivered";
-                case "pending": return "status-pending";
-                case "cancelled": return "status-cancelled";
-                default: return "status-processing";
-            }
-        }
+		private static string DetectMime(byte[] b)
+		{
+			if (b.Length > 3 && b[0] == 0x89 && b[1] == 0x50 && b[2] == 0x4E && b[3] == 0x47) return "image/png";
+			if (b.Length > 2 && b[0] == 0xFF && b[1] == 0xD8) return "image/jpeg";
+			if (b.Length > 3 && b[0] == 0x47 && b[1] == 0x49 && b[2] == 0x46) return "image/gif";
+			if (b.Length > 1 && b[0] == 0x42 && b[1] == 0x4D) return "image/bmp";
+			if (b.Length > 11 && b[0] == 0x52 && b[1] == 0x49 && b[8] == 0x57 && b[9] == 0x45) return "image/webp";
+			return null;
+		}
 
-        protected string FormatStatus(object status)
-        {
-            string s = status == null ? "" : status.ToString().Trim();
-            return Regex.Replace(s, "(?<=[a-z])(?=[A-Z])", " ");
-        }
-    }
+		protected string GetStatusClass(object status)
+		{
+			string s = status == null ? "" : status.ToString();
+			switch (s.Trim().ToLowerInvariant())
+			{
+				case "delivered":
+				case "completed": return "status-delivered";
+				case "pending": return "status-pending";
+				case "cancelled": return "status-cancelled";
+				default: return "status-processing";
+			}
+		}
+
+		protected string FormatStatus(object status)
+		{
+			string s = status == null ? "" : status.ToString().Trim();
+			return Regex.Replace(s, "(?<=[a-z])(?=[A-Z])", " ");
+		}
+	}
 }
+

@@ -72,7 +72,6 @@
             <div class="field"><label for="avunaExpiry">Expiry date (MM/YY)</label><input type="text" id="avunaExpiry" inputmode="numeric" maxlength="5" placeholder="MM/YY" autocomplete="off" /></div>
             <div class="field"><label for="avunaCvv">CVV</label><input type="password" id="avunaCvv" inputmode="numeric" maxlength="4" placeholder="CVV" autocomplete="off" /></div>
           </div>
-          <p class="small">Simulation only — no card is charged. Use fictional card details.</p>
         </div>
         <div class="client-error" id="avunaPaymentError" role="alert" aria-live="polite"></div>
         <input type="hidden" name="avunaPaymentSubmit" id="avunaPaymentSubmit" value="" />
@@ -85,11 +84,10 @@
     <div class="avuna-modal-overlay" role="presentation">
       <div class="avuna-modal" role="dialog" aria-modal="true" aria-labelledby="avunaSuccessTitle" aria-describedby="avunaSuccessDescription">
         <div class="avuna-modal-tick" aria-hidden="true">&#10003;</div>
-        <h2 id="avunaSuccessTitle">Payment Simulation Successful!</h2>
-        <p id="avunaSuccessDescription">Your <%= Server.HtmlEncode(SubmittedMethod) %> payment simulation was completed successfully. The demonstration order status is now Paid.</p>
+        <h2 id="avunaSuccessTitle">Payment Successful!</h2>
+        <p id="avunaSuccessDescription">Your <%= Server.HtmlEncode(SubmittedMethod) %> payment was completed successfully. Your order status is now Paid.</p>
         <p><strong>Order:</strong> <%= Server.HtmlEncode(CurrentOrderId) %><br />
         <strong>Reference:</strong> <%= Server.HtmlEncode(SubmittedPaymentId) %></p>
-        <p class="avuna-sim-caption">Demonstration only: no funds were transferred or received. "Paid" is recorded only in the demo database.</p>
         <a class="avuna-modal-ok" id="avunaModalOkay" href="<%= ResolveUrl("~/CreateOrder.aspx") %>">OK</a>
       </div>
     </div>
@@ -140,15 +138,18 @@
                     return;
                 }
             }
-            // All editable financial inputs are deliberately unnamed and are removed
-            // from the DOM before posting so they can never be transmitted to ASP.NET.
-            ['avunaCardNumber', 'avunaExpiry', 'avunaCvv', 'avunaAccountNumber', 'avunaAccountHolder']
-                .forEach(function (id) { var el = document.getElementById(id); if (el) el.value = ''; });
-            document.getElementById('avunaPaymentSubmit').value = '1';
-            var form = button.closest('form');
-            if (form) HTMLFormElement.prototype.submit.call(form);
-            else error.textContent = 'The form could not be found.';
+            avConfirm('Confirm this payment?', 'Your payment will be submitted for this order.', 'Yes, pay now', function () {
+                // All editable financial inputs are deliberately unnamed and are removed
+                // from the DOM before posting so they can never be transmitted to ASP.NET.
+                ['avunaCardNumber', 'avunaExpiry', 'avunaCvv', 'avunaAccountNumber', 'avunaAccountHolder']
+                    .forEach(function (id) { var el = document.getElementById(id); if (el) el.value = ''; });
+                document.getElementById('avunaPaymentSubmit').value = '1';
+                var form = button.closest('form');
+                if (form) HTMLFormElement.prototype.submit.call(form);
+                else error.textContent = 'The form could not be found.';
+            });
         });
     })();
 </script>
 </asp:Content>
+ 

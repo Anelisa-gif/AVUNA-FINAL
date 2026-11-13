@@ -234,7 +234,7 @@ hr{display:none}
                     <div><h4>Explore</h4><p>Dashboard &middot; Staff &middot; Customers &middot; Inventory &middot; Orders</p></div>
                     <div><h4>Follow us</h4>
                         <ul class="av-social">
-                            <li><a href="https://www.instagram.com/avunacollective" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><svg viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r=".9" fill="currentColor" stroke="none"/></svg><span>@avunacollective</span></a></li>
+                            <li><a href="https://www.instagram.com/avunacollected" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><svg viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r=".9" fill="currentColor" stroke="none"/></svg><span>@avunacollective</span></a></li>
                             <li><a href="https://www.facebook.com/avunacollective" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><svg viewBox="0 0 24 24"><path d="M14 8.5h2.5V5h-3c-2.4 0-3.8 1.5-3.8 3.9V11H7.5v3.4h2.2V21h3.5v-6.6h2.5l.5-3.4h-3v-1.6c0-.6.3-.9.8-.9z"/></svg><span>Avuna Collective</span></a></li>
                             <li><a href="https://www.tiktok.com/@avunacollective" target="_blank" rel="noopener noreferrer" aria-label="TikTok"><svg viewBox="0 0 24 24"><path d="M14.5 3.5v10.2a3.6 3.6 0 1 1-3.6-3.6"/><path d="M14.5 3.5c.4 2.3 1.9 3.8 4.2 4"/></svg><span>@avunacollective</span></a></li>
                             <li><a href="https://wa.me/27714860091" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp"><svg viewBox="0 0 24 24"><path d="M21 11.5a8.4 8.4 0 0 1-12.4 7.4L3 20.5l1.7-5.4A8.5 8.5 0 1 1 21 11.5z"/><path d="M9 8.5c.3 2.6 2.6 5.1 5.5 6l1.4-1.5-2-1-.8.8c-.9-.4-1.7-1.2-2.1-2.1l.8-.8-1-2z"/></svg><span>+27 71 486 0091</span></a></li>
@@ -244,23 +244,93 @@ hr{display:none}
             </footer>
         </div>
     <script>
-        // Highlights the current page in the navigation bar
-        (function () {
-            var here = (location.pathname.split("/").pop() || "default").toLowerCase().replace(/\.aspx$/, "");
-            var links = document.querySelectorAll(".av-links .av-link");
-            for (var i = 0; i < links.length; i++) {
-                var h = (links[i].getAttribute("href") || "").split("?")[0].split("/").pop().toLowerCase().replace(/\.aspx$/, "");
-                if (h === "" && here === "default") h = "default";
-                if (h === here) links[i].className += " active";
-            }
-        })();
-    </script>
+    // Highlights the current page in the navigation bar
+    (function () {
+        var here = (location.pathname.split("/").pop() || "default").toLowerCase().replace(/\.aspx$/, "");
+        var links = document.querySelectorAll(".av-links .av-link");
+        for (var i = 0; i < links.length; i++) {
+            var h = (links[i].getAttribute("href") || "").split("?")[0].split("/").pop().toLowerCase().replace(/\.aspx$/, "");
+            if (h === "" && here === "default") h = "default";
+            if (h === here) links[i].className += " active";
+        }
+    })();
+</script>
+<style>
+.avc-back{position:fixed;inset:0;z-index:100000;display:none;align-items:center;justify-content:center;background:rgba(15,42,31,.55);padding:20px;font-family:"Inter","Segoe UI",Roboto,Arial,sans-serif}
+.avc-back.avc-open{display:flex}
+.avc-box{position:relative;background:#fbf8f2;border-radius:18px;max-width:440px;width:100%;padding:30px 30px 24px;box-shadow:0 24px 60px rgba(0,0,0,.3);overflow:hidden;animation:avcIn .18s ease-out}
+.avc-box:before{content:"";position:absolute;left:0;right:0;top:0;height:5px;background:#b98a3e}
+.avc-box.avc-danger:before{background:#b4443c}
+@keyframes avcIn{from{transform:translateY(10px) scale(.98);opacity:0}to{transform:none;opacity:1}}
+.avc-icon{width:46px;height:46px;border-radius:50%;background:#f2e8d6;color:#8a6a35;display:flex;align-items:center;justify-content:center;margin-bottom:14px}
+.avc-danger .avc-icon{background:#f7e1de;color:#b4443c}
+.avc-icon svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.avc-title{font-family:"Playfair Display",Georgia,serif;font-size:23px;font-weight:700;color:#0f2a1f;margin:0 0 8px}
+.avc-msg{font-size:14.5px;line-height:1.65;color:#4c564f;margin:0 0 20px}
+.avc-msg ul{margin:10px 0 0;padding-left:18px}.avc-msg li{margin:3px 0}
+.avc-actions{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap}
+.avc-btn{border-radius:10px;padding:11px 20px;font-size:14px;font-weight:600;cursor:pointer;border:1px solid transparent;font-family:inherit}
+.avc-cancel{background:#fff;border-color:#d9cfbd;color:#0f2a1f}.avc-cancel:hover{background:#f5efe6}
+.avc-ok{background:#0f2a1f;color:#f5efe6}.avc-ok:hover{background:#173c2c}
+.avc-danger .avc-ok{background:#b4443c;color:#fff}.avc-danger .avc-ok:hover{background:#963530}
+.av-lowstock{background:#fff7e6;border:1px solid #ecd49b;border-left:5px solid #c78a1a;border-radius:14px;padding:16px 20px;margin:0 0 22px;font-family:"Inter","Segoe UI",Roboto,Arial,sans-serif;color:#5b4310}
+.av-ls-head{display:flex;align-items:center;gap:12px;flex-wrap:wrap;font-size:14px}
+.av-ls-head strong{font-size:15px;color:#7a5200}.av-ls-head a{margin-left:auto;background:#0f2a1f;color:#f5efe6!important;text-decoration:none!important;border-radius:9px;padding:8px 16px;font-weight:600;font-size:13px}
+.av-lowstock ul{list-style:none;margin:12px 0 0;padding:0;display:flex;flex-wrap:wrap;gap:8px}
+.av-lowstock li{background:#fff;border:1px solid #ecd49b;border-radius:20px;padding:5px 12px;font-size:12.5px}
+.av-lowstock li.out{border-color:#e3b3ae;background:#fdeceb;color:#8f2f28}
+</style>
+<script>
+    (function () {
+        var ICON = {
+            q: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.6 2.2c-.7.4-1.1.9-1.1 1.8M12 17h.01"/></svg>',
+            m: '<svg viewBox="0 0 24 24"><rect x="3.5" y="5.5" width="17" height="13" rx="2"/><path d="m4 7 8 6 8-6"/></svg>',
+            w: '<svg viewBox="0 0 24 24"><path d="M12 3.5 21 19.5H3z"/><path d="M12 10v4.5M12 17.2h.01"/></svg>'
+        };
+        var back = null, onOk = null;
+        function ensure() {
+            if (back) return;
+            back = document.createElement('div');
+            back.className = 'avc-back';
+            back.innerHTML = '<div class="avc-box" role="dialog" aria-modal="true"><div class="avc-icon"></div><h3 class="avc-title"></h3><div class="avc-msg"></div><div class="avc-actions"><button type="button" class="avc-btn avc-cancel">Cancel</button><button type="button" class="avc-btn avc-ok">OK</button></div></div>';
+            document.body.appendChild(back);
+            back.addEventListener('click', function (e) { if (e.target === back) close(); });
+            back.querySelector('.avc-cancel').onclick = close;
+            back.querySelector('.avc-ok').onclick = function () { var f = onOk; close(); if (f) f(); };
+            document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && back.classList.contains('avc-open')) close(); });
+        }
+        function close() { if (back) back.classList.remove('avc-open'); onOk = null; }
+        function open(title, html, okText, cancelText, danger, icon, cb) {
+            ensure();
+            var box = back.querySelector('.avc-box');
+            box.className = 'avc-box' + (danger ? ' avc-danger' : '');
+            back.querySelector('.avc-icon').innerHTML = icon;
+            back.querySelector('.avc-title').textContent = title;
+            back.querySelector('.avc-msg').innerHTML = html;
+            back.querySelector('.avc-ok').textContent = okText;
+            var c = back.querySelector('.avc-cancel');
+            c.textContent = cancelText; c.style.display = cancelText ? '' : 'none';
+            onOk = cb;
+            back.classList.add('avc-open');
+            back.querySelector('.avc-ok').focus();
+        }
+        function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+        window.avConfirm = function (title, message, okText, onConfirm, danger) {
+            open(title, esc(message), okText || 'Yes, continue', 'Cancel', !!danger, danger ? ICON.w : ICON.q, onConfirm);
+        };
+        window.avNotice = function (title, html, okText, href) {
+            open(title, html, okText || 'OK', href ? 'Close' : '', false, href ? ICON.w : ICON.m, href ? function () { window.location.href = href; } : null);
+        };
+        window.avConfirmClick = function (el, title, message, okText, danger) {
+            if (el.__avOk) { el.__avOk = false; return true; }
+            avConfirm(title, message, okText, function () { el.__avOk = true; el.click(); }, danger);
+            return false;
+        };
+    })();
+</script>
     </form>
     <asp:PlaceHolder runat="server">
         <%: Scripts.Render("~/Scripts/bootstrap.js") %>
     </asp:PlaceHolder>
 </body>
 </html>
-
- 
-

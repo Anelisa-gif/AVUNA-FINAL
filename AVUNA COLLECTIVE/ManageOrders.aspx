@@ -275,6 +275,47 @@ min-height: 470px;
 .avuna-orders-header { }
 .avuna-eyebrow-inline { font-size: 14px; }
 </style>
+<style>
+#ratings-panel{padding:0 0 12px}#ratings-panel .rt-tabs,#ratings-panel .rt-card,#ratings-panel .rt-note,#ratings-panel .rt-empty{margin-left:28px;margin-right:28px}
+.rt-note{border-radius:12px;padding:12px 16px;margin:0 0 16px;font-size:14px;line-height:1.6}
+.rt-ok{background:#e4f5ec;border:1px solid #bfe3cf;color:#1f6b45}.rt-bad{background:#fdeaea;border:1px solid #f0c4c4;color:#8a2f2f}.rt-warn{background:#fff7e6;border:1px solid #ecd49b;color:#5b4310}
+.rt-warn pre{background:#fff;border:1px solid #ecd49b;border-radius:8px;padding:10px 12px;margin:8px 0 0;white-space:pre-wrap;font-size:12.5px;color:#222}
+.rt-tabs{display:flex;gap:8px;margin:6px 0 18px;flex-wrap:wrap}
+.rt-tab{padding:8px 16px;border-radius:999px;border:1px solid #d9cfbd;background:#fff;color:#0f2a1f!important;font-size:13px;font-weight:600;text-decoration:none!important}
+.rt-tab.rt-on{background:#0f2a1f;border-color:#0f2a1f;color:#f5efe6!important}
+.rt-card{border:1px solid #e5dccd;border-left:4px solid #b98a3e;border-radius:14px;background:#fff;padding:18px 20px;margin:0 0 14px}
+.rt-top{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:center}
+.rt-stars{color:#b98a3e;font-size:18px;letter-spacing:2px}.rt-stars b{font-size:13px;letter-spacing:0;color:#0f2a1f;margin-left:6px}.rt-off{color:#e2d9c6}
+.rt-meta{font-size:13px;color:#6c736d}.rt-meta b{color:#0f2a1f}
+.rt-review{margin:12px 0;font-size:15px;line-height:1.6;color:#222}
+.rt-resp{background:#f2e8d6;border-radius:10px;padding:10px 14px;margin:0 0 12px}.rt-resp span{font-size:11px;letter-spacing:1.5px;text-transform:uppercase;font-weight:700;color:#8a6a35}.rt-resp p{margin:4px 0 0;font-size:14px;color:#3b3226}
+.rt-btn,.rt-send{background:#0f2a1f;color:#f5efe6;border:0;border-radius:9px;padding:9px 18px;font-size:13px;font-weight:600;cursor:pointer}
+.rt-cancel{background:#fff;color:#0f2a1f;border:1px solid #d9cfbd;border-radius:9px;padding:9px 18px;font-size:13px;font-weight:600;cursor:pointer}
+.rt-form{margin-top:12px}.rt-form textarea{width:100%;min-height:90px;border:1px solid #d9cfbd;border-radius:10px;padding:10px 12px;font:inherit;font-size:14px;box-sizing:border-box;resize:vertical}
+.rt-form textarea.rt-bad-input{border-color:#b4443c}
+.rt-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:10px}
+.rt-empty{padding:30px;text-align:center;color:#6c736d}
+</style>
+<input type="hidden" name="avRatingSave" id="avRatingSave" value="" />
+<input type="hidden" name="avRatingId" id="avRatingId" value="" />
+<input type="hidden" name="avRatingReply" id="avRatingReply" value="" />
+<script>
+    function rtOpen(b) { var f = document.getElementById('rf_' + b.getAttribute('data-id')); if (f) { f.style.display = 'block'; b.style.display = 'none'; var t = f.querySelector('textarea'); if (t) t.focus(); } }
+    function rtClose(b) { var f = b.closest('.rt-form'); f.style.display = 'none'; var o = f.previousElementSibling; if (o) o.style.display = ''; }
+    function rtSend(b) {
+        var id = b.getAttribute('data-id'), order = b.getAttribute('data-order');
+        var ta = b.closest('.rt-form').querySelector('textarea');
+        var text = ta.value.trim();
+        if (!text) { ta.classList.add('rt-bad-input'); ta.focus(); return; }
+        ta.classList.remove('rt-bad-input');
+        avConfirm('Save this response?', 'Your response to the rating on order ' + order + ' will be saved.', 'Yes, save response', function () {
+            document.getElementById('avRatingId').value = id;
+            document.getElementById('avRatingReply').value = text;
+            document.getElementById('avRatingSave').value = '1';
+            HTMLFormElement.prototype.submit.call(document.forms[0]);
+        });
+    }
+</script>
 <div class="avuna-manager-page">
 <!-- ===================================================== HERO ===================================================== -->
 <section class="avuna-manager-hero" style="--hero-img:url('images/GG-0653_PinksInks_29_lg.jpg');--hero-size:cover;--hero-pos:center">
@@ -284,6 +325,7 @@ min-height: 470px;
 <p>Every customer order and its current status.</p>
 <div class="avuna-hero-buttons">
 <a href="ManageOrders.aspx?view=pending" class="avuna-button avuna-button-orange">Pending Orders</a>
+<a href="ManageOrders.aspx?view=ratings" class="avuna-button avuna-button-orange">Customer Ratings</a>
 <a href="ManagerDashboard.aspx" class="avuna-button avuna-button-outline">Back to Dashboard</a>
 </div>
 </div>
@@ -299,6 +341,7 @@ min-height: 470px;
 <span><%: DateTime.Now.ToString("dddd, d MMMM yyyy", System.Globalization.CultureInfo.InvariantCulture) %></span>
 </div>
 <asp:Literal ID="litDbNotice" runat="server" />
+<div style="display:<%= ShowRatings ? "none" : "block" %>">
 <!-- ORDER STATISTICS -->
 <section class="avuna-stat-grid">
 <article class="avuna-stat-card">
@@ -362,7 +405,10 @@ min-height: 470px;
 </table>
 </div>
 </section>
+</div>
+<div style="display:<%= ShowRatings ? "block" : "none" %>">
+<%= RatingsHtml %>
+</div>
 </main>
 </div>
 </asp:Content>
-

@@ -1,4 +1,4 @@
-﻿ <%@ Page Title="Login" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="Login.aspx.cs" Inherits="AVUNA_COLLECTIVE.Login" %>
+﻿<%@ Page Title="Login" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="Login.aspx.cs" Inherits="AVUNA_COLLECTIVE.Login" %>
 <asp:Content ID="BodyContent" ContentPlaceHolderID="MainContent" runat="server">
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
@@ -212,9 +212,35 @@
             .avuna-card { padding: 36px 26px 32px; }
             .avuna-card h1 { font-size: 2.05rem; }
         }
+
+        /* ---------- Moving photo background: always drifting, photos cross-fade over each other ---------- */
+        .avuna-bg { position: absolute; top: 0; left: 0; right: 0; bottom: 0; z-index: 0; background: #efe7d9; overflow: hidden; }
+        .avuna-bg img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; display: block; animation: avunaDrift 14s ease-in-out infinite alternate; }
+        .avuna-bg .bg-b, .avuna-bg .bg-c { opacity: 0; animation: avunaBgFade 14s infinite, avunaDrift 14s ease-in-out infinite alternate; }
+        .avuna-bg .bg-b { animation-delay: 3s, 3s; }
+        .avuna-bg .bg-c { animation-delay: 10s, 10s; }
+        @keyframes avunaDrift {
+            0% { transform: scale(1.02) translate(0, 0); }
+            100% { transform: scale(1.16) translate(-2.5%, -2%); }
+        }
+        @keyframes avunaBgFade {
+            0% { opacity: 0; }
+            15% { opacity: 1; }
+            45% { opacity: 1; }
+            60% { opacity: 0; }
+            100% { opacity: 0; }
+        }
+        .avuna-bg:after { content: ""; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(243,236,224,.42); }
+        .avuna-auth .avuna-card { z-index: 1; }
+        @media (prefers-reduced-motion: reduce) { .avuna-bg img { animation: none !important; } .avuna-bg .bg-b, .avuna-bg .bg-c { opacity: 0; } }
     </style>
 
     <div class="avuna-auth">
+        <div class="avuna-bg" aria-hidden="true">
+            <img runat="server" class="bg-a" src="~/images/avuna_collective_background.jpg" alt="" />
+            <img runat="server" class="bg-b" src="~/images/sweater.jpg" alt="" />
+            <img runat="server" class="bg-c" src="~/images/Jacket.jpg" alt="" />
+        </div>
         <div class="avuna-card avuna-auth-form">
             <div class="avuna-mark" aria-hidden="true">
                 <svg viewBox="0 0 100 100">
@@ -281,3 +307,4 @@
         }
     </script>
 </asp:Content>
+

@@ -93,6 +93,19 @@
 .avuna-stockbar-amber > span { background: #c49a45; }
 .avuna-stockbar-red > span { background: #c84b4b; }
 
+
+/* raw materials */
+.mat-flash { border-radius: 14px; padding: 14px 20px; margin-bottom: 20px; font-size: 15px; }
+.mat-flash.ok { background: #e7f4eb; border: 1px solid #b9dcc4; color: #1f6a3d; }
+.mat-flash.bad { background: #fdeaea; border: 1px solid #f0c4c4; color: #8a2f2f; }
+.mat-edit { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+.mat-r { color: #6c736d; font-weight: bold; }
+.mat-in { width: 92px; text-align: right; padding: 8px 10px; border: 1.5px solid #e4dccd; border-radius: 10px; background: #f5efe6; color: #1b2a22; font-size: 15px; font-weight: bold; font-family: inherit; }
+.mat-in:focus { outline: none; border-color: #c49a45; background: #fff; box-shadow: 0 0 0 3px rgba(196,154,69,.18); }
+.mat-save { background: #c49a45; color: #fff; border: 0; border-radius: 10px; padding: 9px 14px; font-weight: bold; font-size: 13px; cursor: pointer; font-family: inherit; }
+.mat-save:disabled { background: #e4dccd; color: #9a9184; cursor: default; }
+.mat-save:not(:disabled):hover { background: #a8812f; }
+
 /* small screens */
 @media (max-width: 1100px) { .avuna-stat-grid { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 800px) { .avuna-toolbar { padding: 14px; } }
@@ -116,9 +129,10 @@
 <div class="avuna-manager-copy">
 <span class="avuna-eyebrow">MANAGER PORTAL</span>
 <h1 style="color: white;">Inventory</h1>
-<p>Every product variant in stock, with its size, colour, quantity and cost. Search by product, size, colour or variant number.</p>
+<p><%= ShowMaterials ? "Every raw material we hold, with quantity, reorder level, supplier and unit cost. The Manager can change a base price right here." : "Every product variant in stock, with its size, colour, quantity and cost. Search by product, size, colour or variant number." %></p>
 <div class="avuna-hero-buttons">
-<a href="ManageOrders.aspx" class="avuna-button avuna-button-orange">View Orders</a>
+<%= ShowMaterials ? "<a href=\"Inventory.aspx\" class=\"avuna-button avuna-button-orange\">Product Stock</a>" : "<a href=\"Inventory.aspx?view=materials\" class=\"avuna-button avuna-button-orange\">Raw Materials &amp; Prices</a>" %>
+<a href="ManageOrders.aspx" class="avuna-button avuna-button-outline">View Orders</a>
 <a href="ManagerDashboard.aspx" class="avuna-button avuna-button-outline">Back to Dashboard</a>
 </div>
 </div>
@@ -133,6 +147,7 @@
 <span><%: DateTime.Now.ToString("dddd, d MMMM yyyy", System.Globalization.CultureInfo.InvariantCulture) %></span>
 </div>
 <asp:Literal ID="litDbNotice" runat="server" />
+<div style="display:<%= ShowMaterials ? "none" : "block" %>">
 <!-- STATISTICS -->
 <section class="avuna-stat-grid">
 <article class="avuna-stat-card">
@@ -196,6 +211,11 @@
 </table>
 </div>
 </section>
+</div>
+<%= MaterialsHtml %>
+<input type="hidden" name="avMatId" id="avMatId" value="" />
+<input type="hidden" name="avMatCost" id="avMatCost" value="" />
+<input type="hidden" name="avMatSave" id="avMatSave" value="" />
 </main>
 </div>
 <script>
@@ -210,6 +230,40 @@
     document.addEventListener('DOMContentLoaded', function () {
         var box = document.getElementById('invSearch');
         if (box) box.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); doSearch(); } });
+    });
+</script>
+<script>
+    function matSearch() {
+        var q = document.getElementById('matSearch').value.replace(/^\s+|\s+$/g, '');
+        var cat = document.getElementById('matCat').value;
+        var parts = ['view=materials'];
+        if (q) parts.push('q=' + encodeURIComponent(q));
+        if (cat) parts.push('cat=' + encodeURIComponent(cat));
+        window.location.href = 'Inventory.aspx?' + parts.join('&');
+    }
+    function matChanged(inp) {
+        var b = inp.parentNode.querySelector('.mat-save');
+        b.disabled = inp.value.replace(/^\s+|\s+$/g, '') === inp.getAttribute('data-orig');
+    }
+    function matSave(btn) {
+        var inp = btn.parentNode.querySelector('.mat-in');
+        var v = inp.value.replace(/^\s+|\s+$/g, '').replace(',', '.');
+        if (!/^\d{1,7}(\.\d{1,2})?$/.test(v)) {
+            avNotice('Invalid price', 'Please enter a price such as 85 or 85.50.');
+            return;
+        }
+        var id = inp.getAttribute('data-id'), name = inp.getAttribute('data-name');
+        var oldV = inp.getAttribute('data-orig');
+        avConfirm('Change base price?', 'Change the unit cost of ' + name + ' from R' + oldV + ' to R' + parseFloat(v).toFixed(2) + '?', 'Yes, update price', function () {
+            document.getElementById('avMatId').value = id;
+            document.getElementById('avMatCost').value = v;
+            document.getElementById('avMatSave').value = '1';
+            HTMLFormElement.prototype.submit.call(document.forms[0]);
+        });
+    }
+    document.addEventListener('DOMContentLoaded', function () {
+        var box = document.getElementById('matSearch');
+        if (box) box.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); matSearch(); } });
     });
 </script>
 </asp:Content>

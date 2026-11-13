@@ -39,6 +39,24 @@
 .avuna-order .qbtn-alt{background:#0f2a1f;color:#fff}.avuna-order .qbtn-alt:hover{background:#173c2c}.avuna-order .qbtn:disabled{opacity:.6;cursor:wait}
 .avuna-order .quote-msg{display:none;margin:8px 0 2px;padding:10px 12px;border-radius:10px;font-size:13px;line-height:1.5}
 .avuna-order .quote-msg.ok{display:block;background:#e7f4eb;color:#277446}.avuna-order .quote-msg.bad{display:block;background:#fdeaea;color:#b03a3a}
+.avuna-cart{margin:18px 0 12px;border:1px solid #e8dcc4;border-radius:12px;background:#fffdf8;padding:14px 16px}
+.avuna-cart h3{margin:0 0 8px;font-size:15px;color:#0f2a1f}
+.avuna-cart-empty{color:#7a7a6e;font-size:13px;margin:0}
+.avuna-cart-row{display:flex;gap:10px;align-items:center;justify-content:space-between;padding:9px 0;border-top:1px solid #f0e6d0;font-size:13px}
+.avuna-cart-row:first-of-type{border-top:0}
+.avuna-cart-row small{display:block;color:#6b6b60;margin-top:2px}
+.avuna-cart-row button{background:none;border:1px solid #d9b8b0;color:#a33a2a;border-radius:8px;padding:5px 10px;cursor:pointer;font-weight:700;font-size:12px}
+.avuna-cart-total{display:flex;justify-content:space-between;border-top:2px solid #e8dcc4;margin-top:6px;padding-top:10px;font-weight:800;color:#0f2a1f}
+.avuna-order .addcart{background:#fff;color:#0f2a1f;border:2px solid #0f2a1f;border-radius:10px;width:100%;padding:14px;font-weight:800;cursor:pointer;margin-top:6px}
+.avuna-order .addcart:hover{background:#0f2a1f;color:#fff}
+.cart-sum-item{border:1px solid #e8dcc4;border-radius:12px;background:#fffdf8;padding:8px 14px 4px;margin:0 0 12px}
+.cart-sum-item summary{display:flex;justify-content:space-between;gap:10px;cursor:pointer;padding:8px 0;font-size:14px;list-style:none}
+.cart-sum-item summary::-webkit-details-marker{display:none}
+.cart-sum-item summary::before{content:"\25B8";margin-right:6px;color:#8a6a2f}
+.cart-sum-item[open] summary::before{content:"\25BE"}
+.cart-sum-item summary span{flex:1}
+#summaryCartList{max-height:260px;overflow-y:auto;padding-right:4px}
+.cart-sum-item .rowline strong{text-align:right;max-width:60%;word-break:break-word}
 </style>
 
 <div class="avuna-order" id="createOrderPage">
@@ -46,14 +64,14 @@
 <div class="wrap">
 <div class="layout"><div class="panel"><span class="tag">ORDER DETAILS</span><h2>Customize Your Order</h2><p class="muted">Only available inventory combinations can be selected.</p>
 <div class="fields">
-<div class="field"><label for="itemName">ITEM NAME </label><select id="itemName"><option value="">Select an item</option></select></div>
+<div class="field"><label for="itemName">ITEM NAME *</label><select id="itemName"><option value="">Select an item</option></select></div>
 <div class="field"><label for="quantity">TOTAL QUANTITY</label><input type="number" id="quantity" min="1" step="1" readonly placeholder="Calculated from colours" /><div class="hint" id="quantityHint">Enter quantities next to the colours you select.</div></div>
-<div class="field"><label for="itemSize">SIZE </label><select id="itemSize" disabled><option value="">Select an item first</option></select></div>
-<div class="field"><label>COLOURS AND QUANTITIES </label><div id="colourPicker" class="colour-picker"><span class="hint">Select an item and size first.</span></div><p class="hint">Tick each available colour and enter the number of garments for that colour.</p></div>
-<div class="field"><label>AUTOMATIC DESIGN PACKAGE</label><div class="auto-package" id="detectedPackage">Select colours to calculate the package</div><p class="hint">1 Colour: Bronze · 2 Colours: Silver · 3 Colours: Gold · 4+ Colours: Platinum. Design fee charged once.</p></div>
+<div class="field"><label for="itemSize">SIZE *</label><select id="itemSize" disabled><option value="">Select an item first</option></select></div>
+<div class="field"><label>COLOURS AND QUANTITIES *</label><div id="colourPicker" class="colour-picker"><span class="hint">Select an item and size first.</span></div><p class="hint">Tick each available colour and enter the number of garments for that colour.</p></div>
+<div class="field"><label>AUTOMATIC DESIGN PACKAGE</label><div class="auto-package" id="detectedPackage">Select colours to calculate the package</div><p class="hint">Based on the number of colours found in your uploaded design: 1 colour: Bronze · 2: Silver · 3: Gold · 4+: Platinum. Design fee charged once per item.</p></div>
 </div>
 <div id="stockMessage" class="stock warn" role="status">Select an item and size, then choose colours and quantities.</div>
-<div class="field"><label for="designFile">UPLOAD YOUR DESIGN</label><div class="upload"><div class="upload-icon">&#8682;</div><strong>Upload your custom design</strong><p class="hint">PNG, JPG, JPEG or WEBP, maximum 5 MB</p><input type="file" id="designFile" name="designFile" accept=".png,.jpg,.jpeg,.webp,image/png,image/jpeg,image/webp" /><img id="designPreview" alt="Uploaded design preview" /></div></div>
+<div class="field"><label for="designFile">UPLOAD YOUR DESIGN *</label><div class="upload"><div class="upload-icon">&#8682;</div><strong>Upload your custom design</strong><p class="hint">PNG, JPG, JPEG or WEBP, maximum 5 MB</p><input type="file" id="designFile" name="designFile" accept=".png,.jpg,.jpeg,.webp,image/png,image/jpeg,image/webp" /><img id="designPreview" alt="Uploaded design preview" /></div></div>
     <style>
 .avuna-order .mock-wrap{margin:4px 0 24px;border:1px solid #e5dccd;border-radius:12px;background:#fbf8f2;padding:16px}
 .avuna-order .mock-wrap h3{margin:0 0 4px;font-size:17px}
@@ -286,6 +304,12 @@
     })();
 </script>
 
+<button type="button" class="addcart" id="addToCart">+ Add to Cart</button>
+<div class="avuna-cart" id="cartPanel" aria-live="polite">
+  <h3>Your Cart (<span id="cartCount">0</span>)</h3>
+  <div id="cartList"><p class="avuna-cart-empty">Your cart is empty. Fill in the form above and press &ldquo;Add to Cart&rdquo; to order several items at once.</p></div>
+  <div class="avuna-cart-total" id="cartTotalRow" style="display:none"><span>CART TOTAL</span><strong id="cartTotal">R 0.00</strong></div>
+</div>
 <input type="hidden" id="checkoutPayload" name="checkoutPayload" />
 <input type="hidden" id="checkoutSubmit" name="checkoutSubmit" value="" />
 <input type="hidden" id="checkoutIntent" name="checkoutIntent" value="later" />
@@ -303,6 +327,11 @@
 <%= ServerFeedbackHtml %>
 </div>
 <div class="panel"><span class="tag">ORDER OVERVIEW</span><h2>Order Summary</h2><p class="muted">Quotation based on current database inventory.</p>
+<div id="summaryCartBlock" style="display:none">
+<div class="quote-head"><h3>Items in your order</h3></div>
+<div id="summaryCartList"></div>
+</div>
+<div class="quote-head" id="summaryCurrentHead" style="display:none"><h3>Item you are adding</h3></div>
 <div class="rowline"><span>Item</span><strong id="summaryItem">Not selected</strong></div>
 <div class="rowline"><span>Size</span><strong id="summarySize">Not selected</strong></div>
 <div class="rowline"><span>Colours</span><strong id="summaryColour">Not selected</strong></div>
@@ -313,13 +342,12 @@
 <div id="quoteMessage" class="quote-msg" role="status" aria-live="polite"></div>
 <div class="rowline"><span>Unit cost(s)</span><strong id="quoteUnit">R 0.00</strong></div>
 <div class="rowline"><span>Item cost (quantity × unit cost)</span><strong id="quoteItemCost">R 0.00</strong></div>
-<div class="rowline"><span>Design fee (once)</span><strong id="quoteFee">R 0.00</strong></div>
+<div class="rowline"><span id="quoteFeeLabel">Design fee (once)</span><strong id="quoteFee">R 0.00</strong></div>
 <div class="rowline"><span>Amount before VAT</span><strong id="quoteBeforeVat">R 0.00</strong></div>
 <div class="rowline"><span>VAT (15%)</span><strong id="quoteVat">R 0.00</strong></div>
 <div class="rowline"><span>Subtotal including VAT</span><strong id="quoteSubtotal">R 0.00</strong></div>
 <div class="rowline"><span>Markup (10% after VAT)</span><strong id="quoteMarkup">R 0.00</strong></div>
-<div class="total"><span>ESTIMATED ORDER TOTAL</span><strong id="quoteTotal">R 0.00</strong></div>
-<div class="note">The design package is based on the number of selected garment colours. Submitting saves your pending order and uploaded design. Stock is checked again before saving, and available inventory quantities are deducted when the order is successfully submitted.</div>
+<div class="total"><span id="quoteTotalLabel">ESTIMATED ORDER TOTAL</span><strong id="quoteTotal">R 0.00</strong></div>
 </div></div></div></div>
 <script>
     (function () {
@@ -327,6 +355,7 @@
         var records = <%= InventoryJson %>;
         var fees = { Bronze: 15000, Silver: 25000, Gold: 35000, Platinum: 40000 };
         var currentPackage = "";
+        var designColours = 0, designAnalysing = false, designToken = 0;   // colours found in the uploaded design
         var colourQuantities = {};
         var previewUrl = null;
         function el(id) { return document.getElementById(id); }
@@ -360,6 +389,8 @@
                 });
         }
         function packageFor(n) { return n >= 4 ? "Platinum" : n === 3 ? "Gold" : n === 2 ? "Silver" : n === 1 ? "Bronze" : ""; }
+        // Colours that decide the design package: those found in the design image (falls back to garment colours).
+        function pkgCount(chosenLen) { return designColours > 0 ? designColours : chosenLen; }
         function clearFeedback() { feedback.className = "feedback"; feedback.replaceChildren(); }
         function errorsDisplay(errors) {
             feedback.replaceChildren(); feedback.className = "feedback error";
@@ -390,24 +421,60 @@
         }
         function update() {
             var chosen = selections(), valid = chosen.length > 0 && chosen.every(function (v) { return v.valid && !v.conflict; });
-            currentPackage = packageFor(chosen.length);
+            currentPackage = packageFor(pkgCount(chosen.length));
             var sum = chosen.reduce(function (n, v) { return n + (Number.isSafeInteger(v.quantity) && v.quantity > 0 ? v.quantity : 0); }, 0);
             qty.value = chosen.length ? String(sum) : "";
             el("summaryItem").textContent = item.value || "Not selected";
             el("summarySize").textContent = size.value || "Not selected";
             el("summaryColour").textContent = chosen.length ? chosen.map(function (v) { return v.colour + " (" + (v.raw || "0") + ")"; }).join(", ") : "Not selected";
             el("summaryQuantity").textContent = chosen.length ? String(sum) : "-";
-            el("summaryPackage").textContent = currentPackage || "Awaiting colours";
-            el("detectedPackage").textContent = currentPackage ? currentPackage + " — " + money(fees[currentPackage]) : "Select colours to calculate the package";
+            el("summaryPackage").textContent = designAnalysing ? "Analysing design..." : (currentPackage || "Awaiting design");
+            el("detectedPackage").textContent = designAnalysing ? "Analysing the colours in your design..." :
+                !file.files.length ? "Upload your design to calculate the package" :
+                designColours > 0 ? currentPackage + " \u2014 " + money(fees[currentPackage]) + " (" + designColours + (designColours >= 4 ? "+" : "") + " colour" + (designColours === 1 ? "" : "s") + " found in your design)" :
+                currentPackage ? currentPackage + " \u2014 " + money(fees[currentPackage]) + " (design colours could not be read; based on garment colours)" : "Select colours to calculate the package";
             el("summaryDesign").textContent = file.files.length ? file.files[0].name : "Not uploaded";
             var stock = el("stockMessage"); stock.className = "stock" + (valid ? "" : " warn");
             stock.textContent = !size.value ? "Select an item and size first." : !chosen.length ? "Choose at least one available colour and its quantity." :
                 !valid ? "One or more quantities are invalid or exceed current available stock." : "Your selected quantities fit the most recently loaded inventory. Stock is checked again when submitting.";
-            var cost = valid ? chosen.reduce(function (n, v) { return n + v.quantity * v.unitCents; }, 0) : 0;
-            var fee = valid ? fees[currentPackage] : 0, before = cost + fee, vat = Math.round(before * .15), subtotal = before + vat, total = Math.round(subtotal * 1.1);
-            var priceList = Array.from(new Set(chosen.map(function (v) { return v.unitCents; })));
+            var cur = valid ? calc(chosen, pkgCount(chosen.length)) : null;
+            var parts = cart.map(function (c) { return c.calc; }).concat(cur ? [cur] : []);
+            function tot(k) { return parts.reduce(function (n, p) { return n + p[k]; }, 0); }
+            var priceList = Array.from(new Set(cart.reduce(function (a, c) { return a.concat(c.calc.units); }, []).concat(cur ? cur.units : [])));
             el("quoteUnit").textContent = priceList.length ? priceList.map(money).join(" / ") : money(0);
-            [["quoteItemCost", cost], ["quoteFee", fee], ["quoteBeforeVat", before], ["quoteVat", vat], ["quoteSubtotal", subtotal], ["quoteMarkup", total - subtotal], ["quoteTotal", total]].forEach(function (row) { el(row[0]).textContent = money(row[1]); });
+            el("quoteFeeLabel").textContent = parts.length > 1 ? "Design fees (once per item)" : "Design fee (once)";
+            el("quoteTotalLabel").textContent = parts.length > 1 ? "ESTIMATED TOTAL (" + parts.length + " ITEMS)" : "ESTIMATED ORDER TOTAL";
+            [["quoteItemCost", tot("cost")], ["quoteFee", tot("fee")], ["quoteBeforeVat", tot("before")], ["quoteVat", tot("vat")], ["quoteSubtotal", tot("subtotal")], ["quoteMarkup", tot("total") - tot("subtotal")], ["quoteTotal", tot("total")]].forEach(function (row) { el(row[0]).textContent = money(row[1]); });
+            el("summaryCurrentHead").style.display = cart.length ? "" : "none";
+            renderSummaryCart();
+        }
+        function calc(chosen, n) {
+            var cost = chosen.reduce(function (n, v) { return n + v.quantity * v.unitCents; }, 0);
+            var fee = fees[packageFor(n)], before = cost + fee, vat = Math.round(before * .15), subtotal = before + vat;
+            return { cost: cost, fee: fee, before: before, vat: vat, subtotal: subtotal, total: Math.round(subtotal * 1.1),
+                     units: Array.from(new Set(chosen.map(function (v) { return v.unitCents; }))) };
+        }
+        function renderSummaryCart() {
+            var box = el("summaryCartList");
+            box.replaceChildren();
+            el("summaryCartBlock").style.display = cart.length ? "" : "none";
+            cart.forEach(function (c, i) {
+                var card = document.createElement("details"); card.className = "cart-sum-item";
+                var h = document.createElement("summary");
+                var hl = document.createElement("span"); hl.textContent = (i + 1) + ". " + c.req.item + " (" + c.req.size + ") \u00B7 " + c.qty + " pcs";
+                var hr = document.createElement("strong"); hr.textContent = money(c.calc.total);
+                h.appendChild(hl); h.appendChild(hr); card.appendChild(h);
+                [["Item", c.req.item], ["Size", c.req.size], ["Colours", c.colourText], ["Quantity", String(c.qty)],
+                 ["Design package", c.pkg], ["Design file", c.file.name],
+                 ["Unit cost(s)", c.calc.units.map(money).join(" / ")], ["Item cost", money(c.calc.cost)],
+                 ["Design fee", money(c.calc.fee)], ["Item total (incl. VAT & markup)", money(c.calc.total)]].forEach(function (r) {
+                    var row = document.createElement("div"); row.className = "rowline";
+                    var l = document.createElement("span"); l.textContent = r[0];
+                    var v = document.createElement("strong"); v.textContent = r[1];
+                    row.appendChild(l); row.appendChild(v); card.appendChild(row);
+                });
+                box.appendChild(card);
+            });
         }
         function refreshSizes() {
             var sizes = Array.from(new Set(variants().map(function (v) { return v.size; }))).sort();
@@ -423,14 +490,28 @@
             if (f && ["image/png", "image/jpeg", "image/webp"].includes(f.type) && f.size > 0 && f.size <= 5 * 1024 * 1024) {
                 previewUrl = URL.createObjectURL(f); preview.src = previewUrl; preview.style.display = "block";
             }
+            designColours = 0; designAnalysing = false; designToken++;
+            if (f && ["image/png", "image/jpeg", "image/webp"].includes(f.type) && f.size > 0 && f.size <= 5 * 1024 * 1024) {
+                var token = designToken, fd = new FormData();
+                designAnalysing = true;
+                fd.append("avunaAction", "analyzeDesign"); fd.append("designFile", f, f.name);
+                fetch(window.location.pathname + window.location.search, {
+                    method: "POST", credentials: "same-origin", headers: { "X-Requested-With": "XMLHttpRequest" }, body: fd
+                }).then(function (r) { return r.json(); })
+                    .then(function (j) { if (token === designToken) { designColours = (j && j.ok) ? (j.colours || 0) : 0; } })
+                    .catch(function () { if (token === designToken) designColours = 0; })
+                    .then(function () { if (token === designToken) { designAnalysing = false; update(); } });
+            }
             update(); clearFeedback();
         });
         var submissionInProgress = false;
-        submit.addEventListener("click", function (event) {
-            // Explicitly submit the ASP.NET form after validation. Disabling a clicked
-            // submit button before its default action can cancel the postback.
-            event.preventDefault();
-            if (submissionInProgress) return;
+        var cart = [];
+        function totalFor(chosen, n) { return calc(chosen, n).total; }
+        function isFormBlank() {
+            return !item.value && !file.files.length;
+        }
+        // Validates the form; returns { errors, line } where line is a cart entry when valid.
+        function currentLine() {
             var errors = [], chosen = selections(), f = file.files[0];
             if (!item.value || !variants().length) errors.push("Select an available item.");
             if (!size.value || !variants().some(function (v) { return v.size === size.value; })) errors.push("Select an available size.");
@@ -440,26 +521,93 @@
                 if (v.raw.trim() === "" || !Number.isSafeInteger(v.quantity) || v.quantity < 1) errors.push("Enter a positive whole-number quantity for " + v.colour + ".");
                 else if (v.quantity > v.stock) errors.push("The requested quantity of " + v.colour + " is not available.");
             });
+            if (designAnalysing) errors.push("Please wait a moment while your design is analysed.");
             if (!f) errors.push("Upload a design image.");
             else if (!["image/png", "image/jpeg", "image/webp"].includes(f.type) || f.size <= 0 || f.size > 5 * 1024 * 1024) errors.push("Upload a non-empty PNG, JPG, JPEG or WEBP image up to 5 MB.");
-            if (errors.length) { event.preventDefault(); errorsDisplay(errors); return; }
-            el("checkoutPayload").value = JSON.stringify({
-                item: item.value, size: size.value,
-                colours: chosen.map(function (v) { return { colour: v.colour, quantity: v.quantity }; }), designFileName: f.name
+            if (errors.length) return { errors: errors };
+            return {
+                errors: [],
+                line: {
+                    req: { item: item.value, size: size.value, colours: chosen.map(function (v) { return { colour: v.colour, quantity: v.quantity }; }), designFileName: f.name, designColours: designColours },
+                    file: f, totalCents: totalFor(chosen, pkgCount(chosen.length)), calc: calc(chosen, pkgCount(chosen.length)),
+                    qty: chosen.reduce(function (n, v) { return n + v.quantity; }, 0),
+                    colourText: chosen.map(function (v) { return v.colour + " x" + v.quantity; }).join(", "),
+                    pkg: packageFor(pkgCount(chosen.length)), designColours: designColours
+                }
+            };
+        }
+        function renderCart() {
+            var list = el("cartList");
+            list.replaceChildren();
+            el("cartCount").textContent = String(cart.length);
+            if (!cart.length) {
+                var p = document.createElement("p"); p.className = "avuna-cart-empty";
+                p.textContent = "Your cart is empty. Fill in the form above and press \u201CAdd to Cart\u201D to order several items at once.";
+                list.appendChild(p); el("cartTotalRow").style.display = "none"; return;
+            }
+            cart.forEach(function (c, i) {
+                var row = document.createElement("div"); row.className = "avuna-cart-row";
+                var info = document.createElement("div");
+                var strong = document.createElement("strong"); strong.textContent = (i + 1) + ". " + c.req.item + " (" + c.req.size + ") \u2014 " + c.qty + " pcs";
+                var small = document.createElement("small"); small.textContent = c.colourText + " \u00B7 " + c.pkg + " design \u00B7 " + c.file.name;
+                info.appendChild(strong); info.appendChild(small);
+                var right = document.createElement("div"); right.style.textAlign = "right";
+                var price = document.createElement("div"); price.textContent = money(c.totalCents); price.style.fontWeight = "800";
+                var rm = document.createElement("button"); rm.type = "button"; rm.textContent = "Remove";
+                rm.addEventListener("click", function () { cart.splice(i, 1); renderCart(); update(); clearFeedback(); });
+                right.appendChild(price); right.appendChild(rm);
+                row.appendChild(info); row.appendChild(right); list.appendChild(row);
             });
+            el("cartTotal").textContent = money(cart.reduce(function (n, c) { return n + c.totalCents; }, 0));
+            el("cartTotalRow").style.display = "flex";
+        }
+        function resetForm() {
+            item.value = ""; refreshSizes();
+            file.value = ""; designColours = 0; designAnalysing = false; designToken++;
+            if (previewUrl) { URL.revokeObjectURL(previewUrl); previewUrl = null; }
+            preview.style.display = "none"; preview.removeAttribute("src");
+            update();
+        }
+        function addCurrentToCart() {
+            var r = currentLine();
+            if (r.errors.length) { errorsDisplay(r.errors); return false; }
+            if (cart.length >= 10) { errorsDisplay(["You can order up to 10 items at once."]); return false; }
+            cart.push(r.line); clearFeedback(); resetForm(); renderCart(); update();
+            return true;
+        }
+        el("addToCart").addEventListener("click", function () { addCurrentToCart(); });
+        submit.addEventListener("click", function (event) {
+            event.preventDefault();
+            if (submissionInProgress) return;
+            // A filled-in form is added to the cart automatically; a blank form just uses the cart.
+            if (!isFormBlank() || !cart.length) { if (!addCurrentToCart()) return; }
+            if (!cart.length) { errorsDisplay(["Your cart is empty."]); return; }
             el("choosePaymentOverlay").style.display = "flex";
         });
         function finishOrder(intent) {
-            if (submissionInProgress) return;
-            var form = submit.closest("form");
-            if (!form) { errorsDisplay(["The order form could not be found. Reload the page."]); return; }
-            el("checkoutIntent").value = intent;
-            el("checkoutSubmit").value = "1";
+            if (submissionInProgress || !cart.length) return;
             submissionInProgress = true;
             el("choosePaymentOverlay").style.display = "none";
             submit.disabled = true;
-            submit.textContent = "Saving your order...";
-            HTMLFormElement.prototype.submit.call(form);
+            submit.textContent = "Saving your order" + (cart.length > 1 ? "s" : "") + "...";
+            var fd = new FormData();
+            fd.append("avunaAction", "cartCheckout");
+            fd.append("checkoutIntent", intent);
+            fd.append("cart", JSON.stringify(cart.map(function (c) { return c.req; })));
+            cart.forEach(function (c, i) { fd.append("designFile" + i, c.file, c.file.name); });
+            function fail(msg) {
+                submissionInProgress = false; submit.disabled = false; submit.textContent = "Submit Order";
+                errorsDisplay([msg]);
+            }
+            fetch(window.location.pathname + window.location.search, {
+                method: "POST", credentials: "same-origin",
+                headers: { "X-Requested-With": "XMLHttpRequest" }, body: fd
+            }).then(function (r) { return r.json(); })
+                .then(function (j) {
+                    if (j && j.ok && j.redirect) { window.location.href = j.redirect; }
+                    else fail((j && j.message) || "Your orders were not saved. Please try again.");
+                })
+                .catch(function () { fail("Could not reach the server. Nothing was saved. Please check your connection and try again."); });
         }
         el("payLaterChoice").addEventListener("click", function () { finishOrder("later"); });
         el("payNowChoice").addEventListener("click", function () { finishOrder("now"); });
@@ -467,21 +615,43 @@
         // ---- Print / save as PDF and email the quotation ----
         var quoteMsg = el("quoteMessage");
         function showQuoteMessage(text, ok) { quoteMsg.textContent = text; quoteMsg.className = "quote-msg " + (ok ? "ok" : "bad"); }
+        // Items covered by the quotation: everything in the cart plus the item on the form (when it is valid).
         function quoteSelection() {
+            var lines = cart.map(function (c) {
+                return { item: c.req.item, size: c.req.size, pkg: c.pkg, designColours: c.designColours,
+                         colours: c.req.colours.map(function (x) { return { colour: x.colour, quantity: x.quantity, unitCents: unitFor(c.req.item, c.req.size, x.colour) }; }),
+                         calc: c.calc };
+            });
             var chosen = selections();
-            if (!item.value || !size.value || !chosen.length || !chosen.every(function (v) { return v.valid && !v.conflict; })) {
-                showQuoteMessage("Choose an item, size, colours and quantities first, so there is a quotation to print or email.", false);
+            var formValid = item.value && size.value && chosen.length && chosen.every(function (v) { return v.valid && !v.conflict; });
+            if (formValid) {
+                lines.push({ item: item.value, size: size.value, pkg: packageFor(pkgCount(chosen.length)), designColours: designColours,
+                             colours: chosen.map(function (v) { return { colour: v.colour, quantity: v.quantity, unitCents: v.unitCents }; }),
+                             calc: calc(chosen, pkgCount(chosen.length)) });
+            } else if (!lines.length) {
+                showQuoteMessage("Choose an item, size, colours and quantities first (or add items to your cart), so there is a quotation to print or email.", false);
                 return null;
             }
             quoteMsg.className = "quote-msg";
-            return chosen;
+            return lines;
+        }
+        function unitFor(it, sz, col) {
+            var m = records.filter(function (v) { return v.item === it && v.size === sz && v.colour === col; })[0];
+            return m ? m.unitCents : 0;
         }
         function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
-        function printDocument(chosen) {
+        function printDocument(lines) {
             var logo = new URL("<%= ResolveUrl("~/avuna-logo.png") %>", window.location.href).href;
             var today = new Date().toLocaleDateString("en-ZA", { day: "numeric", month: "long", year: "numeric" });
-            var colourRows = chosen.map(function (v) {
-                return "<tr><td>" + esc(v.colour) + "</td><td class='r'>" + v.quantity + "</td><td class='r'>" + esc(money(v.unitCents)) + "</td><td class='r'>" + esc(money(v.unitCents * v.quantity)) + "</td></tr>";
+            var itemSections = lines.map(function (l, i) {
+                var rows = l.colours.map(function (v) {
+                    return "<tr><td>" + esc(v.colour) + "</td><td class='r'>" + v.quantity + "</td><td class='r'>" + esc(money(v.unitCents)) + "</td><td class='r'>" + esc(money(v.unitCents * v.quantity)) + "</td></tr>";
+                }).join("");
+                var qtyTotal = l.colours.reduce(function (n, v) { return n + v.quantity; }, 0);
+                return "<h2>" + (lines.length > 1 ? "ITEM " + (i + 1) + " \u2013 " : "") + "ORDER DETAILS</h2><table class='k'><tr><td>Item</td><td>" + esc(l.item) + "</td></tr><tr><td>Size</td><td>" + esc(l.size) + "</td></tr>" +
+                    "<tr><td>Design package</td><td>" + esc(l.pkg) + "</td></tr><tr><td>Total quantity</td><td>" + qtyTotal + "</td></tr>" +
+                    (lines.length > 1 ? "<tr><td>Item total</td><td>" + esc(money(l.calc.total)) + "</td></tr>" : "") + "</table>" +
+                    "<table style='margin-top:10px'><thead><tr><th>COLOUR</th><th class='r'>QTY</th><th class='r'>UNIT COST</th><th class='r'>TOTAL</th></tr></thead><tbody>" + rows + "</tbody></table>";
             }).join("");
             function line(label, id, strong) { return "<tr" + (strong ? " class='s'" : "") + "><td>" + label + "</td><td class='r'>" + esc(el(id).textContent) + "</td></tr>"; }
             return "<!DOCTYPE html><html><head><meta charset='utf-8'><title>Avuna Collective quotation</title><style>" +
@@ -497,12 +667,10 @@
                 ".note{margin-top:20px;color:#6c736d;font-size:11px;line-height:1.6}.foot{margin-top:26px;padding-top:12px;border-top:1px solid #e5dccd;text-align:center;color:#6c736d;font-size:11px}" +
                 "</style></head><body>" +
                 "<div class='head'><img src='" + esc(logo) + "' alt='Avuna Collective'><div><h1>Avuna Collective</h1><p>QUOTATION</p></div><div class='d'>Date<br><strong>" + esc(today) + "</strong></div></div>" +
-                "<h2>ORDER DETAILS</h2><table class='k'><tr><td>Item</td><td>" + esc(el("summaryItem").textContent) + "</td></tr><tr><td>Size</td><td>" + esc(el("summarySize").textContent) + "</td></tr>" +
-                "<tr><td>Design package</td><td>" + esc(el("summaryPackage").textContent) + "</td></tr><tr><td>Total quantity</td><td>" + esc(el("summaryQuantity").textContent) + "</td></tr></table>" +
-                "<h2>COLOURS</h2><table><thead><tr><th>COLOUR</th><th class='r'>QTY</th><th class='r'>UNIT COST</th><th class='r'>TOTAL</th></tr></thead><tbody>" + colourRows + "</tbody></table>" +
-                "<h2>QUOTATION</h2><table class='k'>" + line("Item cost (quantity &times; unit cost)", "quoteItemCost") + line("Design fee (once)", "quoteFee") + line("Amount before VAT", "quoteBeforeVat") +
+                itemSections +
+                "<h2>QUOTATION</h2><table class='k'>" + line("Item cost (quantity &times; unit cost)", "quoteItemCost") + line(esc(el("quoteFeeLabel").textContent), "quoteFee") + line("Amount before VAT", "quoteBeforeVat") +
                 line("VAT (15%)", "quoteVat") + line("Subtotal including VAT", "quoteSubtotal") + line("Markup (10% after VAT)", "quoteMarkup") + "</table>" +
-                "<div class='total'><small>ESTIMATED ORDER TOTAL</small><strong>" + esc(el("quoteTotal").textContent) + "</strong></div>" +
+                "<div class='total'><small>" + esc(el("quoteTotalLabel").textContent) + "</small><strong>" + esc(el("quoteTotal").textContent) + "</strong></div>" +
                 "<p class='note'>This is an estimate based on current inventory and prices. Stock is checked again when the order is submitted, so the final amount may change if stock or prices change.</p>" +
                 "<div class='foot'>Avuna Collective &middot; 127 Victoria Embankment, Astron Garage, Durban</div></body></html>";
         }
@@ -531,7 +699,7 @@
             btn.disabled = true; btn.textContent = "Sending...";
             var body = new URLSearchParams();
             body.set("avunaAction", "emailQuote");
-            body.set("payload", JSON.stringify({ item: item.value, size: size.value, colours: chosen.map(function (v) { return { colour: v.colour, quantity: v.quantity }; }) }));
+            body.set("payload", JSON.stringify(chosen.map(function (l) { return { item: l.item, size: l.size, designColours: l.designColours || 0, colours: l.colours.map(function (v) { return { colour: v.colour, quantity: v.quantity }; }) }; })));
             fetch(window.location.pathname + window.location.search, {
                 method: "POST", credentials: "same-origin",
                 headers: { "X-Requested-With": "XMLHttpRequest", "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8" },
@@ -558,3 +726,4 @@
     })();
 </script>
 </asp:Content>
+

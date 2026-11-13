@@ -388,7 +388,7 @@ min-height: 470px;
 </div>
 <div class="avuna-modal-foot">
 <button type="button" class="avuna-modal-cancel" onclick="closeEdit()">Cancel</button>
-<asp:Button ID="btnSave" runat="server" Text="Save changes" CssClass="avuna-modal-save" OnClick="btnSave_Click" OnClientClick="return validateEdit();" />
+<asp:Button ID="btnSave" runat="server" Text="Save changes" CssClass="avuna-modal-save" OnClick="btnSave_Click" OnClientClick="return validateEdit() && avConfirmClick(this, 'Save these changes?', 'This staff member\'s details will be updated.', 'Yes, save changes');" />
 </div>
 </div>
 </div>
@@ -396,10 +396,12 @@ min-height: 470px;
 <script>
     function archiveStaff(btn) {
         var name = btn.getAttribute('data-name') || btn.getAttribute('data-id');
-        if (!confirm('Archive ' + name + '?\n\nThey will be moved out of the active staff list into the archive.')) return;
-        document.getElementById('<%= hfKind.ClientID %>').value = btn.getAttribute('data-kind');
-        document.getElementById('<%= hfId.ClientID %>').value = btn.getAttribute('data-id');
-        document.getElementById('<%= btnArchive.ClientID %>').click();
+        var kind = btn.getAttribute('data-kind'), id = btn.getAttribute('data-id');
+        avConfirm('Archive ' + name + '?', 'They will be moved out of the active staff list into the archive.', 'Yes, archive', function () {
+            document.getElementById('<%= hfKind.ClientID %>').value = kind;
+            document.getElementById('<%= hfId.ClientID %>').value = id;
+            document.getElementById('<%= btnArchive.ClientID %>').click();
+        }, true);
     }
 
     function $ed(id) { return document.getElementById(id); }
@@ -537,7 +539,7 @@ min-height: 470px;
 <div class="avuna-modal-foot">
 <button type="button" class="avuna-modal-back-link" onclick="showAddStep(1)">&larr; Back</button>
 <button type="button" class="avuna-modal-cancel" onclick="closeAdd()">Cancel</button>
-<asp:Button ID="btnAdd" runat="server" Text="Add staff member" CssClass="avuna-modal-save" OnClick="btnAdd_Click" OnClientClick="return validateAdd();" />
+<asp:Button ID="btnAdd" runat="server" Text="Add staff member" CssClass="avuna-modal-save" OnClick="btnAdd_Click" OnClientClick="return validateAdd() && avConfirmClick(this, 'Add this staff member?', 'A new staff account will be created with the details you entered.', 'Yes, add staff member');" />
 </div>
 </div>
 </div>
@@ -645,10 +647,12 @@ min-height: 470px;
 <script>
     function archiveStaff(btn) {
         var name = btn.getAttribute('data-name') || btn.getAttribute('data-id');
-        if (!confirm('Archive ' + name + '?\n\nThey will be moved out of the active staff list into the archive.')) return;
-        document.getElementById('<%= hfKind.ClientID %>').value = btn.getAttribute('data-kind');
-    document.getElementById('<%= hfId.ClientID %>').value = btn.getAttribute('data-id');
-    document.getElementById('<%= btnArchive.ClientID %>').click();
+        var kind = btn.getAttribute('data-kind'), id = btn.getAttribute('data-id');
+        avConfirm('Archive ' + name + '?', 'They will be moved out of the active staff list into the archive.', 'Yes, archive', function () {
+            document.getElementById('<%= hfKind.ClientID %>').value = kind;
+            document.getElementById('<%= hfId.ClientID %>').value = id;
+            document.getElementById('<%= btnArchive.ClientID %>').click();
+        }, true);
     }
 </script>
 <!-- STAFF STATISTICS -->

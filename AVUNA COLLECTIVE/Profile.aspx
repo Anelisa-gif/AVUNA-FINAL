@@ -266,7 +266,7 @@
 
     <div class="edit-modal-foot">
       <button type="button" class="edit-btn-cancel" onclick="closeEditProfile()">Cancel</button>
-      <asp:Button ID="btnSaveProfile" runat="server" Text="Save changes" CssClass="edit-btn-save" OnClick="btnSaveProfile_Click" OnClientClick="return checkPasswordBeforeSave();" />
+      <asp:Button ID="btnSaveProfile" runat="server" Text="Save changes" CssClass="edit-btn-save" OnClick="btnSaveProfile_Click" OnClientClick="return checkPasswordBeforeSave() && avConfirmClick(this, 'Save your changes?', 'Your profile details will be updated.', 'Yes, save changes');" />
     </div>
   </div>
 </div>

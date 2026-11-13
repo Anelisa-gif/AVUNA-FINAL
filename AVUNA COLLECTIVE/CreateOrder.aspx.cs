@@ -41,14 +41,33 @@ namespace AVUNA_COLLECTIVE
 				return;
 			}
 
+			// Cart checkout: several order lines (each with its own design file) saved together.
+			if (Request.Form["avunaAction"] == "cartCheckout")
+			{
+				CartCheckoutResponse();
+				return;
+			}
+
+			// Counts the colours in an uploaded design so the design package can be priced from it.
+			if (Request.Form["avunaAction"] == "analyzeDesign")
+			{
+				AnalyzeDesignResponse();
+				return;
+			}
+
 			Page.Form.Enctype = "multipart/form-data";
 			// A redirect after saving prevents an accidental duplicate order on Refresh.
 			if (!IsPostBack && !String.IsNullOrWhiteSpace(Request.QueryString["saved"]) &&
 				String.Equals(Convert.ToString(Session["LastCreatedOrderId"]),
 							  Request.QueryString["saved"], StringComparison.Ordinal))
 			{
-				ShowServerMessage("Order " + Request.QueryString["saved"] +
-					" was submitted successfully and is Pending.", true);
+				string allIds = Convert.ToString(Session["LastCreatedOrderIds"]);
+				if (allIds.Contains(","))
+					ShowServerMessage("Orders " + allIds.Replace(",", ", ") +
+						" were submitted successfully and are Pending.", true);
+				else
+					ShowServerMessage("Order " + Request.QueryString["saved"] +
+						" was submitted successfully and is Pending.", true);
 			}
 			try
 			{
@@ -126,12 +145,14 @@ namespace AVUNA_COLLECTIVE
 				return;
 			}
 			request.designFileName = Path.GetFileName(file.FileName);
+			request.designColours = CountDesignColours(file);
 			// All inventory, pricing, customer and ID checks are repeated inside
 			// the same SQL transaction which performs the inserts.
 			try
 			{
 				string newOrderId = SaveOrder(request, file);
 				Session["LastCreatedOrderId"] = newOrderId;
+				Session["LastCreatedOrderIds"] = newOrderId;
 				bool payNow = String.Equals(Request.Form["checkoutIntent"], "now", StringComparison.Ordinal);
 				string destination = payNow
 					? ResolveUrl("~/Payment.aspx") + "?order=" + HttpUtility.UrlEncode(newOrderId)
@@ -153,6 +174,187 @@ namespace AVUNA_COLLECTIVE
 				System.Diagnostics.Trace.TraceError("CreateOrder SubmitOrder error: " + ex);
 				ShowServerMessage("Order was not confirmed. Please check the Visual Studio Output log and verify the Order table before retrying.", false);
 			}
+		}
+
+		// =====================================================================
+		//  Cart checkout: every cart line becomes its own order, all saved in ONE
+		//  database transaction (either all orders are saved, or none).
+		// =====================================================================
+		private void CartCheckoutResponse()
+		{
+			bool ok = false;
+			string message = "";
+			string redirect = "";
+			try
+			{
+				if (Request.Headers["X-Requested-With"] != "XMLHttpRequest")
+					throw new OrderValidationException("Invalid request.");
+
+				var serializer = new JavaScriptSerializer { MaxJsonLength = 1000000 };
+				List<CheckoutRequest> requests;
+				try { requests = serializer.Deserialize<List<CheckoutRequest>>(Request.Form["cart"] ?? ""); }
+				catch (Exception) { throw new OrderValidationException("Invalid cart. Please add your items again."); }
+				if (requests == null || requests.Count == 0)
+					throw new OrderValidationException("Your cart is empty.");
+				if (requests.Count > 10)
+					throw new OrderValidationException("You can order up to 10 items at once.");
+
+				var files = new List<HttpPostedFile>();
+				for (int i = 0; i < requests.Count; i++)
+				{
+					if (requests[i] == null) throw new OrderValidationException("Invalid cart item " + (i + 1) + ".");
+					HttpPostedFile f = Request.Files["designFile" + i];
+					if (f == null || f.ContentLength <= 0 || f.ContentLength > 5 * 1024 * 1024 || !IsSupportedImage(f))
+						throw new OrderValidationException("Upload a valid PNG, JPG or WEBP design image (maximum 5 MB) for cart item " + (i + 1) + ".");
+					requests[i].designFileName = Path.GetFileName(f.FileName);
+					requests[i].designColours = CountDesignColours(f);
+					files.Add(f);
+				}
+
+				List<string> ids = SaveOrders(requests, files);
+				Session["LastCreatedOrderId"] = ids[0];
+				Session["LastCreatedOrderIds"] = String.Join(",", ids);
+				bool payNow = String.Equals(Request.Form["checkoutIntent"], "now", StringComparison.Ordinal);
+				redirect = payNow
+					? ResolveUrl("~/Payment.aspx") + "?order=" + HttpUtility.UrlEncode(ids[0])
+					: Request.Path + "?saved=" + HttpUtility.UrlEncode(ids[0]);
+				ok = true;
+				message = "Order " + ids[0] + " saved with " + requests.Count + (requests.Count == 1 ? " item." : " items.");
+			}
+			catch (OrderValidationException ex)
+			{
+				message = ex.Message;
+			}
+			catch (SqlException ex)
+			{
+				System.Diagnostics.Trace.TraceError("CreateOrder cart SQL error: " + ex);
+				message = "Your orders were not saved: a database error occurred. Nothing was changed. Please try again.";
+			}
+			catch (Exception ex)
+			{
+				System.Diagnostics.Trace.TraceError("CreateOrder cart error: " + ex);
+				message = "Your orders were not confirmed. Nothing was changed. Please check My Orders before trying again.";
+			}
+
+			Response.Clear();
+			Response.ContentType = "application/json";
+			Response.Cache.SetCacheability(HttpCacheability.NoCache);
+			Response.Write(new JavaScriptSerializer().Serialize(new { ok = ok, message = message, redirect = redirect }));
+			Response.End();
+		}
+
+		// =====================================================================
+		//  Design colour detection. The image is shrunk (nearest-neighbour keeps the true colours),
+		//  the plain background is ignored, and similar shades are merged. A colour only counts when
+		//  it covers at least 3% of the design, so anti-aliasing and JPEG noise are not counted.
+		//  Returns 0 when the image cannot be read (the garment colours are then used instead).
+		// =====================================================================
+		private static int CountDesignColours(HttpPostedFile file)
+		{
+			try
+			{
+				byte[] bytes;
+				using (var ms = new MemoryStream())
+				{
+					if (file.InputStream.CanSeek) file.InputStream.Position = 0;
+					file.InputStream.CopyTo(ms);
+					bytes = ms.ToArray();
+					if (file.InputStream.CanSeek) file.InputStream.Position = 0;
+				}
+				using (var srcStream = new MemoryStream(bytes))
+				using (var src = new System.Drawing.Bitmap(srcStream))
+				{
+					int w = src.Width, h = src.Height;
+					if (w < 1 || h < 1) return 0;
+					double scale = 96.0 / Math.Max(w, h);
+					int nw = scale < 1 ? Math.Max(1, (int)Math.Round(w * scale)) : w;
+					int nh = scale < 1 ? Math.Max(1, (int)Math.Round(h * scale)) : h;
+					using (var bmp = new System.Drawing.Bitmap(nw, nh, System.Drawing.Imaging.PixelFormat.Format32bppArgb))
+					{
+						using (var g = System.Drawing.Graphics.FromImage(bmp))
+						{
+							g.Clear(System.Drawing.Color.Transparent);
+							g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.NearestNeighbor;
+							g.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.Half;
+							g.DrawImage(src, new System.Drawing.Rectangle(0, 0, nw, nh), 0, 0, w, h, System.Drawing.GraphicsUnit.Pixel);
+						}
+
+						var corners = new[] { bmp.GetPixel(0, 0), bmp.GetPixel(nw - 1, 0), bmp.GetPixel(0, nh - 1), bmp.GetPixel(nw - 1, nh - 1) };
+						System.Drawing.Color? bg = null;
+						foreach (var c in corners)
+						{
+							if (c.A < 128) continue;
+							int same = corners.Count(o => o.A >= 128 && ColourDistance(c.R, c.G, c.B, o.R, o.G, o.B) < 40);
+							if (same >= 3) { bg = c; break; }
+						}
+
+						var buckets = new SortedDictionary<int, long[]>();   // key -> count, sumR, sumG, sumB
+						long counted = 0;
+						for (int y = 0; y < nh; y++)
+							for (int x = 0; x < nw; x++)
+							{
+								var p = bmp.GetPixel(x, y);
+								if (p.A < 128) continue;
+								if (bg.HasValue && ColourDistance(p.R, p.G, p.B, bg.Value.R, bg.Value.G, bg.Value.B) < 40) continue;
+								int key = ((p.R >> 5) << 6) | ((p.G >> 5) << 3) | (p.B >> 5);
+								long[] e;
+								if (!buckets.TryGetValue(key, out e)) { e = new long[4]; buckets[key] = e; }
+								e[0]++; e[1] += p.R; e[2] += p.G; e[3] += p.B;
+								counted++;
+							}
+						if (counted == 0) return 1;
+
+						var clusters = new List<double[]>();   // meanR, meanG, meanB, count
+						foreach (var kv in buckets.OrderByDescending(b => b.Value[0]).ThenBy(b => b.Key))
+						{
+							double mr = (double)kv.Value[1] / kv.Value[0], mg = (double)kv.Value[2] / kv.Value[0], mb = (double)kv.Value[3] / kv.Value[0];
+							double[] home = null;
+							foreach (var c in clusters)
+								if (ColourDistance(c[0], c[1], c[2], mr, mg, mb) <= 70) { home = c; break; }
+							if (home != null) home[3] += kv.Value[0];
+							else clusters.Add(new[] { mr, mg, mb, (double)kv.Value[0] });
+						}
+						int found = clusters.Count(c => c[3] >= 0.03 * counted);
+						return Math.Max(1, found);
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				System.Diagnostics.Trace.TraceWarning("Design colour detection skipped: " + ex.Message);
+				return 0;
+			}
+		}
+
+		private static double ColourDistance(double r1, double g1, double b1, double r2, double g2, double b2)
+		{
+			return Math.Sqrt((r1 - r2) * (r1 - r2) + (g1 - g2) * (g1 - g2) + (b1 - b2) * (b1 - b2));
+		}
+
+		private void AnalyzeDesignResponse()
+		{
+			bool ok = false; int colours = 0; string message = "";
+			try
+			{
+				if (Request.Headers["X-Requested-With"] != "XMLHttpRequest")
+					throw new OrderValidationException("Invalid request.");
+				HttpPostedFile f = Request.Files["designFile"];
+				if (f == null || f.ContentLength <= 0 || f.ContentLength > 5 * 1024 * 1024 || !IsSupportedImage(f))
+					throw new OrderValidationException("Upload a valid PNG, JPG or WEBP design image (maximum 5 MB).");
+				colours = CountDesignColours(f);
+				ok = true;
+			}
+			catch (OrderValidationException ex) { message = ex.Message; }
+			catch (Exception ex)
+			{
+				System.Diagnostics.Trace.TraceError("Design analysis error: " + ex);
+				message = "The design could not be analysed.";
+			}
+			Response.Clear();
+			Response.ContentType = "application/json";
+			Response.Cache.SetCacheability(HttpCacheability.NoCache);
+			Response.Write(new JavaScriptSerializer().Serialize(new { ok = ok, colours = colours, message = message }));
+			Response.End();
 		}
 
 		private static bool IsSupportedImage(HttpPostedFile file)
@@ -191,6 +393,7 @@ namespace AVUNA_COLLECTIVE
 			public string size { get; set; }
 			public List<ColourSelection> colours { get; set; }
 			public string designFileName { get; set; }
+			public int designColours { get; set; }   // colours found in the uploaded design (0 = unknown)
 		}
 		public class QuotedColour
 		{
@@ -244,14 +447,32 @@ namespace AVUNA_COLLECTIVE
 				if (last.HasValue && (DateTime.UtcNow - last.Value).TotalSeconds < 20)
 					throw new OrderValidationException("Please wait a few seconds before sending another quotation.");
 
-				var serializer = new JavaScriptSerializer { MaxJsonLength = 100000 };
-				var request = serializer.Deserialize<CheckoutRequest>(Request.Form["payload"] ?? "");
-				if (request != null) request.designFileName = "design-to-be-uploaded";
+				var serializer = new JavaScriptSerializer { MaxJsonLength = 200000 };
+				string payload = (Request.Form["payload"] ?? "").Trim();
+				List<CheckoutRequest> requests;
+				try
+				{
+					// The quotation may cover the whole cart (a JSON array) or one item (a JSON object).
+					requests = payload.StartsWith("[")
+						? serializer.Deserialize<List<CheckoutRequest>>(payload)
+						: new List<CheckoutRequest> { serializer.Deserialize<CheckoutRequest>(payload) };
+				}
+				catch (Exception) { throw new OrderValidationException("Invalid quotation request."); }
+				if (requests == null || requests.Count == 0 || requests.Count > 10)
+					throw new OrderValidationException("Add at least one item (up to 10) to get a quotation.");
 
 				// The figures are always recalculated on the server from the database prices.
-				var result = ValidateCheckout(request, ReadInventory());
-				if (!result.ok)
-					throw new OrderValidationException(String.Join(" ", result.errors));
+				var inventory = ReadInventory();
+				var quotes = new List<CheckoutQuote>();
+				for (int n = 0; n < requests.Count; n++)
+				{
+					if (requests[n] == null) throw new OrderValidationException("Invalid item " + (n + 1) + ".");
+					requests[n].designFileName = "design-to-be-uploaded";
+					var result = ValidateCheckout(requests[n], inventory);
+					if (!result.ok)
+						throw new OrderValidationException((requests.Count > 1 ? "Item " + (n + 1) + ": " : "") + String.Join(" ", result.errors));
+					quotes.Add(result.quote);
+				}
 
 				int customerId;
 				if (!Int32.TryParse(Convert.ToString(Session["customer_ID"]), out customerId) || customerId < 1)
@@ -282,7 +503,7 @@ namespace AVUNA_COLLECTIVE
 				}
 
 				string quoteNo = "Q-" + DateTime.Now.ToString("yyyyMMdd-HHmmss", CultureInfo.InvariantCulture);
-				SendQuoteEmail(to, name, quoteNo, result.quote);
+				SendQuoteEmail(to, name, quoteNo, quotes);
 				Session["QuoteEmailLast"] = DateTime.UtcNow;
 				ok = true;
 				message = "Your quotation " + quoteNo + " was sent to " + MaskEmail(to.Address) + ". Please check your inbox (and spam folder).";
@@ -330,7 +551,7 @@ namespace AVUNA_COLLECTIVE
 			return shown + "****" + address.Substring(at);
 		}
 
-		private void SendQuoteEmail(System.Net.Mail.MailAddress to, string name, string quoteNo, CheckoutQuote q)
+		private void SendQuoteEmail(System.Net.Mail.MailAddress to, string name, string quoteNo, List<CheckoutQuote> q)
 		{
 			using (var msg = new System.Net.Mail.MailMessage())
 			{
@@ -362,34 +583,39 @@ namespace AVUNA_COLLECTIVE
 			}
 		}
 
-		private static string BuildQuoteText(string name, string quoteNo, CheckoutQuote q)
+		private static string BuildQuoteText(string name, string quoteNo, List<CheckoutQuote> qs)
 		{
 			var sb = new System.Text.StringBuilder();
 			sb.AppendLine("AVUNA COLLECTIVE - QUOTATION " + quoteNo);
 			sb.AppendLine("Date: " + DateTime.Now.ToString("d MMMM yyyy", CultureInfo.InvariantCulture));
 			sb.AppendLine();
 			sb.AppendLine("Hi " + (name.Length == 0 ? "there" : name) + ", here is the quotation you requested.");
+			for (int n = 0; n < qs.Count; n++)
+			{
+				var q = qs[n];
+				sb.AppendLine();
+				sb.AppendLine((qs.Count > 1 ? "ITEM " + (n + 1) + ": " : "Item: ") + q.item);
+				sb.AppendLine("Size: " + q.size);
+				foreach (var c in q.colours)
+					sb.AppendLine("  " + c.colour + ": " + c.quantity + " x " + QuoteMoney(c.unitCents) + " = " + QuoteMoney(c.unitCents * c.quantity));
+				sb.AppendLine("Design package: " + q.package);
+				if (qs.Count > 1) sb.AppendLine("Item total: " + QuoteMoney(q.totalCents));
+			}
 			sb.AppendLine();
-			sb.AppendLine("Item: " + q.item);
-			sb.AppendLine("Size: " + q.size);
-			foreach (var c in q.colours)
-				sb.AppendLine("  " + c.colour + ": " + c.quantity + " x " + QuoteMoney(c.unitCents) + " = " + QuoteMoney(c.unitCents * c.quantity));
-			sb.AppendLine("Design package: " + q.package);
-			sb.AppendLine();
-			sb.AppendLine("Item cost: " + QuoteMoney(q.itemCostCents));
-			sb.AppendLine("Design fee (once): " + QuoteMoney(q.designFeeCents));
-			sb.AppendLine("Amount before VAT: " + QuoteMoney(q.beforeVatCents));
-			sb.AppendLine("VAT (15%): " + QuoteMoney(q.vatCents));
-			sb.AppendLine("Subtotal including VAT: " + QuoteMoney(q.subtotalCents));
-			sb.AppendLine("Markup (10% after VAT): " + QuoteMoney(q.markupCents));
-			sb.AppendLine("ESTIMATED ORDER TOTAL: " + QuoteMoney(q.totalCents));
+			sb.AppendLine("Item cost: " + QuoteMoney(qs.Sum(x => x.itemCostCents)));
+			sb.AppendLine((qs.Count > 1 ? "Design fees (once per item): " : "Design fee (once): ") + QuoteMoney(qs.Sum(x => x.designFeeCents)));
+			sb.AppendLine("Amount before VAT: " + QuoteMoney(qs.Sum(x => x.beforeVatCents)));
+			sb.AppendLine("VAT (15%): " + QuoteMoney(qs.Sum(x => x.vatCents)));
+			sb.AppendLine("Subtotal including VAT: " + QuoteMoney(qs.Sum(x => x.subtotalCents)));
+			sb.AppendLine("Markup (10% after VAT): " + QuoteMoney(qs.Sum(x => x.markupCents)));
+			sb.AppendLine((qs.Count > 1 ? "ESTIMATED TOTAL (" + qs.Count + " ITEMS): " : "ESTIMATED ORDER TOTAL: ") + QuoteMoney(qs.Sum(x => x.totalCents)));
 			sb.AppendLine();
 			sb.AppendLine("This is an estimate based on current inventory. Stock is checked again when you submit your order.");
 			sb.AppendLine("Avuna Collective, 127 Victoria Embankment, Astron Garage, Durban");
 			return sb.ToString();
 		}
 
-		private static string BuildQuoteHtml(string name, string quoteNo, CheckoutQuote q)
+		private static string BuildQuoteHtml(string name, string quoteNo, List<CheckoutQuote> qs)
 		{
 			Func<string, string> e = s => System.Net.WebUtility.HtmlEncode(s ?? "");
 			var sb = new System.Text.StringBuilder();
@@ -403,35 +629,42 @@ namespace AVUNA_COLLECTIVE
 			sb.Append("<p style=\"margin:0 0 6px;font-size:16px\">Hi " + e(name.Length == 0 ? "there" : name) + ",</p>");
 			sb.Append("<p style=\"margin:0 0 20px;color:#6b6055;font-size:14px;line-height:1.6\">Here is the quotation you requested. Quotation no. <strong>" + e(quoteNo) + "</strong> &middot; " + DateTime.Now.ToString("d MMMM yyyy", CultureInfo.InvariantCulture) + "</p>");
 
-			sb.Append("<table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" style=\"font-size:14px;margin-bottom:18px\">");
-			sb.Append(QuoteRow("Item", e(q.item), false));
-			sb.Append(QuoteRow("Size", e(q.size), false));
-			sb.Append(QuoteRow("Design package", e(q.package), false));
-			sb.Append("</table>");
-
-			sb.Append("<table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" style=\"font-size:14px;margin-bottom:18px;border:1px solid #e5dccd\">");
-			sb.Append("<tr style=\"background:#f5efe6;color:#6c736d;font-size:11px;letter-spacing:1px\"><td style=\"padding:10px 12px\">COLOUR</td><td style=\"padding:10px 12px;text-align:right\">QTY</td><td style=\"padding:10px 12px;text-align:right\">UNIT COST</td><td style=\"padding:10px 12px;text-align:right\">TOTAL</td></tr>");
-			foreach (var c in q.colours)
+			for (int n = 0; n < qs.Count; n++)
 			{
-				sb.Append("<tr><td style=\"padding:10px 12px;border-top:1px solid #e5dccd\">" + e(c.colour) + "</td>"
-					+ "<td style=\"padding:10px 12px;border-top:1px solid #e5dccd;text-align:right\">" + c.quantity + "</td>"
-					+ "<td style=\"padding:10px 12px;border-top:1px solid #e5dccd;text-align:right\">" + e(QuoteMoney(c.unitCents)) + "</td>"
-					+ "<td style=\"padding:10px 12px;border-top:1px solid #e5dccd;text-align:right\">" + e(QuoteMoney(c.unitCents * c.quantity)) + "</td></tr>");
+				var q = qs[n];
+				if (qs.Count > 1)
+					sb.Append("<div style=\"margin:6px 0 8px;color:#8a6a2f;font-size:12px;letter-spacing:1.5px;font-weight:bold\">ITEM " + (n + 1) + "</div>");
+				sb.Append("<table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" style=\"font-size:14px;margin-bottom:12px\">");
+				sb.Append(QuoteRow("Item", e(q.item), false));
+				sb.Append(QuoteRow("Size", e(q.size), false));
+				sb.Append(QuoteRow("Design package", e(q.package), false));
+				if (qs.Count > 1) sb.Append(QuoteRow("Item total", e(QuoteMoney(q.totalCents)), false));
+				sb.Append("</table>");
+
+				sb.Append("<table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" style=\"font-size:14px;margin-bottom:22px;border:1px solid #e5dccd\">");
+				sb.Append("<tr style=\"background:#f5efe6;color:#6c736d;font-size:11px;letter-spacing:1px\"><td style=\"padding:10px 12px\">COLOUR</td><td style=\"padding:10px 12px;text-align:right\">QTY</td><td style=\"padding:10px 12px;text-align:right\">UNIT COST</td><td style=\"padding:10px 12px;text-align:right\">TOTAL</td></tr>");
+				foreach (var c in q.colours)
+				{
+					sb.Append("<tr><td style=\"padding:10px 12px;border-top:1px solid #e5dccd\">" + e(c.colour) + "</td>"
+						+ "<td style=\"padding:10px 12px;border-top:1px solid #e5dccd;text-align:right\">" + c.quantity + "</td>"
+						+ "<td style=\"padding:10px 12px;border-top:1px solid #e5dccd;text-align:right\">" + e(QuoteMoney(c.unitCents)) + "</td>"
+						+ "<td style=\"padding:10px 12px;border-top:1px solid #e5dccd;text-align:right\">" + e(QuoteMoney(c.unitCents * c.quantity)) + "</td></tr>");
+				}
+				sb.Append("</table>");
 			}
-			sb.Append("</table>");
 
 			sb.Append("<table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" style=\"font-size:14px\">");
-			sb.Append(QuoteRow("Item cost", e(QuoteMoney(q.itemCostCents)), false));
-			sb.Append(QuoteRow("Design fee (once)", e(QuoteMoney(q.designFeeCents)), false));
-			sb.Append(QuoteRow("Amount before VAT", e(QuoteMoney(q.beforeVatCents)), false));
-			sb.Append(QuoteRow("VAT (15%)", e(QuoteMoney(q.vatCents)), false));
-			sb.Append(QuoteRow("Subtotal including VAT", e(QuoteMoney(q.subtotalCents)), false));
-			sb.Append(QuoteRow("Markup (10% after VAT)", e(QuoteMoney(q.markupCents)), false));
+			sb.Append(QuoteRow("Item cost", e(QuoteMoney(qs.Sum(x => x.itemCostCents))), false));
+			sb.Append(QuoteRow(qs.Count > 1 ? "Design fees (once per item)" : "Design fee (once)", e(QuoteMoney(qs.Sum(x => x.designFeeCents))), false));
+			sb.Append(QuoteRow("Amount before VAT", e(QuoteMoney(qs.Sum(x => x.beforeVatCents))), false));
+			sb.Append(QuoteRow("VAT (15%)", e(QuoteMoney(qs.Sum(x => x.vatCents))), false));
+			sb.Append(QuoteRow("Subtotal including VAT", e(QuoteMoney(qs.Sum(x => x.subtotalCents))), false));
+			sb.Append(QuoteRow("Markup (10% after VAT)", e(QuoteMoney(qs.Sum(x => x.markupCents))), false));
 			sb.Append("</table>");
 
 			sb.Append("<table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" style=\"margin-top:18px\"><tr><td style=\"background:#0f2a1f;border-radius:10px;padding:18px 20px\">");
-			sb.Append("<div style=\"color:#cfc9a0;font-size:11px;letter-spacing:1.5px\">ESTIMATED ORDER TOTAL</div>");
-			sb.Append("<div style=\"color:#8a6a35;font-size:28px;font-weight:bold;margin-top:6px\">" + e(QuoteMoney(q.totalCents)) + "</div>");
+			sb.Append("<div style=\"color:#cfc9a0;font-size:11px;letter-spacing:1.5px\">" + (qs.Count > 1 ? "ESTIMATED TOTAL (" + qs.Count + " ITEMS)" : "ESTIMATED ORDER TOTAL") + "</div>");
+			sb.Append("<div style=\"color:#8a6a35;font-size:28px;font-weight:bold;margin-top:6px\">" + e(QuoteMoney(qs.Sum(x => x.totalCents))) + "</div>");
 			sb.Append("</td></tr></table>");
 
 			sb.Append("<p style=\"margin:20px 0 0;color:#6c736d;font-size:12px;line-height:1.6\">This is an estimate based on current inventory and prices. Stock is checked again when you submit your order, so the final amount may change if stock or prices change.</p>");
@@ -607,7 +840,9 @@ namespace AVUNA_COLLECTIVE
 			if (errors.Count > 0) return new ValidationResult { ok = false, errors = errors.ToArray() };
 
 			// Official Avuna Collective formula: (items + fixed design fee) * 1.15 * 1.10
-			int colourCount = selected.Count;
+			// The design package is priced from the number of colours found in the uploaded design image.
+			// If the image could not be analysed (0), the number of garment colours is used instead.
+			int colourCount = request.designColours >= 1 ? Math.Min(request.designColours, 4) : selected.Count;
 			string package = colourCount >= 4 ? "Platinum" : colourCount == 3 ? "Gold" :
 							 colourCount == 2 ? "Silver" : "Bronze";
 			decimal fee = package == "Platinum" ? 400m : package == "Gold" ? 350m :
@@ -746,19 +981,30 @@ namespace AVUNA_COLLECTIVE
 
 		private string SaveOrder(CheckoutRequest request, HttpPostedFile file)
 		{
+			return SaveOrders(new List<CheckoutRequest> { request }, new List<HttpPostedFile> { file })[0];
+		}
+
+		// Saves one order per request inside a single transaction: all orders are saved, or none.
+		private List<string> SaveOrders(List<CheckoutRequest> requests, List<HttpPostedFile> files)
+		{
 			int customerId;
 			if (!Int32.TryParse(Convert.ToString(Session["customer_ID"]), out customerId) || customerId < 1)
 				throw new OrderValidationException("Please sign in again before submitting an order.");
 
-			byte[] photo;
-			using (var ms = new MemoryStream())
+			var photos = new List<byte[]>();
+			foreach (HttpPostedFile file in files)
 			{
-				if (file.InputStream.CanSeek) file.InputStream.Position = 0;
-				file.InputStream.CopyTo(ms);
-				photo = ms.ToArray();
+				byte[] photo;
+				using (var ms = new MemoryStream())
+				{
+					if (file.InputStream.CanSeek) file.InputStream.Position = 0;
+					file.InputStream.CopyTo(ms);
+					photo = ms.ToArray();
+				}
+				if (photo.Length < 1 || photo.Length > 5 * 1024 * 1024)
+					throw new OrderValidationException("The design image must be smaller than 5 MB.");
+				photos.Add(photo);
 			}
-			if (photo.Length < 1 || photo.Length > 5 * 1024 * 1024)
-				throw new OrderValidationException("The design image must be smaller than 5 MB.");
 
 			string connection = ConfigurationManager.ConnectionStrings["GroupWst2"].ConnectionString;
 			using (var con = new SqlConnection(connection))
@@ -787,134 +1033,42 @@ namespace AVUNA_COLLECTIVE
 								throw new OrderValidationException("Customer account was not found. Please sign in again.");
 						}
 
-						// Re-read inventory with locks immediately before inserting the order.
-						var variants = ReadInventory(con, tx, true);
-						ValidationResult result = ValidateCheckout(request, variants);
-						if (!result.ok)
-							throw new OrderValidationException(String.Join(" ", result.errors));
-
-						if (request.item.Length > 50 || request.size.Length > 50 ||
-							result.quote.colours.Any(c => c.colour.Length > 50))
-							throw new OrderValidationException("An item, size or colour name exceeds the database limit.");
-						var lines = new List<OrderLine>();
-						foreach (var selected in result.quote.colours)
-						{
-							int remaining = selected.quantity;
-							var matching = variants.Where(v =>
-								String.Equals(v.item, request.item, StringComparison.OrdinalIgnoreCase) &&
-								String.Equals(v.size, request.size, StringComparison.OrdinalIgnoreCase) &&
-								String.Equals(v.colour, selected.colour, StringComparison.OrdinalIgnoreCase))
-								.OrderBy(v => v.id);
-							foreach (var variant in matching)
-							{
-								if (remaining == 0) break;
-								int take = Math.Min(remaining, variant.stock);
-								lines.Add(new OrderLine
-								{
-									VariantId = variant.id,
-									Colour = selected.colour,
-									Quantity = take,
-									UnitCents = variant.unitCents,
-									BeforeTaxCents = checked(take * variant.unitCents)
-								});
-								remaining -= take;
-							}
-							if (remaining != 0)
-								throw new OrderValidationException("Available stock changed. Please review your order.");
-						}
-						if (lines.Count == 0) throw new OrderValidationException("Choose at least one item.");
-
-						// Charge the design package once. Allocate final tax-inclusive
-						// total across the item rows, with any rounding remainder on last row.
-						lines[0].BeforeTaxCents = checked(lines[0].BeforeTaxCents + result.quote.designFeeCents);
-						int sumBefore = lines.Sum(l => l.BeforeTaxCents);
-						if (sumBefore <= 0 || sumBefore != result.quote.beforeVatCents)
-							throw new InvalidOperationException("Order subtotal validation failed.");
-						int allocated = 0;
-						for (int i = 0; i < lines.Count; i++)
-						{
-							int amount = i == lines.Count - 1
-								? result.quote.totalCents - allocated
-								: checked((int)Math.Round(
-									(decimal)result.quote.totalCents * lines[i].BeforeTaxCents / sumBefore,
-									0, MidpointRounding.AwayFromZero));
-							lines[i].FinalCents = amount;
-							allocated = checked(allocated + amount);
-						}
-						if (allocated != result.quote.totalCents)
-							throw new InvalidOperationException("Order total does not balance.");
-
+						// ONE order ID for the whole cart. Each cart item becomes its own design and its own
+						// OrderItem rows (one per colour), so MyOrders shows every item as a separate line.
 						string orderId = NextId(con, tx, "Order", "order_ID", "ORD", 3);
-						string designId = NextId(con, tx, "Design", "design_ID", "DES", 3);
-						string fileId = NextId(con, tx, "DesignFile", "designFile_ID", "DFID", 3);
-						string itemId = NextId(con, tx, "OrderItem", "orderItem_ID", "ORDIT", 3);
-						int nextItemNumber = Int32.Parse(itemId.Substring("ORDIT".Length), CultureInfo.InvariantCulture);
-
-						string description = Path.GetFileName(file.FileName);
-						if (String.IsNullOrWhiteSpace(description)) description = "Customer uploaded design";
-						if (description.Length > 100) description = description.Substring(0, 100);
-
-						Execute(con, tx, @"INSERT INTO dbo.DesignFile
-                            (designFile_ID, design_Description, design_Photo)
-                            VALUES (@id, @description, @photo)", cmd =>
-						{
-							AddText(cmd, "@id", fileId, 50);
-							AddText(cmd, "@description", description, 100);
-							cmd.Parameters.Add("@photo", SqlDbType.Image).Value = photo;
-						});
-
-						Execute(con, tx, @"INSERT INTO dbo.Design
-                            (design_ID, design_Type, upload_Date, design_Fee, customer_ID)
-                            VALUES (@id,@type,@date,@fee,@customer)", cmd =>
-						{
-							AddText(cmd, "@id", designId, 50);
-							AddText(cmd, "@type", result.quote.package, 50);
-							cmd.Parameters.Add("@date", SqlDbType.Date).Value = DateTime.Today;
-							AddMoney(cmd, "@fee", result.quote.designFeeCents / 100m);
-							cmd.Parameters.Add("@customer", SqlDbType.Int).Value = customerId;
-						});
-
 						Execute(con, tx, @"INSERT INTO dbo.[Order]
                             (order_ID, order_Date, order_TotalCost, order_Status, customer_ID)
-                            VALUES (@id,@date,@total,'Pending',@customer)", cmd =>
+                            VALUES (@id,@date,0,'Pending',@customer)", cmd =>
 						{
 							AddText(cmd, "@id", orderId, 50);
 							cmd.Parameters.Add("@date", SqlDbType.Date).Value = DateTime.Today;
-							AddMoney(cmd, "@total", result.quote.totalCents / 100m);
 							cmd.Parameters.Add("@customer", SqlDbType.Int).Value = customerId;
 						});
 
-						for (int i = 0; i < lines.Count; i++)
+						int orderTotalCents = 0;
+						for (int n = 0; n < requests.Count; n++)
 						{
-							OrderLine line = lines[i];
-							string currentId = "ORDIT" + checked(nextItemNumber + i).ToString("D3", CultureInfo.InvariantCulture);
-							string detail = "Uploaded design: " + description;
-							if (detail.Length > 200) detail = detail.Substring(0, 200);
-							Execute(con, tx, @"INSERT INTO dbo.OrderItem
-                                (orderItem_ID, orderItem_Quantity, item, DesignPackage,
-                                 orderItem_Subtotal, orderItem_Description, design_ID,
-                                 order_ID, orderItem_Status, designFile_ID,
-                                 orderItem_Size, orderItem_Colour, Variant_ID)
-                                VALUES (@id,@quantity,@item,@package,@subtotal,@description,
-                                        @design,@order,'Pending',@file,@size,@colour,@variant)", cmd =>
+							try
 							{
-								AddText(cmd, "@id", currentId, 50);
-								cmd.Parameters.Add("@quantity", SqlDbType.Int).Value = line.Quantity;
-								AddText(cmd, "@item", request.item, 50);
-								AddText(cmd, "@package", result.quote.package + " - R" +
-									(result.quote.designFeeCents / 100m).ToString("0.00", CultureInfo.InvariantCulture), 50);
-								AddMoney(cmd, "@subtotal", line.FinalCents / 100m);
-								AddText(cmd, "@description", detail, 200);
-								AddText(cmd, "@design", designId, 50);
-								AddText(cmd, "@order", orderId, 50);
-								AddText(cmd, "@file", fileId, 50);
-								AddText(cmd, "@size", request.size, 50);
-								AddText(cmd, "@colour", line.Colour, 50);
-								cmd.Parameters.Add("@variant", SqlDbType.Int).Value = line.VariantId;
-							});
+								orderTotalCents = checked(orderTotalCents + InsertOneOrder(con, tx, customerId, orderId,
+									requests[n], files[n].FileName, photos[n]));
+							}
+							catch (OrderValidationException ex)
+							{
+								if (requests.Count == 1) throw;
+								throw new OrderValidationException("Cart item " + (n + 1) + " (" + requests[n].item + ", " +
+									requests[n].size + "): " + ex.Message + " None of your items were saved.");
+							}
 						}
 
-						// Exactly as agreed: Customer.order_ID points to newest order.
+						// Order total = sum of all cart items.
+						Execute(con, tx, "UPDATE dbo.[Order] SET order_TotalCost=@total WHERE order_ID=@id", cmd =>
+						{
+							AddText(cmd, "@id", orderId, 50);
+							AddMoney(cmd, "@total", orderTotalCents / 100m);
+						});
+
+						// Customer.order_ID points to the newest order.
 						Execute(con, tx,
 							"UPDATE dbo.Customer SET order_ID=@order WHERE customer_ID=@customer", cmd =>
 							{
@@ -922,12 +1076,9 @@ namespace AVUNA_COLLECTIVE
 								cmd.Parameters.Add("@customer", SqlDbType.Int).Value = customerId;
 							});
 
-						// All inserts + Customer latest-order update + BOTH stock deductions
-						// are atomic: any failure triggers the catch/rollback below.
-						DeductStockForOrder(con, tx, lines);
-
+						var ids = new List<string> { orderId };
 						tx.Commit();
-						return orderId;
+						return ids;
 					}
 					catch
 					{
@@ -936,6 +1087,133 @@ namespace AVUNA_COLLECTIVE
 					}
 				}
 			}
+		}
+
+		// Inserts ONE cart item (design, design file, order items per colour) under the shared order ID
+		// and deducts its stock, returning the item total in cents, on the caller's open connection and transaction. Stock is re-read inside the
+		// transaction, so a later cart line for the same item/size/colour sees stock already used.
+		private int InsertOneOrder(SqlConnection con, SqlTransaction tx, int customerId, string orderId,
+									  CheckoutRequest request, string uploadedFileName, byte[] photo)
+		{
+			// Re-read inventory with locks immediately before inserting the order.
+			var variants = ReadInventory(con, tx, true);
+			ValidationResult result = ValidateCheckout(request, variants);
+			if (!result.ok)
+				throw new OrderValidationException(String.Join(" ", result.errors));
+
+			if (request.item.Length > 50 || request.size.Length > 50 ||
+				result.quote.colours.Any(c => c.colour.Length > 50))
+				throw new OrderValidationException("An item, size or colour name exceeds the database limit.");
+			var lines = new List<OrderLine>();
+			foreach (var selected in result.quote.colours)
+			{
+				int remaining = selected.quantity;
+				var matching = variants.Where(v =>
+					String.Equals(v.item, request.item, StringComparison.OrdinalIgnoreCase) &&
+					String.Equals(v.size, request.size, StringComparison.OrdinalIgnoreCase) &&
+					String.Equals(v.colour, selected.colour, StringComparison.OrdinalIgnoreCase))
+					.OrderBy(v => v.id);
+				foreach (var variant in matching)
+				{
+					if (remaining == 0) break;
+					int take = Math.Min(remaining, variant.stock);
+					lines.Add(new OrderLine
+					{
+						VariantId = variant.id,
+						Colour = selected.colour,
+						Quantity = take,
+						UnitCents = variant.unitCents,
+						BeforeTaxCents = checked(take * variant.unitCents)
+					});
+					remaining -= take;
+				}
+				if (remaining != 0)
+					throw new OrderValidationException("Available stock changed. Please review your order.");
+			}
+			if (lines.Count == 0) throw new OrderValidationException("Choose at least one item.");
+
+			// Charge the design package once. Allocate final tax-inclusive
+			// total across the item rows, with any rounding remainder on last row.
+			lines[0].BeforeTaxCents = checked(lines[0].BeforeTaxCents + result.quote.designFeeCents);
+			int sumBefore = lines.Sum(l => l.BeforeTaxCents);
+			if (sumBefore <= 0 || sumBefore != result.quote.beforeVatCents)
+				throw new InvalidOperationException("Order subtotal validation failed.");
+			int allocated = 0;
+			for (int i = 0; i < lines.Count; i++)
+			{
+				int amount = i == lines.Count - 1
+					? result.quote.totalCents - allocated
+					: checked((int)Math.Round(
+						(decimal)result.quote.totalCents * lines[i].BeforeTaxCents / sumBefore,
+						0, MidpointRounding.AwayFromZero));
+				lines[i].FinalCents = amount;
+				allocated = checked(allocated + amount);
+			}
+			if (allocated != result.quote.totalCents)
+				throw new InvalidOperationException("Order total does not balance.");
+
+			string designId = NextId(con, tx, "Design", "design_ID", "DES", 3);
+			string fileId = NextId(con, tx, "DesignFile", "designFile_ID", "DFID", 3);
+			string itemId = NextId(con, tx, "OrderItem", "orderItem_ID", "ORDIT", 3);
+			int nextItemNumber = Int32.Parse(itemId.Substring("ORDIT".Length), CultureInfo.InvariantCulture);
+
+			string description = Path.GetFileName(uploadedFileName);
+			if (String.IsNullOrWhiteSpace(description)) description = "Customer uploaded design";
+			if (description.Length > 100) description = description.Substring(0, 100);
+
+			Execute(con, tx, @"INSERT INTO dbo.DesignFile
+                            (designFile_ID, design_Description, design_Photo)
+                            VALUES (@id, @description, @photo)", cmd =>
+			{
+				AddText(cmd, "@id", fileId, 50);
+				AddText(cmd, "@description", description, 100);
+				cmd.Parameters.Add("@photo", SqlDbType.Image).Value = photo;
+			});
+
+			Execute(con, tx, @"INSERT INTO dbo.Design
+                            (design_ID, design_Type, upload_Date, design_Fee, customer_ID)
+                            VALUES (@id,@type,@date,@fee,@customer)", cmd =>
+			{
+				AddText(cmd, "@id", designId, 50);
+				AddText(cmd, "@type", result.quote.package, 50);
+				cmd.Parameters.Add("@date", SqlDbType.Date).Value = DateTime.Today;
+				AddMoney(cmd, "@fee", result.quote.designFeeCents / 100m);
+				cmd.Parameters.Add("@customer", SqlDbType.Int).Value = customerId;
+			});
+
+			for (int i = 0; i < lines.Count; i++)
+			{
+				OrderLine line = lines[i];
+				string currentId = "ORDIT" + checked(nextItemNumber + i).ToString("D3", CultureInfo.InvariantCulture);
+				string detail = "Uploaded design: " + description;
+				if (detail.Length > 200) detail = detail.Substring(0, 200);
+				Execute(con, tx, @"INSERT INTO dbo.OrderItem
+                                (orderItem_ID, orderItem_Quantity, item, DesignPackage,
+                                 orderItem_Subtotal, orderItem_Description, design_ID,
+                                 order_ID, orderItem_Status, designFile_ID,
+                                 orderItem_Size, orderItem_Colour, Variant_ID)
+                                VALUES (@id,@quantity,@item,@package,@subtotal,@description,
+                                        @design,@order,'Pending',@file,@size,@colour,@variant)", cmd =>
+				{
+					AddText(cmd, "@id", currentId, 50);
+					cmd.Parameters.Add("@quantity", SqlDbType.Int).Value = line.Quantity;
+					AddText(cmd, "@item", request.item, 50);
+					AddText(cmd, "@package", result.quote.package + " - R" +
+						(result.quote.designFeeCents / 100m).ToString("0.00", CultureInfo.InvariantCulture), 50);
+					AddMoney(cmd, "@subtotal", line.FinalCents / 100m);
+					AddText(cmd, "@description", detail, 200);
+					AddText(cmd, "@design", designId, 50);
+					AddText(cmd, "@order", orderId, 50);
+					AddText(cmd, "@file", fileId, 50);
+					AddText(cmd, "@size", request.size, 50);
+					AddText(cmd, "@colour", line.Colour, 50);
+					cmd.Parameters.Add("@variant", SqlDbType.Int).Value = line.VariantId;
+				});
+			}
+
+			DeductStockForOrder(con, tx, lines);
+
+			return result.quote.totalCents;
 		}
 
 	}
